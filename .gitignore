@@ -1,0 +1,9 @@
+vendor/
+data/
+.settings/
+.project
+.buildpath
+deployment.xml
+deployment.properties
+.idea/
+tests/_output/*
