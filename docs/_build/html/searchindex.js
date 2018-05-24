@@ -1,0 +1,1 @@
+Search.setIndex({docnames:["index"],envversion:52,filenames:["index.rst"],objects:{},objnames:{},objtypes:{},terms:{construct:0,home:0,index:0,page:0,project:0,search:0,still:0,under:0},titles:["Welcome to Linux For Composer\u2019s documentation"],titleterms:{For:0,compos:0,document:0,indic:0,linux:0,tabl:0,welcom:0}})

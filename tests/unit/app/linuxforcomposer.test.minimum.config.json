@@ -1,0 +1,7 @@
+{
+    "name": "linuxforphp/linuxforcomposer",
+    "description": "A Composer interface to run 'Linux for PHP' Docker containers.",
+    "php-versions": [
+        "5.6.35"
+    ]
+}
