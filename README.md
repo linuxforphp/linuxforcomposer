@@ -3,7 +3,7 @@
 
 https://linuxforphp.net
 
-Composer package that runs Linux for PHP containers.
+Composer package that helps to easily configure and run Linux for PHP containers for any PHP project.
 
 [![Build Status](https://travis-ci.org/linuxforphp/linuxforcomposer.svg?branch=master)](https://travis-ci.org/linuxforphp/linuxforcomposer)
 [![Coverage Status](https://linuxforphp.net/download_file/force/37/210)](https://github.com/linuxforphp/linuxforcomposer)
