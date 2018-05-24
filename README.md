@@ -6,7 +6,7 @@ https://linuxforphp.net
 Composer package that runs Linux for PHP containers.
 
 [![Build Status](https://travis-ci.org/linuxforphp/linuxforcomposer.svg?branch=master)](https://travis-ci.org/linuxforphp/linuxforcomposer)
-[![Coverage Status](docs/images/code_coverage.svg)](https://github.com/linuxforphp/linuxforcomposer)
+[![Coverage Status](https://linuxforphp.net/download_file/force/37/210)](https://github.com/linuxforphp/linuxforcomposer)
 [![Documentation Status](https://readthedocs.org/projects/linux-for-composer/badge/?version=latest)](https://linux-for-composer.readthedocs.io/en/latest/?badge=latest)
 [![PDS Skeleton](https://img.shields.io/badge/pds-skeleton-blue.svg?style=flat-square)](https://github.com/php-pds/skeleton)
 
