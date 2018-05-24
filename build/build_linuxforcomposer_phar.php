@@ -39,6 +39,7 @@ $exclude = [
     PHARFILE,
     'bin',
     'build',
+    'data',
     'docs',
     'docs-api',
     'tests',
