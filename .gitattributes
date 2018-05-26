@@ -53,3 +53,7 @@ lib export-ignore
 tests export-ignore
 # vendor
 vendor export-ignore
+# source files
+src export-ignore
+# main source file
+app.php export-ignore
