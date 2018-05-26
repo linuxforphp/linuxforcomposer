@@ -4,7 +4,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2010 - 2018 A. Caya <andrewscaya@yahoo.ca>
- * Version 0.9.8
+ * Version 0.9.9
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
