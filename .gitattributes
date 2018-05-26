@@ -11,8 +11,6 @@
 composer.* export-ignore
 # travis file
 .travis.yml export-ignore
-# codeclimate file
-.codeclimate.yml export-ignore
 # phpunit files
 phpunit.* export-ignore
 # CodeSniffer files
