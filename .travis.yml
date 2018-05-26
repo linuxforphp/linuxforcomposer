@@ -37,6 +37,7 @@ matrix:
 before_install:
   - travis_retry composer self-update
   - if [[ -z "$TEST_CHECK_COVER" ]]; then phpenv config-rm xdebug.ini || return 0 ; fi
+  - mv composer.json composer.json.dist && mv composer.json.dev composer.json
     
 install:
   - travis_retry composer install --no-interaction
