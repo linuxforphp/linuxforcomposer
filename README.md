@@ -17,7 +17,7 @@ composer require linuxforphp/linuxforcomposer
 
 Once the dependencies are installed, you can create the linuxforcomposer.json file using:
 ```bash
-php vendor/bin/linuxforcomposer.phar docker:run start
+vendor/bin/linuxforcomposer.phar docker:run start
 ```
 
 Just enter the previous command again to run the Linux for PHP containers that you have configured in the JSON file.
