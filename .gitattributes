@@ -11,8 +11,6 @@
 composer.* export-ignore
 # travis file
 .travis.yml export-ignore
-# codeclimate file
-.codeclimate.yml export-ignore
 # phpunit files
 phpunit.* export-ignore
 # CodeSniffer files
@@ -43,6 +41,8 @@ MAINTAINERS.txt export-ignore
 INSTALL*.txt export-ignore
 # build scripts
 build export-ignore
+# data
+data export-ignore
 # docs
 docs export-ignore
 # docs-api
@@ -53,3 +53,7 @@ lib export-ignore
 tests export-ignore
 # vendor
 vendor export-ignore
+# source files
+src export-ignore
+# main source file
+app.php export-ignore

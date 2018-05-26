@@ -3,10 +3,10 @@
 
 https://linuxforphp.net
 
-Composer package that runs Linux for PHP containers.
+Composer package that helps to easily configure and run Linux for PHP containers for any PHP project.
 
 [![Build Status](https://travis-ci.org/linuxforphp/linuxforcomposer.svg?branch=master)](https://travis-ci.org/linuxforphp/linuxforcomposer)
-[![Coverage Status](docs/images/code_coverage.svg)](https://github.com/linuxforphp/linuxforcomposer)
+[![Coverage Status](https://linuxforphp.net/download_file/force/37/210)](https://github.com/linuxforphp/linuxforcomposer)
 [![Documentation Status](https://readthedocs.org/projects/linux-for-composer/badge/?version=latest)](https://linux-for-composer.readthedocs.io/en/latest/?badge=latest)
 [![PDS Skeleton](https://img.shields.io/badge/pds-skeleton-blue.svg?style=flat-square)](https://github.com/php-pds/skeleton)
 
@@ -17,7 +17,7 @@ composer require linuxforphp/linuxforcomposer
 
 Once the dependencies are installed, you can create the linuxforcomposer.json file using:
 ```bash
-php vendor/bin/linuxforcomposer.phar docker:run start
+vendor/bin/linuxforcomposer.phar docker:run start
 ```
 
 Just enter the previous command again to run the Linux for PHP containers that you have configured in the JSON file.

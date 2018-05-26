@@ -4,7 +4,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2010 - 2018 A. Caya <andrewscaya@yahoo.ca>
- * Version 0.9.8
+ * Version 0.9.9
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ class DockerManageCommand extends Command
     const PHPDEFAULTVERSION = 'master';
 
     protected $phpCurrentVersions = array(
+        '7.3.0dev',
         '7.2.5',
         '7.1.16',
         '7.0.29',
