@@ -41,6 +41,8 @@ MAINTAINERS.txt export-ignore
 INSTALL*.txt export-ignore
 # build scripts
 build export-ignore
+# data
+data export-ignore
 # docs
 docs export-ignore
 # docs-api
