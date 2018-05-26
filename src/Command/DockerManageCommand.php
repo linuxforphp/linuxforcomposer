@@ -45,6 +45,7 @@ class DockerManageCommand extends Command
     const PHPDEFAULTVERSION = 'master';
 
     protected $phpCurrentVersions = array(
+        '7.3.0dev',
         '7.2.5',
         '7.1.16',
         '7.0.29',
