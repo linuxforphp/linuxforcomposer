@@ -202,7 +202,15 @@ class DockerManageCommand extends Command
 
         $script = ($input->getOption('script')) ?: 'lfphp';
 
-        $dockerRunCommand .= $this->checkImage($phpversionFull, $threadsafe, $script);
+        if (strpos($phpversionFull, 'custom') !== false) {
+            $dockerRunCommand .= ' '
+                . DockerManageCommand::LFPHPDEFAULTVERSION
+                . ':' . $phpversionFull
+                . ' '
+                . $script;
+        } else {
+            $dockerRunCommand .= $this->checkImage($phpversionFull, $threadsafe, $script);
+        }
 
         return $dockerRunCommand;
     }

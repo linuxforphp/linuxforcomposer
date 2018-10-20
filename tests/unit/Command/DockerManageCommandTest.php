@@ -367,6 +367,39 @@ class DockerManageCommandTest extends KernelTestCase
             . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test asclinux/linuxforphp-8.1:7.2.5-nts lfphp',
             $output
         );
+
+        $arguments = array(
+            'command' => 'docker:run',
+            'interactive' => true,
+            'tty'  => true,
+            'detached'  => true,
+            'phpversion' => '7.2.5-custom',
+            'threadsafe' => 'nts',
+            'port' => array(
+                '8181:80',
+                '3306:3306',
+            ),
+            'volume' => array(
+                '${PWD}/:/srv/www',
+                '${PWD}/:/srv/test',
+            ),
+            'script' => 'lfphp',
+            'execute' => 'run',
+        );
+
+        $arrayInputFake = new InputMock();
+        $arrayInputFake->setArguments($arguments);
+
+        $output = $commandMethods['formatInput']->invokeArgs(
+            $dockerManageCommandFake,
+            array($arrayInputFake)
+        );
+
+        $this->assertSame(
+            'docker run --restart=always -i -t -d -p 8181:80 -p 3306:3306 '
+            . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test asclinux/linuxforphp-8.1:7.2.5-custom-nts lfphp',
+            $output
+        );
     }
 
     public function testExecuteWithRunCommand()
