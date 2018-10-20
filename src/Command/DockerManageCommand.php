@@ -44,14 +44,6 @@ class DockerManageCommand extends Command
 
     const PHPDEFAULTVERSION = 'master';
 
-    protected $phpCurrentVersions = array(
-        '7.3.0dev',
-        '7.2.5',
-        '7.1.16',
-        '7.0.29',
-        '5.6.35',
-    );
-
     protected static $defaultName = 'docker:manage';
 
     public function __construct()
@@ -93,15 +85,17 @@ class DockerManageCommand extends Command
 
         $dockerPullCommand = 'docker pull ' . DockerManageCommand::LFPHPDEFAULTVERSION . ':' . $phpversionFull;
 
+        $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprv');
+
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                 $dockerPullCommand = 'start /wait PowerShell -Command "'
                     . $dockerPullCommand
-                    . '"';
+                    . ' ; $LASTEXITCODE | Out-File ' . $temp_filename . ' -encoding ASCII"';
             } else {
                 $dockerPullCommand = 'start /wait bash -c "'
                     . $dockerPullCommand
-                    .'"';
+                    . ' ; echo $? > ' . $temp_filename . '"';
             }
         }
 
@@ -129,7 +123,11 @@ class DockerManageCommand extends Command
             echo $processStderr . PHP_EOL;
         }
 
-        $checkLocalExitCode = $checkImage->getExitCode();
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $checkLocalExitCode = (int) trim(file_get_contents($temp_filename));
+        } else {
+            $checkLocalExitCode = (int) trim($checkImage->getExitCode());
+        }
 
         echo 'Done!' . PHP_EOL . PHP_EOL;
 
@@ -139,11 +137,10 @@ class DockerManageCommand extends Command
 
         $phpversion = $phpversionFullArray[0];
 
-        // The use of in_array() is a Windows workaround
-        if ($checkLocalExitCode === 1 || !in_array($phpversion, $this->phpCurrentVersions)) {
+        if ($checkLocalExitCode !== 0) {
             $imageString .= ' ' . DockerManageCommand::LFPHPDEFAULTVERSION . ':src ';
             $imageString .=
-                '/bin/bash -c \'cd ; wget -O tmp http://bit.ly/2jheBrr ; /bin/bash ./tmp '
+                '/bin/bash -c \'lfphp-compile '
                 . $phpversion . ' ' . $threadsafe
                 . ' ; '. $script .'\'';
         } else {
@@ -216,18 +213,24 @@ class DockerManageCommand extends Command
             case 'run':
                 $dockerRunCommand = $this->formatInput($input);
 
+                $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprv');
+
                 echo 'Starting container...' . PHP_EOL;
 
                 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                     if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
-                        $dockerRunCommand = 'start /wait PowerShell -Command "'
+                        $dockerRunCommand = 'start /wait PowerShell -Command "$Env:AppReturnValue =  & '
                             . $dockerRunCommand
-                            . '"';
+                            . ' ; $Env:AppReturnValue | Out-File ' . $temp_filename . ' -encoding ASCII"';
                     } else {
                         $dockerRunCommand = 'start /wait bash -i -c "'
                             . $dockerRunCommand
-                            . '"';
+                            . ' > ' . $temp_filename . '"';
                     }
+                } else {
+                    $dockerRunCommand = 'bash & '
+                        . $dockerRunCommand
+                        . ' > ' . $temp_filename;
                 }
 
                 $process = new Process($dockerRunCommand);
@@ -256,7 +259,7 @@ class DockerManageCommand extends Command
 
                 // executes after the command finishes
                 if ($process->isSuccessful()) {
-                    $processPID = new Process('docker ps -l -q');
+                    /*$processPID = new Process('docker ps -l -q');
 
                     $processPID->setTimeout(null);
 
@@ -264,9 +267,11 @@ class DockerManageCommand extends Command
 
                     $processPID->wait();
 
-                    $pid = $processPID->getOutput();
+                    $pid = $processPID->getOutput();*/
 
                     //throw new ProcessFailedException($process);
+
+                    $pid = trim(file_get_contents($temp_filename));
 
                     file_put_contents(
                         VENDORFOLDERPID
@@ -274,7 +279,7 @@ class DockerManageCommand extends Command
                         . 'composer'
                         . DIRECTORY_SEPARATOR
                         . 'linuxforcomposer.pid',
-                        $pid,
+                        $pid . PHP_EOL,
                         FILE_APPEND
                     );
                 }
@@ -314,10 +319,12 @@ class DockerManageCommand extends Command
                     }
 
                     if (!empty($pids)) {
-                        foreach ($pids as $key => $pid) {
-                            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                                echo 'Stopping containers...' . PHP_EOL;
+                        echo 'Stopping containers...' . PHP_EOL;
 
+                        foreach ($pids as $key => $pid) {
+                            $pid = substr(trim($pid), 0, 12);
+
+                            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                                 if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                                     $dockerStopCommand = 'docker stop ' . $pid;
                                     $dockerStopCommand = 'PowerShell -Command "'
@@ -334,8 +341,6 @@ class DockerManageCommand extends Command
                                         . '"';
                                 }
                             } else {
-                                echo 'Stopping container...' . PHP_EOL;
-
                                 $dockerStopCommand = 'docker stop ' . $pid . ' && docker rm ' . $pid;
                             }
 

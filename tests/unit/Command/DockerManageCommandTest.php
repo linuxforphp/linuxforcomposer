@@ -239,7 +239,7 @@ class DockerManageCommandTest extends KernelTestCase
 
         $this->assertSame(
             ' asclinux/linuxforphp-8.1:src '
-            . '/bin/bash -c \'cd ; wget -O tmp http://bit.ly/2jheBrr ; /bin/bash ./tmp 7.3.5 nts ; lfphp\'',
+            . '/bin/bash -c \'lfphp-compile 7.3.5 nts ; lfphp\'',
             $output
         );
 
@@ -551,7 +551,7 @@ class DockerManageCommandTest extends KernelTestCase
         ));
 
         $this->assertSame(
-            'Stopping container...' . PHP_EOL,
+            'Stopping containers...' . PHP_EOL,
             $this->getActualOutput()
         );
     }
@@ -608,7 +608,7 @@ class DockerManageCommandTest extends KernelTestCase
         ));
 
         $this->assertSame(
-            'Stopping container...'
+            'Stopping containers...'
             . PHP_EOL
             . 'Fake containers stopped and removed!'
             . PHP_EOL
