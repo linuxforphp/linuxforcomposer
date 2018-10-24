@@ -91,11 +91,15 @@ class DockerManageCommand extends Command
             if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                 $dockerPullCommand = 'start /wait PowerShell -Command "'
                     . $dockerPullCommand
-                    . ' ; $LASTEXITCODE | Out-File ' . $temp_filename . ' -encoding ASCII"';
+                    . ' ; $LASTEXITCODE | Out-File '
+                    . $temp_filename
+                    . ' -encoding ASCII"';
             } else {
                 $dockerPullCommand = 'start /wait bash -c "'
                     . $dockerPullCommand
-                    . ' ; echo $? > ' . $temp_filename . '"';
+                    . ' ; echo $? > '
+                    . $temp_filename
+                    . '"';
             }
         }
 
@@ -225,20 +229,39 @@ class DockerManageCommand extends Command
 
                 echo 'Starting container...' . PHP_EOL;
 
-                if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                    if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
-                        $dockerRunCommand = 'start /wait PowerShell -Command "$Env:AppReturnValue =  & '
-                            . $dockerRunCommand
-                            . ' ; $Env:AppReturnValue | Out-File ' . $temp_filename . ' -encoding ASCII"';
+                if ($input->getOption('detached') !== false) {
+                    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                        if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                            $dockerRunCommand = 'start /wait PowerShell -Command "$Env:AppReturnValue =  & '
+                                . $dockerRunCommand
+                                . ' ; $Env:AppReturnValue | Out-File '
+                                . $temp_filename
+                                . ' -encoding ASCII"';
+                        } else {
+                            $dockerRunCommand = 'start /wait bash -i -c "'
+                                . $dockerRunCommand
+                                . ' > '
+                                . $temp_filename
+                                . '"';
+                        }
                     } else {
-                        $dockerRunCommand = 'start /wait bash -i -c "'
+                        $dockerRunCommand = '/bin/bash & '
                             . $dockerRunCommand
-                            . ' > ' . $temp_filename . '"';
+                            . ' > '
+                            . $temp_filename;
                     }
                 } else {
-                    $dockerRunCommand = 'bash & '
-                        . $dockerRunCommand
-                        . ' > ' . $temp_filename;
+                    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                        if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                            $dockerRunCommand = 'start /wait PowerShell -Command "'
+                                . $dockerRunCommand
+                                . '"';
+                        } else {
+                            $dockerRunCommand = 'start /wait bash -i -c "'
+                                . $dockerRunCommand
+                                . '"';
+                        }
+                    }
                 }
 
                 $process = new Process($dockerRunCommand);
