@@ -290,19 +290,15 @@ class DockerManageCommand extends Command
 
                 // executes after the command finishes
                 if ($process->isSuccessful()) {
-                    /*$processPID = new Process('docker ps -l -q');
-
-                    $processPID->setTimeout(null);
-
-                    $processPID->start();
-
-                    $processPID->wait();
-
-                    $pid = $processPID->getOutput();*/
-
-                    //throw new ProcessFailedException($process);
-
-                    $pid = trim(file_get_contents($temp_filename));
+                    if ($input->getOption('detached') !== false) {
+                        $pid = trim(file_get_contents($temp_filename));
+                    } else {
+                        $processPID = new Process('docker ps -l -q');
+                        $processPID->setTimeout(null);
+                        $processPID->start();
+                        $processPID->wait();
+                        $pid = trim($processPID->getOutput());
+                    }
 
                     file_put_contents(
                         VENDORFOLDERPID
@@ -314,6 +310,8 @@ class DockerManageCommand extends Command
                         FILE_APPEND
                     );
                 }
+
+                //throw new ProcessFailedException($process);
 
                 break;
 
