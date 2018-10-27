@@ -45,7 +45,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Linux for Composer'
-copyright = '2018, Andrew Caya'
+copyright = '2018, Foreach Code Factory'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -198,7 +198,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   ('index', 'LinuxForComposer.tex', 'Linux For Composer Documentation',
-   'Andrew Caya', 'manual'),
+   'Foreach Code Factory', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -228,7 +228,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'linuxforcomposer', 'Linux For Composer Documentation',
-     ['Andrew Caya'], 1)
+     ['Foreach Code Factory'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -242,7 +242,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'LinuxForComposer', 'Linux For Composer Documentation',
-   'Andrew Caya', 'LinuxForComposer', 'Run any PHP, anywhere, anytime using Composer!',
+   'Foreach Code Factory', 'LinuxForComposer', 'Run any PHP, anywhere, anytime using Composer!',
    'Miscellaneous'),
 ]
 

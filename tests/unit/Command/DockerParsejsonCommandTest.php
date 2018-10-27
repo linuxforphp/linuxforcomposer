@@ -3,7 +3,7 @@
 /**
  * Linux for PHP/Linux for Composer
  *
- * Copyright 2010 - 2018 A. Caya <andrewscaya@yahoo.ca>
+ * Copyright 2010 - 2018 Foreach Code Factory <lfphp@asclinux.net>
  * Version 1.0.0-dev
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@
  * limitations under the License.
  *
  * @package    Linux for PHP/Linux for Composer
- * @copyright  Copyright 2010 - 2018 A. Caya <andrewscaya@yahoo.ca>
+ * @copyright  Copyright 2010 - 2018 Foreach Code Factory <lfphp@asclinux.net>
  * @link       http://linuxforphp.net/
  * @license    Apache License, Version 2.0, see above
  * @license    http://www.apache.org/licenses/LICENSE-2.0
