@@ -37,12 +37,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Linuxforcomposer\\": "src"
+      "Linuxforcomposer\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "LinuxforcomposerTest\\": "tests/unit"
+      "LinuxforcomposerTest\\": "tests/unit/"
     }
   },
   "scripts": {
