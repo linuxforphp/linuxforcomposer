@@ -576,6 +576,7 @@ class DockerManageCommandTest extends KernelTestCase
 
         $command = $application->find('docker:manage');
         $commandTester = new CommandTester($command);
+        $commandTester->setInputs(array('n'));
         $commandTester->execute(array(
             'command'  => $command->getName(),
             'execute'  => 'stop',
@@ -633,6 +634,7 @@ class DockerManageCommandTest extends KernelTestCase
 
         $command = $application->find('docker:manage');
         $commandTester = new CommandTester($command);
+        $commandTester->setInputs(array('n'));
         $commandTester->execute(array(
             'command'  => $command->getName(),
             'execute'  => 'stop',

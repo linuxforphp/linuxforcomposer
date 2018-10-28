@@ -33,8 +33,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class DockerManageCommand extends Command
 {
@@ -337,66 +339,55 @@ class DockerManageCommand extends Command
                         . 'linuxforcomposer.pid'
                     );
 
-                    $pids = explode(PHP_EOL, $fileContents);
+                    if (empty(trim($fileContents))) {
+                        echo PHP_EOL . 'PID file was empty!' . PHP_EOL . PHP_EOL;
+                    } else {
+                        $pids = explode(PHP_EOL, $fileContents);
 
-                    foreach ($pids as $key => $value) {
-                        if (empty($value)) {
-                            unset($pids[$key]);
-                        }
-                    }
+                        $position = 0;
 
-                    if (!empty($pids)) {
-                        echo 'Stopping containers...' . PHP_EOL;
+                        foreach ($pids as $key => $value) {
+                            if (empty($value)) {
+                                unset($pids[$key]);
 
-                        foreach ($pids as $key => $pid) {
-                            $pid = substr(trim($pid), 0, 12);
+                                break;
+                            }
 
-                            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                                if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
-                                    $dockerStopCommand = 'docker stop ' . $pid;
-                                    $dockerStopCommand = 'PowerShell -Command "'
-                                        . $dockerStopCommand
-                                        . '"';
-                                    $dockerStopCommand2 = 'docker rm ' . $pid;
-                                    $dockerStopCommand2 = 'PowerShell -Command "'
-                                        . $dockerStopCommand2
-                                        . '"';
+                            $subvalue = substr($value, 0, 12);
+                            $helper1 = $this->getHelper('question');
+                            $question1 = new ConfirmationQuestion(
+                                'Commit container '
+                                . $subvalue
+                                . '? (y/N)',
+                                false
+                            );
+
+                            if ($helper1->ask($input, $output, $question1)) {
+                                $helper2 = $this->getHelper('question');
+                                $question2 = new Question(
+                                    'Please enter the name of the new commit: ',
+                                    'test' . sha1(microtime())
+                                );
+
+                                $name = $helper2->ask($input, $output, $question2);
+
+                                $helper3 = $this->getHelper('question');
+                                $question3 = new ConfirmationQuestion(
+                                    'Save to linuxforcomposer.json file? (y/N)',
+                                    false
+                                );
+
+                                if ($helper3->ask($input, $output, $question3)) {
+                                    $dockerCommitCommand = 'php '
+                                        . PHARFILENAME
+                                        . ' docker:commit ' . $value . ' ' . $name . ' -s ' . $position;
                                 } else {
-                                    $dockerStopCommand = 'docker stop ' . $pid . '&& docker rm ' . $pid;
-                                    $dockerStopCommand = 'bash -c "'
-                                        . $dockerStopCommand
-                                        . '"';
+                                    $dockerCommitCommand = 'php '
+                                        . PHARFILENAME
+                                        . ' docker:commit ' . $value . ' ' . $name;
                                 }
-                            } else {
-                                $dockerStopCommand = 'docker stop ' . $pid . ' && docker rm ' . $pid;
-                            }
 
-                            $process = new Process($dockerStopCommand);
-
-                            $process->setTimeout(null);
-
-                            if (strtoupper((substr(PHP_OS, 0, 3))) !== 'WIN') {
-                                $process->setTty(true);
-                            }
-
-                            $process->start();
-
-                            $process->wait();
-
-                            $processStdout = $process->getOutput();
-
-                            $processStderr = $process->getErrorOutput();
-
-                            if (!empty($processStdout)) {
-                                echo $processStdout . PHP_EOL;
-                            }
-
-                            if (!empty($processStderr)) {
-                                echo $processStderr . PHP_EOL;
-                            }
-
-                            if (isset($dockerStopCommand2)) {
-                                $process = new Process($dockerStopCommand2);
+                                $process = new Process($dockerCommitCommand);
 
                                 $process->setTimeout(null);
 
@@ -420,9 +411,87 @@ class DockerManageCommand extends Command
                                     echo $processStderr . PHP_EOL;
                                 }
                             }
+
+                            $position++;
                         }
-                    } else {
-                        echo PHP_EOL . 'PID file was empty!' . PHP_EOL . PHP_EOL;
+
+                        if (!empty($pids)) {
+                            echo 'Stopping containers...' . PHP_EOL;
+
+                            foreach ($pids as $key => $pid) {
+                                $pid = substr(trim($pid), 0, 12);
+
+                                if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                                    if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                                        $dockerStopCommand = 'docker stop ' . $pid;
+                                        $dockerStopCommand = 'PowerShell -Command "'
+                                            . $dockerStopCommand
+                                            . '"';
+                                        $dockerStopCommand2 = 'docker rm ' . $pid;
+                                        $dockerStopCommand2 = 'PowerShell -Command "'
+                                            . $dockerStopCommand2
+                                            . '"';
+                                    } else {
+                                        $dockerStopCommand = 'docker stop ' . $pid . '&& docker rm ' . $pid;
+                                        $dockerStopCommand = 'bash -c "'
+                                            . $dockerStopCommand
+                                            . '"';
+                                    }
+                                } else {
+                                    $dockerStopCommand = 'docker stop ' . $pid . ' && docker rm ' . $pid;
+                                }
+
+                                $process = new Process($dockerStopCommand);
+
+                                $process->setTimeout(null);
+
+                                if (strtoupper((substr(PHP_OS, 0, 3))) !== 'WIN') {
+                                    $process->setTty(true);
+                                }
+
+                                $process->start();
+
+                                $process->wait();
+
+                                $processStdout = $process->getOutput();
+
+                                $processStderr = $process->getErrorOutput();
+
+                                if (!empty($processStdout)) {
+                                    echo $processStdout . PHP_EOL;
+                                }
+
+                                if (!empty($processStderr)) {
+                                    echo $processStderr . PHP_EOL;
+                                }
+
+                                if (isset($dockerStopCommand2)) {
+                                    $process = new Process($dockerStopCommand2);
+
+                                    $process->setTimeout(null);
+
+                                    if (strtoupper((substr(PHP_OS, 0, 3))) !== 'WIN') {
+                                        $process->setTty(true);
+                                    }
+
+                                    $process->start();
+
+                                    $process->wait();
+
+                                    $processStdout = $process->getOutput();
+
+                                    $processStderr = $process->getErrorOutput();
+
+                                    if (!empty($processStdout)) {
+                                        echo $processStdout . PHP_EOL;
+                                    }
+
+                                    if (!empty($processStderr)) {
+                                        echo $processStderr . PHP_EOL;
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     unlink(

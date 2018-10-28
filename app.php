@@ -111,8 +111,9 @@ require VENDORFOLDER
     .'autoload.php';
 
 use Symfony\Component\Console\Application;
-use Linuxforcomposer\Command\DockerManageCommand;
 use Linuxforcomposer\Command\DockerParsejsonCommand;
+use Linuxforcomposer\Command\DockerManageCommand;
+use Linuxforcomposer\Command\DockerCommitCommand;
 use Linuxforcomposer\Command\DockerRunCommand;
 
 if (!file_exists(JSONFILE)) {
@@ -156,6 +157,8 @@ $application = new Application();
 $application->add(new DockerParsejsonCommand());
 
 $application->add(new DockerManageCommand());
+
+$application->add(new DockerCommitCommand());
 
 $dockerRunner = new DockerRunCommand();
 
