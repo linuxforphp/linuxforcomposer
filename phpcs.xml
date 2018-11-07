@@ -22,12 +22,12 @@
     </rule>
     
     <!-- Lines can be 200 chars long and never show errors -->
-    <!-- <rule ref="Generic.Files.LineLength">
+    <rule ref="Generic.Files.LineLength">
         <properties>
-            <property name="lineLimit" value="200"/>
+            <property name="lineLimit" value="225"/>
             <property name="absoluteLineLimit" value="0"/>
         </properties>
-    </rule> -->
+    </rule>
     
     <!-- Allow long array syntax (PHP 5.3) -->
     <rule ref="Generic.Arrays.DisallowLongArraySyntax.Found">

@@ -33,13 +33,15 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
+use Linuxforcomposer\Helper\LinuxForComposerProcess;
 
 class DockerCommitCommand extends Command
 {
     const LFPHPDEFAULTVERSION = DockerManageCommand::LFPHPDEFAULTVERSION;
 
     protected static $defaultName = 'docker:commit';
+
+    protected $dockerCommitCommand = 'docker commit ';
 
     public function __construct()
     {
@@ -75,6 +77,16 @@ class DockerCommitCommand extends Command
 
         $fileContentsArray = json_decode($fileContentsJson, true);
 
+        if ($fileContentsArray === null) {
+            echo "WARNING: The linuxforcomposer.json file is empty or invalid! The file is unchanged." . PHP_EOL;
+            return;
+        }
+
+        if (!isset($fileContentsArray['php-versions']) || empty($fileContentsArray['php-versions'])) {
+            echo "WARNING: No versions of PHP found in the linuxforcomposer.json file! The file is unchanged." . PHP_EOL;
+            return;
+        }
+
         if ($fileContentsArray['thread-safe'] === 'true') {
             $threadsafe = '-zts';
         } else {
@@ -89,35 +101,31 @@ class DockerCommitCommand extends Command
 
         $name = (string) DockerCommitCommand::LFPHPDEFAULTVERSION . ':' . $versionNameTS;
 
-        $dockerCommitCommand = 'docker commit ' . $pid . ' ' . $name;
+        $this->dockerCommitCommand .= $pid . ' ' . $name;
+
+        $commitImageProcess = new LinuxForComposerProcess($this->dockerCommitCommand);
 
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
-                $dockerCommitCommand = 'PowerShell -Command "'
-                    . $dockerCommitCommand
-                    . '"';
+                $commitImageProcess->setDecorateWindows(true);
             } else {
-                $dockerCommitCommand = 'bash -c "'
-                    . $dockerCommitCommand
-                    . '"';
+                $commitImageProcess->setDecorateWindowsLegacy(true);
             }
         }
 
-        $process = new Process($dockerCommitCommand);
+        $commitImageProcess->setTty($commitImageProcess->isTtySupported());
 
-        $process->setTimeout(null);
+        $commitImageProcess->setTimeout(null);
 
-        if (strtoupper((substr(PHP_OS, 0, 3))) !== 'WIN') {
-            $process->setTty(true);
-        }
+        $commitImageProcess->prepareProcess();
 
-        $process->start();
+        $commitImageProcess->start();
 
-        $process->wait();
+        $commitImageProcess->wait();
 
-        $processStdout = $process->getOutput();
+        $processStdout = $commitImageProcess->getOutput();
 
-        $processStderr = $process->getErrorOutput();
+        $processStderr = $commitImageProcess->getErrorOutput();
 
         if (!empty($processStdout)) {
             echo $processStdout . PHP_EOL;
@@ -130,16 +138,6 @@ class DockerCommitCommand extends Command
         $position = $input->getOption('savetojsonfile');
 
         if ($position !== null) {
-            if ($fileContentsArray === null) {
-                echo "WARNING: The linuxforcomposer.json file is empty! The file is unchanged." . PHP_EOL;
-                return;
-            }
-
-            if (!isset($fileContentsArray['php-versions']) || empty($fileContentsArray['php-versions'])) {
-                echo "WARNING: The linuxforcomposer.json file is invalid! The file is unchanged." . PHP_EOL;
-                return;
-            }
-
             $fileContentsArray['php-versions'][$position] = $versionName;
 
             $fileContentsJson = json_encode($fileContentsArray, JSON_PRETTY_PRINT);

@@ -1,5 +1,5 @@
 {
-    "name": "linuxforphp/linuxforcomposer",
+    "name": "linuxforphp\/linuxforcomposer",
     "description": "A Composer interface to run 'Linux for PHP' Docker containers.",
     "php-versions": [
         "7.2.5",
@@ -20,7 +20,7 @@
         ]
     },
     "volumes": {
-        "volume1": "${PWD}/:/srv/www"
+        "volume1": "${PWD}\/:\/srv\/www"
     },
     "script": "lfphp",
     "thread-safe": "false"

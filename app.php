@@ -71,6 +71,8 @@ if (strlen($path) > 0) {
 } else {
     define('PHARBASEDIR', dirname(__FILE__));
 
+    define('PHARFILENAMERET', PHARBASEDIR);
+
     define('PHARFILENAME', PHARBASEDIR . DIRECTORY_SEPARATOR . basename(__FILE__));
 
     define(

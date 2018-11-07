@@ -35,7 +35,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
+use Linuxforcomposer\Helper\LinuxForComposerProcess;
 
 class DockerRunCommand extends Command
 {
@@ -98,17 +98,17 @@ class DockerRunCommand extends Command
                 }
 
                 foreach ($dockerManageCommandsArray as $key => $dockerManageCommand) {
-                    $process = new Process($dockerManageCommand);
+                    $process = new LinuxForComposerProcess($dockerManageCommand);
+
+                    $process->setTty($process->isTtySupported());
 
                     $process->setTimeout(null);
 
-                    if (strtoupper((substr(PHP_OS, 0, 3))) !== 'WIN') {
-                        $process->setTty(true);
-                    }
-
-                    //$process->run();
+                    $process->prepareProcess();
 
                     $process->start();
+
+                    //$process->run();
 
                     /*while ($process->isRunning()) {
                         // waiting for process to finish
@@ -139,13 +139,13 @@ class DockerRunCommand extends Command
                     . PHARFILENAME
                     . ' docker:manage stop';
 
-                $process = new Process($dockerManageCommand);
+                $process = new LinuxForComposerProcess($dockerManageCommand);
+
+                $process->setTty($process->isTtySupported());
 
                 $process->setTimeout(null);
 
-                if (strtoupper((substr(PHP_OS, 0, 3))) !== 'WIN') {
-                    $process->setTty(true);
-                }
+                $process->prepareProcess();
 
                 $process->start();
 

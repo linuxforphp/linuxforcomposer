@@ -34,9 +34,13 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 class DockerRunCommandTest extends KernelTestCase
 {
-    protected $dockerManageCommandMock;
+    protected $dockerLfcProcessMock;
 
     public static function setUpBeforeClass()
     {
@@ -83,19 +87,24 @@ class DockerRunCommandTest extends KernelTestCase
 
     public function createMocksForUnixEnv()
     {
-        $this->dockerManageCommandMock = \Mockery::mock('overload:Symfony\Component\Process\Process');
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock = \Mockery::mock('overload:Linuxforcomposer\Helper\LinuxForComposerProcess');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('isTtySupported')
+            ->withAnyArgs();
+        $this->dockerLfcProcessMock
+            ->shouldReceive('setTty')
+            ->withAnyArgs();
+        $this->dockerLfcProcessMock
             ->shouldReceive('setTimeout')
             ->once()
             ->with(null);
-        $this->dockerManageCommandMock
-            ->shouldReceive('setTty')
-            ->once()
-            ->with(true);
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
+            ->shouldReceive('prepareProcess')
+            ->once();
+        $this->dockerLfcProcessMock
             ->shouldReceive('start')
             ->once();
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('wait')
             ->once();
     }
@@ -202,11 +211,11 @@ class DockerRunCommandTest extends KernelTestCase
 
         $this->createMocksForUnixEnv();
 
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getOutput')
             ->once()
             ->andReturn('Fake Docker is running!');
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
@@ -243,11 +252,11 @@ class DockerRunCommandTest extends KernelTestCase
 
         $this->createMocksForUnixEnv();
 
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getOutput')
             ->once()
             ->andReturn('Fake Docker is running!');
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
@@ -285,11 +294,11 @@ class DockerRunCommandTest extends KernelTestCase
 
         $this->createMocksForUnixEnv();
 
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getOutput')
             ->once()
             ->andReturn('Fake Docker is running!');
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
@@ -334,11 +343,11 @@ class DockerRunCommandTest extends KernelTestCase
 
         $this->createMocksForUnixEnv();
 
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getOutput')
             ->once()
             ->andReturn('Fake Docker is running!');
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
@@ -484,11 +493,11 @@ class DockerRunCommandTest extends KernelTestCase
 
         $this->createMocksForUnixEnv();
 
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getOutput')
             ->once()
             ->andReturn('Fake Docker is running!');
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
@@ -526,11 +535,11 @@ class DockerRunCommandTest extends KernelTestCase
 
         $this->createMocksForUnixEnv();
 
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getOutput')
             ->once()
             ->andReturn('Fake Docker is running!');
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
@@ -570,11 +579,11 @@ class DockerRunCommandTest extends KernelTestCase
 
         $this->createMocksForUnixEnv();
 
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getOutput')
             ->once()
             ->andReturn('Fake Docker is running!');
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
@@ -614,11 +623,11 @@ class DockerRunCommandTest extends KernelTestCase
 
         $this->createMocksForUnixEnv();
 
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getOutput')
             ->once()
             ->andReturn('Fake Docker is running!');
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
@@ -658,11 +667,11 @@ class DockerRunCommandTest extends KernelTestCase
 
         $this->createMocksForUnixEnv();
 
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getOutput')
             ->once()
             ->andReturn('Fake Docker is running!');
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
@@ -702,11 +711,11 @@ class DockerRunCommandTest extends KernelTestCase
 
         $this->createMocksForUnixEnv();
 
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getOutput')
             ->once()
             ->andReturn('');
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('Error! Docker is not running.');
@@ -748,11 +757,11 @@ class DockerRunCommandTest extends KernelTestCase
 
         $this->createMocksForUnixEnv();
 
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getOutput')
             ->once()
             ->andReturn('Fake Docker stopped!');
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
@@ -785,11 +794,11 @@ class DockerRunCommandTest extends KernelTestCase
 
         $this->createMocksForUnixEnv();
 
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getOutput')
             ->once()
             ->andReturn('');
-        $this->dockerManageCommandMock
+        $this->dockerLfcProcessMock
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('Error! Docker is not stopped.');
