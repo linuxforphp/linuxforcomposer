@@ -35,7 +35,7 @@ define('JSONFILE', 'linuxforcomposer.json');
 // Will exclude everything under these directories
 $exclude = [
     PHARFILE,
-    'bin',
+    'bin/linuxforcomposer.phar',
     'build',
     'data',
     'docs',
