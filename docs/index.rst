@@ -4,18 +4,21 @@ Welcome to Linux For Composer's documentation
 =============================================
 .. image:: /images/logo.png
 
-`Project Home Page <http://linuxforphp.net/>`_
+`Linux for PHP Home Page <https://linuxforphp.net/>`_
 
-PAGE IS STILL UNDER CONSTRUCTION
+Configure and run Linux for PHP containers without ever touching the Docker command line!
+-----------------------------------------------------------------------------------------
+
+**You can create a custom configuration for each PHP project you have and launch the Linux for PHP containers directly from within your projects' working directories!**
 
 .. toctree::
    :maxdepth: 3
 
+   license
    whats_new
    installation
-   basic_options
-   advanced_options
-   demo_config
+   configuration
+   usage
 
 
 Indices and tables

@@ -3,28 +3,26 @@
 /**
  * Linux for PHP/Linux for Composer
  *
- * Copyright 2010 - 2018 A. Caya <andrewscaya@yahoo.ca>
- * Version 0.9.9
+ * Copyright 2010 - 2018 Foreach Code Factory <lfphp@asclinux.net>
+ * Version 1.0.0
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * @package    Linux for PHP/Linux for Composer
- * @copyright  Copyright 2010 - 2018 A. Caya <andrewscaya@yahoo.ca>
+ * @copyright  Copyright 2010 - 2018 Foreach Code Factory <lfphp@asclinux.net>
  * @link       http://linuxforphp.net/
- * @license    GNU/GPLv2, see above
+ * @license    Apache License, Version 2.0, see above
+ * @license    http://www.apache.org/licenses/LICENSE-2.0
  * @since 0.9.8
  */
 
@@ -37,7 +35,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
+use Linuxforcomposer\Helper\LinuxForComposerProcess;
 
 class DockerRunCommand extends Command
 {
@@ -100,17 +98,17 @@ class DockerRunCommand extends Command
                 }
 
                 foreach ($dockerManageCommandsArray as $key => $dockerManageCommand) {
-                    $process = new Process($dockerManageCommand);
+                    $process = new LinuxForComposerProcess($dockerManageCommand);
+
+                    $process->setTty($process->isTtySupported());
 
                     $process->setTimeout(null);
 
-                    if (strtoupper((substr(PHP_OS, 0, 3))) !== 'WIN') {
-                        $process->setTty(true);
-                    }
-
-                    //$process->run();
+                    $process->prepareProcess();
 
                     $process->start();
+
+                    //$process->run();
 
                     /*while ($process->isRunning()) {
                         // waiting for process to finish
@@ -141,13 +139,13 @@ class DockerRunCommand extends Command
                     . PHARFILENAME
                     . ' docker:manage stop';
 
-                $process = new Process($dockerManageCommand);
+                $process = new LinuxForComposerProcess($dockerManageCommand);
+
+                $process->setTty($process->isTtySupported());
 
                 $process->setTimeout(null);
 
-                if (strtoupper((substr(PHP_OS, 0, 3))) !== 'WIN') {
-                    $process->setTty(true);
-                }
+                $process->prepareProcess();
 
                 $process->start();
 

@@ -1,4 +1,4 @@
-# [![Linux for PHP Banner](docs/images/logo.png)](http://linuxforphp.net/)
+# [![Linux for PHP Banner](docs/images/logo.png)](https://linuxforphp.net/)
 # Linux for Composer
 
 https://linuxforphp.net
@@ -17,10 +17,12 @@ composer require linuxforphp/linuxforcomposer
 
 Once the dependencies are installed, you can create the linuxforcomposer.json file using:
 ```bash
-vendor/bin/linuxforcomposer.phar docker:run start
+php vendor/bin/linuxforcomposer.phar docker:run start
 ```
 
-Just enter the previous command again to run the Linux for PHP containers that you have configured in the JSON file.
+NOTE: On Windows, please use the Linux for Composer PHAR file in the 'vendor/linuxforphp/linuxforcomposer/bin' folder.
+
+Then, you only have to enter the previous command again to run the Linux for PHP containers that you have configured in the JSON file.
 
 If you wish to install the Linux for Composer binary for your entire system, please copy the PHAR file to a folder included in your PATH:
 ```bash

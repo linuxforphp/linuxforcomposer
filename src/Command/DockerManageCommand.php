@@ -3,28 +3,26 @@
 /**
  * Linux for PHP/Linux for Composer
  *
- * Copyright 2010 - 2018 A. Caya <andrewscaya@yahoo.ca>
- * Version 0.9.9
+ * Copyright 2010 - 2018 Foreach Code Factory <lfphp@asclinux.net>
+ * Version 1.0.0
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * @package    Linux for PHP/Linux for Composer
- * @copyright  Copyright 2010 - 2018 A. Caya <andrewscaya@yahoo.ca>
+ * @copyright  Copyright 2010 - 2018 Foreach Code Factory <lfphp@asclinux.net>
  * @link       http://linuxforphp.net/
- * @license    GNU/GPLv2, see above
+ * @license    Apache License, Version 2.0, see above
+ * @license    http://www.apache.org/licenses/LICENSE-2.0
  * @since 0.9.8
  */
 
@@ -35,8 +33,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Question\Question;
+use Linuxforcomposer\Helper\LinuxForComposerProcess;
+
+//use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class DockerManageCommand extends Command
 {
@@ -44,15 +45,11 @@ class DockerManageCommand extends Command
 
     const PHPDEFAULTVERSION = 'master';
 
-    protected $phpCurrentVersions = array(
-        '7.3.0dev',
-        '7.2.5',
-        '7.1.16',
-        '7.0.29',
-        '5.6.35',
-    );
-
     protected static $defaultName = 'docker:manage';
+
+    protected $dockerPullCommand = 'docker pull ';
+
+    protected $dockerRunCommand = 'docker run --restart=always ';
 
     public function __construct()
     {
@@ -85,41 +82,38 @@ class DockerManageCommand extends Command
         $threadsafe = (string) $threadsafe;
         $script = (string) $script;
 
-        echo PHP_EOL;
+        echo PHP_EOL . 'Checking for image availability and downloading if necessary.' . PHP_EOL;
 
-        echo 'Checking for image availability and downloading if necessary.' . PHP_EOL;
+        echo PHP_EOL . 'This may take a few minutes...' . PHP_EOL . PHP_EOL;
 
-        echo 'This may take a few minutes...' . PHP_EOL;
+        $this->dockerPullCommand .= DockerManageCommand::LFPHPDEFAULTVERSION . ':' . $phpversionFull;
 
-        $dockerPullCommand = 'docker pull ' . DockerManageCommand::LFPHPDEFAULTVERSION . ':' . $phpversionFull;
+        $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprv');
+
+        $checkImageProcess = new LinuxForComposerProcess($this->dockerPullCommand);
 
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
-                $dockerPullCommand = 'start /wait PowerShell -Command "'
-                    . $dockerPullCommand
-                    . '"';
+                $checkImageProcess->setDecorateWindowsWithReturnCode(true, $temp_filename);
             } else {
-                $dockerPullCommand = 'start /wait bash -c "'
-                    . $dockerPullCommand
-                    .'"';
+                $temp_filename = $this->win8NormalizePath($temp_filename);
+                $checkImageProcess->setDecorateWindowsLegacyWithReturnCode(true, $temp_filename);
             }
         }
 
-        $checkImage = new Process($dockerPullCommand);
+        $checkImageProcess->setTty($checkImageProcess->isTtySupported());
 
-        $checkImage->setTimeout(null);
+        $checkImageProcess->setTimeout(null);
 
-        if (strtoupper((substr(PHP_OS, 0, 3))) !== 'WIN') {
-            $checkImage->setTty(true);
-        }
+        $checkImageProcess->prepareProcess();
 
-        $checkImage->start();
+        $checkImageProcess->start();
 
-        $checkImage->wait();
+        $checkImageProcess->wait();
 
-        $processStdout = $checkImage->getOutput();
+        $processStdout = $checkImageProcess->getOutput();
 
-        $processStderr = $checkImage->getErrorOutput();
+        $processStderr = $checkImageProcess->getErrorOutput();
 
         if (!empty($processStdout)) {
             echo $processStdout . PHP_EOL;
@@ -129,38 +123,39 @@ class DockerManageCommand extends Command
             echo $processStderr . PHP_EOL;
         }
 
-        $checkLocalExitCode = $checkImage->getExitCode();
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $checkLocalExitCode = (int) trim(file_get_contents($temp_filename));
+        } else {
+            $checkLocalExitCode = (int) trim($checkImageProcess->getExitCode());
+        }
 
         echo 'Done!' . PHP_EOL . PHP_EOL;
 
-        $imageString = '';
+        $imageName = '';
 
         $phpversionFullArray = explode('-', $phpversionFull);
 
         $phpversion = $phpversionFullArray[0];
 
-        // The use of in_array() is a Windows workaround
-        if ($checkLocalExitCode === 1 || !in_array($phpversion, $this->phpCurrentVersions)) {
-            $imageString .= ' ' . DockerManageCommand::LFPHPDEFAULTVERSION . ':src ';
-            $imageString .=
-                '/bin/bash -c \'cd ; wget -O tmp http://bit.ly/2jheBrr ; /bin/bash ./tmp '
+        if ($checkLocalExitCode !== 0) {
+            $imageName .= DockerManageCommand::LFPHPDEFAULTVERSION . ':src ';
+            $imageName .=
+                '/bin/bash -c \'lfphp-compile '
                 . $phpversion . ' ' . $threadsafe
                 . ' ; '. $script .'\'';
         } else {
-            $imageString .= ' ' . DockerManageCommand::LFPHPDEFAULTVERSION . ':' . $phpversionFull . ' ';
-            $imageString .= $script;
+            $imageName .= DockerManageCommand::LFPHPDEFAULTVERSION . ':' . $phpversionFull . ' ';
+            $imageName .= $script;
         }
 
-        return $imageString;
+        return $imageName;
     }
 
     protected function formatInput(InputInterface $input)
     {
-        $dockerRunCommand = '';
-        $dockerRunCommand .= 'docker run --restart=always';
-        $dockerRunCommand .= ($input->getOption('interactive')) ? ' -i' : null;
-        $dockerRunCommand .= ($input->getOption('tty')) ? ' -t' : null;
-        $dockerRunCommand .= ($input->getOption('detached')) ? ' -d' : null;
+        $this->dockerRunCommand .= ($input->getOption('interactive')) ? '-i ' : null;
+        $this->dockerRunCommand .= ($input->getOption('tty')) ? '-t ' : null;
+        $this->dockerRunCommand .= ($input->getOption('detached')) ? '-d ' : null;
 
         $ports = $input->getOption('port');
 
@@ -168,13 +163,13 @@ class DockerManageCommand extends Command
             if (!empty($ports) && !in_array('', $ports)) {
                 foreach ($ports as $portMap) {
                     if (!empty($portMap)) {
-                        $dockerRunCommand .= ' -p ' . $portMap;
+                        $this->dockerRunCommand .= '-p ' . $portMap . ' ';
                     }
                 }
             }
         } else {
             if (!empty($ports)) {
-                $dockerRunCommand .= ' -p ' . $ports;
+                $this->dockerRunCommand .= '-p ' . $ports . ' ';
             }
         }
 
@@ -184,13 +179,13 @@ class DockerManageCommand extends Command
             if (!empty($volumes) && !in_array('', $volumes)) {
                 foreach ($volumes as $volumeMap) {
                     if (!empty($volumeMap)) {
-                        $dockerRunCommand .= ' -v ' . $volumeMap;
+                        $this->dockerRunCommand .= '-v ' . $volumeMap . ' ';
                     }
                 }
             }
         } else {
             if (!empty($volumes)) {
-                $dockerRunCommand .= ' -v ' . $volumes;
+                $this->dockerRunCommand .= '-v ' . $volumes . ' ';
             }
         }
 
@@ -205,68 +200,82 @@ class DockerManageCommand extends Command
 
         $script = ($input->getOption('script')) ?: 'lfphp';
 
-        $dockerRunCommand .= $this->checkImage($phpversionFull, $threadsafe, $script);
+        if (strpos($phpversionFull, 'custom') !== false) {
+            $this->dockerRunCommand .= DockerManageCommand::LFPHPDEFAULTVERSION
+                . ':' . $phpversionFull
+                . ' '
+                . $script;
+        } else {
+            $this->dockerRunCommand .= $this->checkImage($phpversionFull, $threadsafe, $script);
+        }
 
-        return $dockerRunCommand;
+        return $this->dockerRunCommand;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         switch ($input->getArgument('execute')) {
             case 'run':
-                $dockerRunCommand = $this->formatInput($input);
+                $this->dockerRunCommand = $this->formatInput($input);
+
+                $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprv');
+
+                $runContainerProcess = new LinuxForComposerProcess($this->dockerRunCommand);
 
                 echo 'Starting container...' . PHP_EOL;
 
-                if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                    if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
-                        $dockerRunCommand = 'start /wait PowerShell -Command "'
-                            . $dockerRunCommand
-                            . '"';
+                if ($input->getOption('detached') !== false) {
+                    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                        if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                            $runContainerProcess->setDecorateWindowsWithStdout(true, $temp_filename);
+                        } else {
+                            $temp_filename = $this->win8NormalizePath($temp_filename);
+                            $runContainerProcess->setDecorateWindowsLegacyWithStdout(true, $temp_filename);
+                        }
                     } else {
-                        $dockerRunCommand = 'start /wait bash -i -c "'
-                            . $dockerRunCommand
-                            . '"';
+                        $runContainerProcess->setTempFilename($temp_filename);
+
+                        $runContainerProcess->setDockerCommand('/bin/bash & '
+                            . $this->dockerRunCommand
+                            . ' > '
+                            . $temp_filename);
+                    }
+                } else {
+                    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                        if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                            $runContainerProcess->setDecorateWindows(true);
+                        } else {
+                            $runContainerProcess->setDecorateWindowsLegacy(true);
+                        }
                     }
                 }
 
-                $process = new Process($dockerRunCommand);
+                $runContainerProcess->setTty($runContainerProcess->isTtySupported());
 
-                $process->setTimeout(null);
+                $runContainerProcess->setTimeout(null);
 
-                if (strtoupper((substr(PHP_OS, 0, 3))) !== 'WIN') {
-                    $process->setTty(true);
-                }
+                $runContainerProcess->prepareProcess();
 
-                $process->start();
+                $runContainerProcess->start();
 
-                $process->wait();
-
-                $processStdout = $process->getOutput();
-
-                $processStderr = $process->getErrorOutput();
-
-                if (!empty($processStdout)) {
-                    echo $processStdout . PHP_EOL;
-                }
-
-                if (!empty($processStderr)) {
-                    echo $processStderr . PHP_EOL;
-                }
+                $runContainerProcess->wait(
+                    function ($type, $data) {
+                        echo $data;
+                    }
+                );
 
                 // executes after the command finishes
-                if ($process->isSuccessful()) {
-                    $processPID = new Process('docker ps -l -q');
-
-                    $processPID->setTimeout(null);
-
-                    $processPID->start();
-
-                    $processPID->wait();
-
-                    $pid = $processPID->getOutput();
-
-                    //throw new ProcessFailedException($process);
+                if ($runContainerProcess->isSuccessful()) {
+                    if ($input->getOption('detached') !== false) {
+                        $pid = trim(file_get_contents($temp_filename));
+                    } else {
+                        $processPID = new LinuxForComposerProcess('docker ps -l -q');
+                        $processPID->setTimeout(null);
+                        $processPID->prepareProcess();
+                        $processPID->start();
+                        $processPID->wait();
+                        $pid = trim($processPID->getOutput());
+                    }
 
                     file_put_contents(
                         VENDORFOLDERPID
@@ -274,10 +283,12 @@ class DockerManageCommand extends Command
                         . 'composer'
                         . DIRECTORY_SEPARATOR
                         . 'linuxforcomposer.pid',
-                        $pid,
+                        $pid . PHP_EOL,
                         FILE_APPEND
                     );
                 }
+
+                //throw new ProcessFailedException($process);
 
                 break;
 
@@ -305,55 +316,265 @@ class DockerManageCommand extends Command
                         . 'linuxforcomposer.pid'
                     );
 
-                    $pids = explode(PHP_EOL, $fileContents);
+                    if (empty(trim($fileContents))) {
+                        echo PHP_EOL . 'PID file was empty!' . PHP_EOL . PHP_EOL;
+                    } else {
+                        $pids = explode(PHP_EOL, $fileContents);
 
-                    foreach ($pids as $key => $value) {
-                        if (empty($value)) {
-                            unset($pids[$key]);
-                        }
-                    }
+                        $position = 0;
 
-                    if (!empty($pids)) {
-                        foreach ($pids as $key => $pid) {
+                        foreach ($pids as $key => $value) {
+                            if (empty($value)) {
+                                unset($pids[$key]);
+
+                                break;
+                            }
+
+                            $subvalue = substr($value, 0, 12);
+
                             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                                echo 'Stopping containers...' . PHP_EOL;
+                                if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                                    if (!file_exists(VENDORFOLDERPID . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bat')) {
+                                        if (!copy(
+                                            PHARFILENAMERET . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bat',
+                                            VENDORFOLDERPID . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bat'
+                                        )
+                                        ) {
+                                            echo PHP_EOL
+                                                . "Could not create the linuxforcomposer-commit-info.bat file! No commits possible."
+                                                . PHP_EOL
+                                                . PHP_EOL;
+                                        }
+                                    }
+
+                                    $containerCommitInfoProcess =
+                                    new LinuxForComposerProcess(
+                                        VENDORFOLDERPID
+                                        . DIRECTORY_SEPARATOR
+                                        . 'bin'
+                                        . DIRECTORY_SEPARATOR
+                                        . 'linuxforcomposer-commit-info.bat '
+                                        . $subvalue
+                                        . ' '
+                                        . VENDORFOLDERPID
+                                        . DIRECTORY_SEPARATOR
+                                        . 'composer'
+                                        . DIRECTORY_SEPARATOR
+                                    );
+                                } else {
+                                    if (!file_exists(VENDORFOLDERPID . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bash')) {
+                                        if (!copy(
+                                            PHARFILENAMERET . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bash',
+                                            VENDORFOLDERPID . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bash'
+                                        )
+                                        ) {
+                                            echo PHP_EOL
+                                                . "Could not create the linuxforcomposer-commit-info.bat file! No commits possible."
+                                                . PHP_EOL
+                                                . PHP_EOL;
+                                        }
+                                    }
+
+                                    $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprv');
+
+                                    $temp_filename = $this->win8NormalizePath($temp_filename);
+
+                                    $containerCommitInfoProcess =
+                                    new LinuxForComposerProcess(
+                                        'start /wait bash '
+                                        . VENDORFOLDERPID
+                                        . DIRECTORY_SEPARATOR
+                                        . 'bin'
+                                        . DIRECTORY_SEPARATOR
+                                        . 'linuxforcomposer-commit-info.bash '
+                                        . $subvalue
+                                        . ' '
+                                        . $temp_filename
+                                    );
+                                }
+
+
+                                $containerCommitInfoProcess->setTty($containerCommitInfoProcess->isTtySupported());
+                                $containerCommitInfoProcess->setTimeout(null);
+                                $containerCommitInfoProcess->prepareProcess();
+                                $containerCommitInfoProcess->start();
+                                $containerCommitInfoProcess->wait();
 
                                 if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
-                                    $dockerStopCommand = 'docker stop ' . $pid;
-                                    $dockerStopCommand = 'PowerShell -Command "'
-                                        . $dockerStopCommand
-                                        . '"';
-                                    $dockerStopCommand2 = 'docker rm ' . $pid;
-                                    $dockerStopCommand2 = 'PowerShell -Command "'
-                                        . $dockerStopCommand2
-                                        . '"';
+                                    $answerArray = explode(';', $containerCommitInfoProcess->getOutput());
                                 } else {
-                                    $dockerStopCommand = 'docker stop ' . $pid . '&& docker rm ' . $pid;
-                                    $dockerStopCommand = 'bash -c "'
-                                        . $dockerStopCommand
-                                        . '"';
+                                    $answerArray = explode(';', file_get_contents($temp_filename));
+                                }
+
+                                if (count($answerArray) < 3) {
+                                    $answerValue1 = '';
+                                    $answerValue2 = '';
+                                    $name = $answerValue2;
+                                    $answerValue3 = '';
+                                } else {
+                                    $answerValue1 = trim($answerArray[0]);
+                                    $answerValue2 = trim($answerArray[1]);
+                                    $name = $answerValue2;
+                                    $answerValue3 = trim($answerArray[2]);
+                                }
+
+                                if ($answerValue1 === 'y'
+                                    || $answerValue1 === 'Y'
+                                    || $answerValue1 === 'yes'
+                                    || $answerValue1 === 'YES'
+                                ) {
+                                    if (empty(trim($name))) {
+                                        $name = 'test' . sha1(microtime());
+                                    }
+
+                                    if ($answerValue3 === 'y'
+                                        || $answerValue3 === 'Y'
+                                        || $answerValue3 === 'yes'
+                                        || $answerValue3 === 'YES'
+                                    ) {
+                                        $dockerCommitCommand = 'php '
+                                            . PHARFILENAME
+                                            . ' docker:commit ' . $subvalue . ' ' . $name . ' -s ' . $position;
+                                    } else {
+                                        $dockerCommitCommand = 'php '
+                                            . PHARFILENAME
+                                            . ' docker:commit ' . $subvalue . ' ' . $name;
+                                    }
+
+                                    $commitContainerProcess = new LinuxForComposerProcess($dockerCommitCommand);
+
+                                    $commitContainerProcess->setTty($commitContainerProcess->isTtySupported());
+
+                                    $commitContainerProcess->setTimeout(null);
+
+                                    $commitContainerProcess->prepareProcess();
+
+                                    $commitContainerProcess->start();
+
+                                    $commitContainerProcess->wait();
+
+                                    $processStdout = $commitContainerProcess->getOutput();
+
+                                    $processStderr = $commitContainerProcess->getErrorOutput();
+
+                                    if (!empty($processStdout)) {
+                                        echo $processStdout . PHP_EOL;
+                                    }
+
+                                    if (!empty($processStderr)) {
+                                        echo $processStderr . PHP_EOL;
+                                    }
                                 }
                             } else {
-                                echo 'Stopping container...' . PHP_EOL;
+                                $containerInfoProcess =
+                                    new LinuxForComposerProcess('docker ps --filter "id=' . $subvalue . '"');
+                                $containerInfoProcess->setTty($containerInfoProcess->isTtySupported());
+                                $containerInfoProcess->setTimeout(null);
+                                $containerInfoProcess->prepareProcess();
+                                $containerInfoProcess->start();
+                                $containerInfoProcess->wait();
+                                echo $containerInfoProcess->getOutput();
 
-                                $dockerStopCommand = 'docker stop ' . $pid . ' && docker rm ' . $pid;
+                                $helper1 = $this->getHelper('question');
+                                $question1 = new ConfirmationQuestion(
+                                    'Commit container '
+                                    . $subvalue
+                                    . '? (y/N)',
+                                    false
+                                );
+
+                                if ($helper1->ask($input, $output, $question1)) {
+                                    $helper2 = $this->getHelper('question');
+                                    $question2 = new Question(
+                                        'Please enter the name of the new commit: ',
+                                        'test' . sha1(microtime())
+                                    );
+
+                                    $name = $helper2->ask($input, $output, $question2);
+
+                                    $helper3 = $this->getHelper('question');
+                                    $question3 = new ConfirmationQuestion(
+                                        'Save to linuxforcomposer.json file? (y/N)',
+                                        false
+                                    );
+
+                                    if ($helper3->ask($input, $output, $question3)) {
+                                        $dockerCommitCommand = 'php '
+                                            . PHARFILENAME
+                                            . ' docker:commit ' . $subvalue . ' ' . $name . ' -s ' . $position;
+                                    } else {
+                                        $dockerCommitCommand = 'php '
+                                            . PHARFILENAME
+                                            . ' docker:commit ' . $subvalue . ' ' . $name;
+                                    }
+
+                                    $commitContainerProcess = new LinuxForComposerProcess($dockerCommitCommand);
+
+                                    $commitContainerProcess->setTty($commitContainerProcess->isTtySupported());
+
+                                    $commitContainerProcess->setTimeout(null);
+
+                                    $commitContainerProcess->prepareProcess();
+
+                                    $commitContainerProcess->start();
+
+                                    $commitContainerProcess->wait();
+
+                                    $processStdout = $commitContainerProcess->getOutput();
+
+                                    $processStderr = $commitContainerProcess->getErrorOutput();
+
+                                    if (!empty($processStdout)) {
+                                        echo $processStdout . PHP_EOL;
+                                    }
+
+                                    if (!empty($processStderr)) {
+                                        echo $processStderr . PHP_EOL;
+                                    }
+                                }
                             }
 
-                            $process = new Process($dockerStopCommand);
+                            echo PHP_EOL . 'Stopping container...' . PHP_EOL;
 
-                            $process->setTimeout(null);
+                            // Not declared and defined at the class level because of potential for multiple containers.
+                            $dockerStopCommand = 'docker stop ';
 
-                            if (strtoupper((substr(PHP_OS, 0, 3))) !== 'WIN') {
-                                $process->setTty(true);
+                            $dockerStopCommand .= $subvalue;
+
+                            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                                if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                                    // Not declared and defined at the class level because of possibly multiple containers.
+                                    $dockerRemoveCommand = 'docker rm ' . $subvalue;
+                                } else {
+                                    $dockerStopCommand .= ' && docker rm ' . $subvalue;
+                                }
+                            } else {
+                                $dockerStopCommand .= ' && docker rm ' . $subvalue;
                             }
 
-                            $process->start();
+                            $stopContainerProcess = new LinuxForComposerProcess($dockerStopCommand);
 
-                            $process->wait();
+                            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                                if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                                    $stopContainerProcess->setDecorateWindows(true);
+                                } else {
+                                    $stopContainerProcess->setDecorateWindowsLegacy(true);
+                                }
+                            }
 
-                            $processStdout = $process->getOutput();
+                            $stopContainerProcess->setTty($stopContainerProcess->isTtySupported());
 
-                            $processStderr = $process->getErrorOutput();
+                            $stopContainerProcess->setTimeout(null);
+
+                            $stopContainerProcess->prepareProcess();
+
+                            $stopContainerProcess->start();
+
+                            $stopContainerProcess->wait();
+
+                            $processStdout = $stopContainerProcess->getOutput();
+
+                            $processStderr = $stopContainerProcess->getErrorOutput();
 
                             if (!empty($processStdout)) {
                                 echo $processStdout . PHP_EOL;
@@ -363,22 +584,23 @@ class DockerManageCommand extends Command
                                 echo $processStderr . PHP_EOL;
                             }
 
-                            if (isset($dockerStopCommand2)) {
-                                $process = new Process($dockerStopCommand2);
+                            if (isset($dockerRemoveCommand)) {
+                                $removeContainerProcess =
+                                    new LinuxForComposerProcess($dockerRemoveCommand);
 
-                                $process->setTimeout(null);
+                                $removeContainerProcess->setTty($removeContainerProcess->isTtySupported());
 
-                                if (strtoupper((substr(PHP_OS, 0, 3))) !== 'WIN') {
-                                    $process->setTty(true);
-                                }
+                                $removeContainerProcess->setTimeout(null);
 
-                                $process->start();
+                                $removeContainerProcess->prepareProcess();
 
-                                $process->wait();
+                                $removeContainerProcess->start();
 
-                                $processStdout = $process->getOutput();
+                                $removeContainerProcess->wait();
 
-                                $processStderr = $process->getErrorOutput();
+                                $processStdout = $removeContainerProcess->getOutput();
+
+                                $processStderr = $removeContainerProcess->getErrorOutput();
 
                                 if (!empty($processStdout)) {
                                     echo $processStdout . PHP_EOL;
@@ -388,9 +610,9 @@ class DockerManageCommand extends Command
                                     echo $processStderr . PHP_EOL;
                                 }
                             }
+
+                            $position++;
                         }
-                    } else {
-                        echo PHP_EOL . 'PID file was empty!' . PHP_EOL . PHP_EOL;
                     }
 
                     unlink(
@@ -408,5 +630,15 @@ class DockerManageCommand extends Command
                 echo PHP_EOL . 'Wrong command given!' . PHP_EOL . PHP_EOL;
                 break;
         }
+    }
+
+    protected function win8NormalizePath($path)
+    {
+        $path = str_replace('\\', '/', $path);
+        $path = preg_replace('|(?<=.)/+|', '/', $path);
+        if (':' === substr($path, 1, 1)) {
+            $path = ucfirst($path);
+        }
+        return $path;
     }
 }
