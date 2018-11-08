@@ -1,4 +1,4 @@
-# [![Linux for PHP Banner](docs/images/logo.png)](http://linuxforphp.net/)
+# [![Linux for PHP Banner](docs/images/logo.png)](https://linuxforphp.net/)
 # Linux for Composer
 
 https://linuxforphp.net
