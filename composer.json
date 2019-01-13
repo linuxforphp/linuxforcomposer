@@ -1,7 +1,7 @@
 {
   "name": "linuxforphp/linuxforcomposer",
   "description": "Composer package that helps to easily configure and run Linux for PHP containers for any PHP project.",
-  "license": "GPL-2.0-only",
+  "license": "Apache-2.0",
   "keywords": [
     "PHP",
     "Composer",

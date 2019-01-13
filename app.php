@@ -120,6 +120,13 @@ use Linuxforcomposer\Command\DockerRunCommand;
 
 if (!file_exists(JSONFILE)) {
     if (copy(JSONFILEDIST, JSONFILE)) {
+        require_once
+            PHARFILENAMERET
+            . DIRECTORY_SEPARATOR
+            . 'bin'
+            . DIRECTORY_SEPARATOR
+            . 'lfcomposer-post-install.php';
+
         echo PHP_EOL
             .'SUCCESS!'
             . PHP_EOL
