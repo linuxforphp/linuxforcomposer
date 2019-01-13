@@ -3,8 +3,8 @@
 /**
  * Linux for PHP/Linux for Composer
  *
- * Copyright 2010 - 2018 Foreach Code Factory <lfphp@asclinux.net>
- * Version 1.0.0
+ * Copyright 2010 - 2019 Foreach Code Factory <lfphp@asclinux.net>
+ * Version 1.0.1
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  * limitations under the License.
  *
  * @package    Linux for PHP/Linux for Composer
- * @copyright  Copyright 2010 - 2018 Foreach Code Factory <lfphp@asclinux.net>
+ * @copyright  Copyright 2010 - 2019 Foreach Code Factory <lfphp@asclinux.net>
  * @link       http://linuxforphp.net/
  * @license    Apache License, Version 2.0, see above
  * @license    http://www.apache.org/licenses/LICENSE-2.0
@@ -87,11 +87,13 @@ class DockerCommitCommand extends Command
             return;
         }
 
+        // @codeCoverageIgnoreStart
         if ($fileContentsArray['thread-safe'] === 'true') {
             $threadsafe = '-zts';
         } else {
             $threadsafe = '-nts';
         }
+        // @codeCoverageIgnoreEnd
 
         $pid = (string) $input->getArgument('pid');
 
@@ -106,11 +108,13 @@ class DockerCommitCommand extends Command
         $commitImageProcess = new LinuxForComposerProcess($this->dockerCommitCommand);
 
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            // @codeCoverageIgnoreStart
             if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                 $commitImageProcess->setDecorateWindows(true);
             } else {
                 $commitImageProcess->setDecorateWindowsLegacy(true);
             }
+            // @codeCoverageIgnoreEnd
         }
 
         $commitImageProcess->setTty($commitImageProcess->isTtySupported());
@@ -140,7 +144,7 @@ class DockerCommitCommand extends Command
         if ($position !== null) {
             $fileContentsArray['php-versions'][$position] = $versionName;
 
-            $fileContentsJson = json_encode($fileContentsArray, JSON_PRETTY_PRINT);
+            $fileContentsJson = json_encode($fileContentsArray, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
             file_put_contents($jsonFile, $fileContentsJson);
         }

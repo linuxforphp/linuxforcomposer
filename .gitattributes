@@ -8,7 +8,7 @@
 .project export-ignore
 .settings
 # composer files
-composer.* export-ignore
+composer.json.* export-ignore
 # travis file
 .travis.yml export-ignore
 # phpunit files
