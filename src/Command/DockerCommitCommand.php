@@ -140,7 +140,7 @@ class DockerCommitCommand extends Command
         if ($position !== null) {
             $fileContentsArray['php-versions'][$position] = $versionName;
 
-            $fileContentsJson = json_encode($fileContentsArray, JSON_PRETTY_PRINT);
+            $fileContentsJson = json_encode($fileContentsArray, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
             file_put_contents($jsonFile, $fileContentsJson);
         }
