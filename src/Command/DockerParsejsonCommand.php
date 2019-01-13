@@ -114,10 +114,12 @@ class DockerParsejsonCommand extends Command
 
             $dockerManageCommand .= $phpversion;
 
+            // @codeCoverageIgnoreStart
             $threadsafe =
                 isset($fileContentsArray['thread-safe']) && $fileContentsArray['thread-safe'] === 'true'
                     ? 'zts'
                     : 'nts';
+            // @codeCoverageIgnoreEnd
 
             $dockerManageCommand .= ' --threadsafe ';
 

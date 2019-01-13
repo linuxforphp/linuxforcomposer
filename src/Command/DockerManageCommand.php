@@ -93,12 +93,14 @@ class DockerManageCommand extends Command
         $checkImageProcess = new LinuxForComposerProcess($this->dockerPullCommand);
 
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            // @codeCoverageIgnoreStart
             if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                 $checkImageProcess->setDecorateWindowsWithReturnCode(true, $temp_filename);
             } else {
                 $temp_filename = $this->win8NormalizePath($temp_filename);
                 $checkImageProcess->setDecorateWindowsLegacyWithReturnCode(true, $temp_filename);
             }
+            // @codeCoverageIgnoreEnd
         }
 
         $checkImageProcess->setTty($checkImageProcess->isTtySupported());
@@ -124,7 +126,9 @@ class DockerManageCommand extends Command
         }
 
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            // @codeCoverageIgnoreStart
             $checkLocalExitCode = (int) trim(file_get_contents($temp_filename));
+            // @codeCoverageIgnoreEnd
         } else {
             $checkLocalExitCode = (int) trim($checkImageProcess->getExitCode());
         }
@@ -224,6 +228,7 @@ class DockerManageCommand extends Command
 
                 echo 'Starting container...' . PHP_EOL;
 
+                // @codeCoverageIgnoreStart
                 if ($input->getOption('detached') !== false) {
                     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                         if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
@@ -249,6 +254,7 @@ class DockerManageCommand extends Command
                         }
                     }
                 }
+                // @codeCoverageIgnoreEnd
 
                 $runContainerProcess->setTty($runContainerProcess->isTtySupported());
 
@@ -258,16 +264,20 @@ class DockerManageCommand extends Command
 
                 $runContainerProcess->start();
 
+                // @codeCoverageIgnoreStart
                 $runContainerProcess->wait(
                     function ($type, $data) {
                         echo $data;
                     }
                 );
+                // @codeCoverageIgnoreEnd
 
                 // executes after the command finishes
                 if ($runContainerProcess->isSuccessful()) {
                     if ($input->getOption('detached') !== false) {
+                        // @codeCoverageIgnoreStart
                         $pid = trim(file_get_contents($temp_filename));
+                        // @codeCoverageIgnoreEnd
                     } else {
                         $processPID = new LinuxForComposerProcess('docker ps -l -q');
                         $processPID->setTimeout(null);
@@ -333,6 +343,7 @@ class DockerManageCommand extends Command
                             $subvalue = substr($value, 0, 12);
 
                             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                                // @codeCoverageIgnoreStart
                                 if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                                     if (!file_exists(VENDORFOLDERPID . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bat')) {
                                         if (!copy(
@@ -465,6 +476,7 @@ class DockerManageCommand extends Command
                                         echo $processStderr . PHP_EOL;
                                     }
                                 }
+                                // @codeCoverageIgnoreEnd
                             } else {
                                 $containerInfoProcess =
                                     new LinuxForComposerProcess('docker ps --filter "id=' . $subvalue . '"');
@@ -483,6 +495,7 @@ class DockerManageCommand extends Command
                                     false
                                 );
 
+                                // @codeCoverageIgnoreStart
                                 if ($helper1->ask($input, $output, $question1)) {
                                     $helper2 = $this->getHelper('question');
                                     $question2 = new Question(
@@ -542,12 +555,14 @@ class DockerManageCommand extends Command
                             $dockerStopCommand .= $subvalue;
 
                             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                                // @codeCoverageIgnoreStart
                                 if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                                     // Not declared and defined at the class level because of possibly multiple containers.
                                     $dockerRemoveCommand = 'docker rm ' . $subvalue;
                                 } else {
                                     $dockerStopCommand .= ' && docker rm ' . $subvalue;
                                 }
+                                // @codeCoverageIgnoreEnd
                             } else {
                                 $dockerStopCommand .= ' && docker rm ' . $subvalue;
                             }
@@ -555,11 +570,13 @@ class DockerManageCommand extends Command
                             $stopContainerProcess = new LinuxForComposerProcess($dockerStopCommand);
 
                             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                                // @codeCoverageIgnoreStart
                                 if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                                     $stopContainerProcess->setDecorateWindows(true);
                                 } else {
                                     $stopContainerProcess->setDecorateWindowsLegacy(true);
                                 }
+                                // @codeCoverageIgnoreEnd
                             }
 
                             $stopContainerProcess->setTty($stopContainerProcess->isTtySupported());
@@ -585,6 +602,7 @@ class DockerManageCommand extends Command
                             }
 
                             if (isset($dockerRemoveCommand)) {
+                                // @codeCoverageIgnoreStart
                                 $removeContainerProcess =
                                     new LinuxForComposerProcess($dockerRemoveCommand);
 
@@ -609,6 +627,7 @@ class DockerManageCommand extends Command
                                 if (!empty($processStderr)) {
                                     echo $processStderr . PHP_EOL;
                                 }
+                                // @codeCoverageIgnoreEnd
                             }
 
                             $position++;
@@ -632,6 +651,7 @@ class DockerManageCommand extends Command
         }
     }
 
+    // @codeCoverageIgnoreStart
     protected function win8NormalizePath($path)
     {
         $path = str_replace('\\', '/', $path);
@@ -641,4 +661,5 @@ class DockerManageCommand extends Command
         }
         return $path;
     }
+    // @codeCoverageIgnoreEnd
 }

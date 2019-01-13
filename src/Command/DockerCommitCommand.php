@@ -87,11 +87,13 @@ class DockerCommitCommand extends Command
             return;
         }
 
+        // @codeCoverageIgnoreStart
         if ($fileContentsArray['thread-safe'] === 'true') {
             $threadsafe = '-zts';
         } else {
             $threadsafe = '-nts';
         }
+        // @codeCoverageIgnoreEnd
 
         $pid = (string) $input->getArgument('pid');
 
@@ -106,11 +108,13 @@ class DockerCommitCommand extends Command
         $commitImageProcess = new LinuxForComposerProcess($this->dockerCommitCommand);
 
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            // @codeCoverageIgnoreStart
             if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                 $commitImageProcess->setDecorateWindows(true);
             } else {
                 $commitImageProcess->setDecorateWindowsLegacy(true);
             }
+            // @codeCoverageIgnoreEnd
         }
 
         $commitImageProcess->setTty($commitImageProcess->isTtySupported());
