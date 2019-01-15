@@ -3,6 +3,11 @@
 What's New
 ==========
 
+What's New in Version 1.0.2 (2019-01-15)
+----------------------------------------
+
+* Updates the PHP versions to the Linux for PHP 8.1.3 pre-compiled versions.
+
 
 What's New in Version 1.0.1 (2019-01-13)
 ----------------------------------------
