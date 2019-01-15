@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.0.2 (2019-01-15)
+
+- Updates the PHP versions to the Linux for PHP 8.1.3 pre-compiled versions.
+
 ## 1.0.1 (2019-01-13)
 
 - Fixes an issue whereby the Linux for Composer PID file could be deleted by the 'composer update' command.
