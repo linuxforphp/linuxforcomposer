@@ -122,10 +122,10 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'bad',
-        ));
+        ]);
 
         // the output of the command in the console
         //$output = $commandTester->getDisplay();
@@ -150,7 +150,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'bad',
             '--jsonfile' => dirname(__DIR__)
@@ -158,7 +158,7 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.custom.json',
-        ));
+        ]);
 
         // the output of the command in the console
         //$output = $commandTester->getDisplay();
@@ -183,7 +183,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'bad',
             '--jsonfile' => dirname(__DIR__)
@@ -191,7 +191,7 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.custom.wrong.json',
-        ));
+        ]);
 
         // the output of the command in the console
         //$output = $commandTester->getDisplay();
@@ -228,10 +228,10 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'start',
-        ));
+        ]);
 
         $this->assertSame(
             'Fake Docker is running!'
@@ -269,7 +269,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'start',
             '--jsonfile' => dirname(__DIR__)
@@ -277,7 +277,7 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.custom.json',
-        ));
+        ]);
 
         $this->assertSame(
             'Fake Docker is running!'
@@ -311,7 +311,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'start',
             '--jsonfile' => dirname(__DIR__)
@@ -319,7 +319,7 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.custom.wrong.json',
-        ));
+        ]);
 
         $this->assertSame(
             'Fake Docker is running!'
@@ -360,7 +360,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'start',
             '--jsonfile' => dirname(__DIR__)
@@ -368,7 +368,7 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.custom.wrong.json',
-        ));
+        ]);
 
         copy(JSONFILE . '.wrong', JSONFILE);
         unlink(JSONFILE . '.wrong');
@@ -400,7 +400,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'start',
             '--jsonfile' => dirname(__DIR__)
@@ -408,7 +408,7 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.invalid.json',
-        ));
+        ]);
 
         $this->assertSame(
             PHP_EOL
@@ -433,7 +433,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'start',
             '--jsonfile' => dirname(__DIR__)
@@ -441,7 +441,7 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.empty.json',
-        ));
+        ]);
 
         $this->assertSame(
             PHP_EOL
@@ -466,7 +466,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'start',
             '--jsonfile' => dirname(__DIR__)
@@ -474,7 +474,7 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.missing.php.json',
-        ));
+        ]);
 
         $this->assertSame(
             PHP_EOL
@@ -510,7 +510,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'start',
             '--jsonfile' => dirname(__DIR__)
@@ -518,7 +518,7 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.minimum.config.json',
-        ));
+        ]);
 
         $this->assertSame(
             'Fake Docker is running!'
@@ -552,7 +552,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'start',
             '--jsonfile' => dirname(__DIR__)
@@ -560,7 +560,7 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.missing.detached.json',
-        ));
+        ]);
 
         $this->assertSame(
             'Fake Docker is running!'
@@ -596,7 +596,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'start',
             '--jsonfile' => dirname(__DIR__)
@@ -604,7 +604,7 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.one.port.json',
-        ));
+        ]);
 
         $this->assertSame(
             'Fake Docker is running!'
@@ -640,7 +640,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'start',
             '--jsonfile' => dirname(__DIR__)
@@ -648,7 +648,7 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.missing.script.json',
-        ));
+        ]);
 
         $this->assertSame(
             'Fake Docker is running!'
@@ -684,7 +684,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'start',
             '--jsonfile' => dirname(__DIR__)
@@ -692,7 +692,7 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.missing.ts.json',
-        ));
+        ]);
 
         $this->assertSame(
             'Fake Docker is running!'
@@ -728,7 +728,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'start',
             '--jsonfile' => dirname(__DIR__)
@@ -736,7 +736,7 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.json',
-        ));
+        ]);
 
         $this->assertSame(
             'Error! Docker is not running.'
@@ -774,10 +774,10 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'stop',
-        ));
+        ]);
 
         $this->assertSame(
             'Fake Docker stopped!'
@@ -811,10 +811,10 @@ class DockerRunCommandTest extends KernelTestCase
 
         $command = $application->find('docker:run');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'stop',
-        ));
+        ]);
 
         $this->assertSame(
             'Error! Docker is not stopped.'

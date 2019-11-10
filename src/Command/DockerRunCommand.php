@@ -68,11 +68,11 @@ class DockerRunCommand extends Command
                 $jsonFile = ($input->getOption('jsonfile')) ?: null;
 
                 if ($jsonFile !== null) {
-                    $arguments = array(
+                    $arguments = [
                         '--jsonfile' => $jsonFile,
-                    );
+                    ];
                 } else {
-                    $arguments = array();
+                    $arguments = [];
                 }
 
                 $parseInput = new ArrayInput($arguments);
