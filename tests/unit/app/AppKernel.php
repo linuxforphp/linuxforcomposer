@@ -34,7 +34,7 @@ class AppKernel extends Kernel
 {
     public function registerBundles()
     {
-        return array();
+        return [];
     }
 
     public function getRootDir()

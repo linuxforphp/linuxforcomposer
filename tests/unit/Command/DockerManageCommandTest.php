@@ -178,7 +178,7 @@ class DockerManageCommandTest extends KernelTestCase
 
         $output = $commandMethods['checkImage']->invokeArgs(
             $command,
-            array('7.2.5-nts', 'nts', 'lfphp')
+            ['7.2.5-nts', 'nts', 'lfphp']
         );
 
         $this->assertSame(
@@ -206,7 +206,7 @@ class DockerManageCommandTest extends KernelTestCase
 
         $output2 = $commandMethods['checkImage']->invokeArgs(
             $command,
-            array('7.1.16-zts', 'zts', '/bin/bash')
+            ['7.1.16-zts', 'zts', '/bin/bash']
         );
 
         $this->assertSame(
@@ -216,7 +216,7 @@ class DockerManageCommandTest extends KernelTestCase
 
         $output3 = $commandMethods['checkImage']->invokeArgs(
             $command,
-            array('7.0.29-nts', 'nts', '/bin/bash')
+            ['7.0.29-nts', 'nts', '/bin/bash']
         );
 
         $this->assertSame(
@@ -267,7 +267,7 @@ class DockerManageCommandTest extends KernelTestCase
 
         $output = $commandMethods['checkImage']->invokeArgs(
             $command,
-            array('7.3.5-nts', 'nts', 'lfphp')
+            ['7.3.5-nts', 'nts', 'lfphp']
         );
 
         $this->assertSame(
@@ -330,7 +330,7 @@ class DockerManageCommandTest extends KernelTestCase
             $commandMethods[$key]->setAccessible(true);
         }
 
-        $arguments = array(
+        $arguments = [
             'command' => 'docker:run',
             'interactive' => true,
             'tty'  => true,
@@ -341,14 +341,14 @@ class DockerManageCommandTest extends KernelTestCase
             'volume' => '${PWD}/:/srv/www',
             'script' => 'lfphp',
             'execute' => 'run',
-        );
+        ];
 
         $arrayInputFake = new InputMock();
         $arrayInputFake->setArguments($arguments);
 
         $output = $commandMethods['formatInput']->invokeArgs(
             $dockerManageCommandFake,
-            array($arrayInputFake)
+            [$arrayInputFake]
         );
 
         $this->assertSame(
@@ -386,31 +386,31 @@ class DockerManageCommandTest extends KernelTestCase
             $commandMethods[$key]->setAccessible(true);
         }
 
-        $arguments = array(
+        $arguments = [
             'command' => 'docker:run',
             'interactive' => true,
             'tty'  => true,
             'detached'  => true,
             'phpversion' => '7.2.5',
             'threadsafe' => 'nts',
-            'port' => array(
+            'port' => [
                 '8181:80',
                 '3306:3306',
-            ),
-            'volume' => array(
+            ],
+            'volume' => [
                 '${PWD}/:/srv/www',
                 '${PWD}/:/srv/test',
-            ),
+            ],
             'script' => 'lfphp',
             'execute' => 'run',
-        );
+        ];
 
         $arrayInputFake = new InputMock();
         $arrayInputFake->setArguments($arguments);
 
         $output = $commandMethods['formatInput']->invokeArgs(
             $dockerManageCommandFake,
-            array($arrayInputFake)
+            [$arrayInputFake]
         );
 
         $this->assertSame(
@@ -430,31 +430,31 @@ class DockerManageCommandTest extends KernelTestCase
             $commandMethods[$key]->setAccessible(true);
         }
 
-        $arguments = array(
+        $arguments = [
             'command' => 'docker:run',
             'interactive' => true,
             'tty'  => true,
             'detached'  => true,
             'phpversion' => 'custom-7.2.5',
             'threadsafe' => 'nts',
-            'port' => array(
+            'port' => [
                 '8181:80',
                 '3306:3306',
-            ),
-            'volume' => array(
+            ],
+            'volume' => [
                 '${PWD}/:/srv/www',
                 '${PWD}/:/srv/test',
-            ),
+            ],
             'script' => 'lfphp',
             'execute' => 'run',
-        );
+        ];
 
         $arrayInputFake = new InputMock();
         $arrayInputFake->setArguments($arguments);
 
         $output = $commandMethods['formatInput']->invokeArgs(
             $dockerManageCommandFake,
-            array($arrayInputFake)
+            [$arrayInputFake]
         );
 
         $this->assertSame(
@@ -495,10 +495,10 @@ class DockerManageCommandTest extends KernelTestCase
 
         $command = $application->find('docker:manage');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'run',
-        ));
+        ]);
 
         $this->assertSame(
             PHP_EOL
@@ -548,10 +548,10 @@ class DockerManageCommandTest extends KernelTestCase
 
         $command = $application->find('docker:manage');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'run',
-        ));
+        ]);
 
         $this->assertSame(
             PHP_EOL
@@ -605,11 +605,11 @@ class DockerManageCommandTest extends KernelTestCase
 
         $command = $application->find('docker:manage');
         $commandTester = new CommandTester($command);
-        $commandTester->setInputs(array('n'));
-        $commandTester->execute(array(
+        $commandTester->setInputs(['n']);
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'stop',
-        ));
+        ]);
 
         $this->assertSame(
             PHP_EOL . 'Stopping container...' . PHP_EOL,
@@ -649,11 +649,11 @@ class DockerManageCommandTest extends KernelTestCase
 
         $command = $application->find('docker:manage');
         $commandTester = new CommandTester($command);
-        $commandTester->setInputs(array('n'));
-        $commandTester->execute(array(
+        $commandTester->setInputs(['n']);
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'stop',
-        ));
+        ]);
 
         $this->assertSame(
             'Fake containers stopped and removed!'
@@ -700,13 +700,13 @@ class DockerManageCommandTest extends KernelTestCase
 
         $command = $application->find('docker:manage');
         $commandTester = new CommandTester($command);
-        $commandTester->setInputs(array('y'));
-        $commandTester->setInputs(array('test-7.2.5'));
-        $commandTester->setInputs(array('n'));
-        $commandTester->execute(array(
+        $commandTester->setInputs(['y']);
+        $commandTester->setInputs(['test-7.2.5']);
+        $commandTester->setInputs(['n']);
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'stop',
-        ));
+        ]);
 
         $this->assertSame(
             'Container a1a1'
@@ -755,16 +755,16 @@ class DockerManageCommandTest extends KernelTestCase
 
         $command = $application->find('docker:manage');
         $commandTester = new CommandTester($command);
-        $commandTester->setInputs(array('y'));
-        $commandTester->setInputs(array('test-7.2.5'));
+        $commandTester->setInputs(['y']);
+        $commandTester->setInputs(['test-7.2.5']);
 
         // ** TEST DEACTIVATED **
         // The next line is causing a runtime exception within the Symfony console!
-        $commandTester->setInputs(array('y'));
-        $commandTester->execute(array(
+        $commandTester->setInputs(['y']);
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'stop',
-        ));
+        ]);
 
         $this->assertSame(
             'Container a1a1'
@@ -810,10 +810,10 @@ class DockerManageCommandTest extends KernelTestCase
 
         $command = $application->find('docker:manage');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'stop',
-        ));
+        ]);
 
         $this->assertSame(
             PHP_EOL
@@ -848,10 +848,10 @@ class DockerManageCommandTest extends KernelTestCase
 
         $command = $application->find('docker:manage');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'stop',
-        ));
+        ]);
 
         $this->assertSame(
             PHP_EOL
@@ -877,10 +877,10 @@ class DockerManageCommandTest extends KernelTestCase
 
         $command = $application->find('docker:manage');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'bad',
-        ));
+        ]);
 
         $this->assertSame(
             PHP_EOL

@@ -84,9 +84,9 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -116,14 +116,14 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             '--jsonfile' => dirname(__DIR__)
                 . DIRECTORY_SEPARATOR
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.custom.json',
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -145,14 +145,14 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             '--jsonfile' => dirname(__DIR__)
                 . DIRECTORY_SEPARATOR
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.custom.wrong.json',
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -185,14 +185,14 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             '--jsonfile' => dirname(__DIR__)
                 . DIRECTORY_SEPARATOR
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.custom.wrong.json',
-        ));
+        ]);
 
         copy(JSONFILE . '.wrong', JSONFILE);
         unlink(JSONFILE . '.wrong');
@@ -229,14 +229,14 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             '--jsonfile' => dirname(__DIR__)
                 . DIRECTORY_SEPARATOR
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.invalid.json',
-        ));
+        ]);
 
         $this->assertEquals(1, $commandTester->getStatusCode());
 
@@ -254,14 +254,14 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             '--jsonfile' => dirname(__DIR__)
                 . DIRECTORY_SEPARATOR
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.empty.json',
-        ));
+        ]);
 
         $this->assertEquals(2, $commandTester->getStatusCode());
 
@@ -279,14 +279,14 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             '--jsonfile' => dirname(__DIR__)
                 . DIRECTORY_SEPARATOR
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.missing.php.json',
-        ));
+        ]);
 
         $this->assertEquals(2, $commandTester->getStatusCode());
 
@@ -304,14 +304,14 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             '--jsonfile' => dirname(__DIR__)
                 . DIRECTORY_SEPARATOR
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.minimum.config.json',
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -332,14 +332,14 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             '--jsonfile' => dirname(__DIR__)
                 . DIRECTORY_SEPARATOR
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.missing.detached.json',
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -365,14 +365,14 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             '--jsonfile' => dirname(__DIR__)
                 . DIRECTORY_SEPARATOR
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.one.port.noarray.json',
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -398,14 +398,14 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             '--jsonfile' => dirname(__DIR__)
                 . DIRECTORY_SEPARATOR
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.one.port.json',
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -431,14 +431,14 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             '--jsonfile' => dirname(__DIR__)
                 . DIRECTORY_SEPARATOR
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.multiple.ports.json',
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -464,14 +464,14 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             '--jsonfile' => dirname(__DIR__)
                 . DIRECTORY_SEPARATOR
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.one.volume.noarray.json',
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -497,14 +497,14 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             '--jsonfile' => dirname(__DIR__)
                 . DIRECTORY_SEPARATOR
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.one.volume.json',
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -530,14 +530,14 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             '--jsonfile' => dirname(__DIR__)
                 . DIRECTORY_SEPARATOR
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.multiple.volumes.json',
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -563,14 +563,14 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             '--jsonfile' => dirname(__DIR__)
                 . DIRECTORY_SEPARATOR
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.missing.script.json',
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -596,14 +596,14 @@ class DockerParsejsonCommandTest extends KernelTestCase
 
         $command = $application->find('docker:parsejson');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             '--jsonfile' => dirname(__DIR__)
                 . DIRECTORY_SEPARATOR
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.missing.ts.json',
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
