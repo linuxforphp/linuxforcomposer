@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Linux for PHP/Linux for Composer
  *
@@ -91,9 +90,7 @@ class DockerParsejsonCommand extends Command
             $fileContentsArray['modes'][] = 'detached';
         }
 
-        $i = 0;
-
-        foreach ($fileContentsArray['php-versions'] as $phpversion) {
+        for ($i = 0; $i < count($fileContentsArray['php-versions']); $i++) {
             $dockerManageCommand = 'php '
                 . PHARFILENAME
                 . ' docker:manage';
@@ -112,7 +109,7 @@ class DockerParsejsonCommand extends Command
 
             $dockerManageCommand .= ' --phpversion ';
 
-            $dockerManageCommand .= $phpversion;
+            $dockerManageCommand .= $fileContentsArray['php-versions'][$i];
 
             // @codeCoverageIgnoreStart
             $threadsafe =
@@ -161,14 +158,31 @@ class DockerParsejsonCommand extends Command
                 }
             }
 
-            $script =
-                isset($fileContentsArray['script']) && !empty($fileContentsArray['script'])
-                    ? $fileContentsArray['script']
-                    : 'lfphp';
+            $script = '';
+
+            if (isset($fileContentsArray['script'])
+                && !empty($fileContentsArray['script'])
+                && is_array($fileContentsArray['script'])
+            ) {
+                foreach ($fileContentsArray['script'] as $command) {
+                    if (!empty($script)) {
+                        $script .= ',,,';
+                    }
+
+                    $script .= $command;
+                }
+            } elseif (isset($fileContentsArray['script'])
+                && !empty($fileContentsArray['script'])
+                && !is_array($fileContentsArray['script'])
+            ) {
+                $script .= $fileContentsArray['script'];
+            } else {
+                $script .= 'lfphp';
+            }
 
             $dockerManageCommand .= ' --script ';
 
-            $dockerManageCommand .= $script;
+            $dockerManageCommand .= escapeshellarg($script);
 
             $dockerManageCommand .= ' run';
 
@@ -176,8 +190,6 @@ class DockerParsejsonCommand extends Command
             $output->writeln($dockerManageCommand);
 
             $dockerManageCommand = '';
-
-            $i++;
         }
 
         return 0;

@@ -18,6 +18,10 @@
             <!-- <file>src/Command/DockerManageCommand.php</file> -->
             <!-- <file>src/Command/DockerParsejsonCommand.php</file> -->
             <!-- <file>src/Command/DockerRunCommand.php</file> -->
+            <exclude>
+                <directory suffix=".php">src/Helper</directory>
+                <!-- <file>src/Helper/LinuxForComposerProcess.php</file> -->
+            </exclude>
         </whitelist>
     </filter>
     <!-- <logging>

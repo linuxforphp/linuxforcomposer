@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Linux for PHP/Linux for Composer
  *
@@ -41,7 +40,7 @@ use Linuxforcomposer\Helper\LinuxForComposerProcess;
 
 class DockerManageCommand extends Command
 {
-    const LFPHPDEFAULTVERSION = 'asclinux/linuxforphp-8.1';
+    const LFPHPDEFAULTVERSION = 'asclinux/linuxforphp-8.1-ultimate';
 
     const PHPDEFAULTVERSION = 'master';
 
@@ -144,12 +143,12 @@ class DockerManageCommand extends Command
         if ($checkLocalExitCode !== 0) {
             $imageName .= DockerManageCommand::LFPHPDEFAULTVERSION . ':src ';
             $imageName .=
-                '/bin/bash -c \'lfphp-compile '
+                '/bin/bash -c "lfphp-compile '
                 . $phpversion . ' ' . $threadsafe
-                . ' ; '. $script .'\'';
+                . ' ; '. $script . '"';
         } else {
             $imageName .= DockerManageCommand::LFPHPDEFAULTVERSION . ':' . $phpversionFull . ' ';
-            $imageName .= $script;
+            $imageName .= '/bin/bash -c "' . $script . '"';
         }
 
         return $imageName;
@@ -204,11 +203,13 @@ class DockerManageCommand extends Command
 
         $script = ($input->getOption('script')) ?: 'lfphp';
 
+        $script = str_replace(',,,', ' ; ', $script);
+
         if (strpos($phpversionFull, 'custom') !== false) {
             $this->dockerRunCommand .= DockerManageCommand::LFPHPDEFAULTVERSION
                 . ':' . $phpversionFull
                 . ' '
-                . $script;
+                . '/bin/bash -c "' . $script . '"';
         } else {
             $this->dockerRunCommand .= $this->checkImage($phpversionFull, $threadsafe, $script);
         }

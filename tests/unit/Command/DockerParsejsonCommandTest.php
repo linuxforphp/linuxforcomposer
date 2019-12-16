@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Linux for PHP/Linux for Composer
  *
@@ -93,15 +92,15 @@ class DockerParsejsonCommandTest extends KernelTestCase
         $this->assertSame(
             'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.2.5 --threadsafe nts --port 8181:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL
             . 'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.1.16 --threadsafe nts --port 8282:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL
             . 'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.0.29 --threadsafe nts --port 8383:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL,
             $output
         );
@@ -130,7 +129,7 @@ class DockerParsejsonCommandTest extends KernelTestCase
         $this->assertSame(
             'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 5.6.35 --threadsafe nts --port 8181:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL,
             $output
         );
@@ -159,15 +158,15 @@ class DockerParsejsonCommandTest extends KernelTestCase
         $this->assertSame(
             'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.2.5 --threadsafe nts --port 8181:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL
             . 'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.1.16 --threadsafe nts --port 8282:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL
             . 'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.0.29 --threadsafe nts --port 8383:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL,
             $output
         );
@@ -202,19 +201,19 @@ class DockerParsejsonCommandTest extends KernelTestCase
         $this->assertSame(
             'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.2.5 --threadsafe nts --port 8181:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL
             . 'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.1.16 --threadsafe nts --port 8282:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL
             . 'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.0.29 --threadsafe nts --port 8383:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL
             . 'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 5.6.35 --threadsafe nts --port 8484:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL,
             $output
         );
@@ -317,7 +316,7 @@ class DockerParsejsonCommandTest extends KernelTestCase
         $output = $commandTester->getDisplay();
         $this->assertSame(
             'php '. dirname(__DIR__) . '/app/app.php docker:manage '
-            .'--detached --phpversion 5.6.35 --threadsafe nts --script lfphp run'
+            .'--detached --phpversion 5.6.35 --threadsafe nts --script \'lfphp\' run'
             . PHP_EOL,
             $output
         );
@@ -346,11 +345,11 @@ class DockerParsejsonCommandTest extends KernelTestCase
         $this->assertSame(
             'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.0.29 --threadsafe nts --port 8181:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL
             . 'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 5.6.35 --threadsafe nts --port 8282:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL,
             $output
         );
@@ -379,11 +378,11 @@ class DockerParsejsonCommandTest extends KernelTestCase
         $this->assertSame(
             'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.0.29 --threadsafe nts '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL
             . 'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 5.6.35 --threadsafe nts '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL,
             $output
         );
@@ -412,11 +411,11 @@ class DockerParsejsonCommandTest extends KernelTestCase
         $this->assertSame(
             'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.0.29 --threadsafe nts --port 8484:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL
             . 'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 5.6.35 --threadsafe nts '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL,
             $output
         );
@@ -445,11 +444,11 @@ class DockerParsejsonCommandTest extends KernelTestCase
         $this->assertSame(
             'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.0.29 --threadsafe nts --port 8181:80 '
-            .'--port 3306:3306 --volume ${PWD}/:/srv/www --script lfphp run'
+            .'--port 3306:3306 --volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL
             . 'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 5.6.35 --threadsafe nts --port 8282:80 '
-            .'--port 3307:3306 --volume ${PWD}/:/srv/www --script lfphp run'
+            .'--port 3307:3306 --volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL,
             $output
         );
@@ -478,11 +477,11 @@ class DockerParsejsonCommandTest extends KernelTestCase
         $this->assertSame(
             'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.0.29 --threadsafe nts --port 8181:80 '
-            .'--script lfphp run'
+            .'--script \'lfphp\' run'
             . PHP_EOL
             . 'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 5.6.35 --threadsafe nts --port 8282:80 '
-            .'--script lfphp run'
+            .'--script \'lfphp\' run'
             . PHP_EOL,
             $output
         );
@@ -511,11 +510,11 @@ class DockerParsejsonCommandTest extends KernelTestCase
         $this->assertSame(
             'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.0.29 --threadsafe nts --port 8181:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL
             . 'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 5.6.35 --threadsafe nts --port 8282:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL,
             $output
         );
@@ -544,11 +543,11 @@ class DockerParsejsonCommandTest extends KernelTestCase
         $this->assertSame(
             'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.0.29 --threadsafe nts --port 8181:80 '
-            .'--volume ${PWD}/:/srv/www --volume ${PWD}/:/srv/test --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --volume ${PWD}/:/srv/test --script \'lfphp\' run'
             . PHP_EOL
             . 'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 5.6.35 --threadsafe nts --port 8282:80 '
-            .'--volume ${PWD}/:/srv/www --volume ${PWD}/:/srv/test --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --volume ${PWD}/:/srv/test --script \'lfphp\' run'
             . PHP_EOL,
             $output
         );
@@ -577,11 +576,44 @@ class DockerParsejsonCommandTest extends KernelTestCase
         $this->assertSame(
             'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.0.29 --threadsafe nts --port 8181:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL
             . 'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 5.6.35 --threadsafe nts --port 8282:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
+            . PHP_EOL,
+            $output
+        );
+    }
+
+    public function testExecuteWithStartCommandWithMultipleScripts()
+    {
+        $kernel = self::bootKernel();
+
+        $application = new Application($kernel);
+        $application->add(new DockerParsejsonCommand());
+
+        $command = $application->find('docker:parsejson');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            '--jsonfile' => dirname(__DIR__)
+                . DIRECTORY_SEPARATOR
+                . 'app'
+                . DIRECTORY_SEPARATOR
+                . 'linuxforcomposer.test.multiple.scripts.json',
+        ]);
+
+        // the output of the command in the console
+        $output = $commandTester->getDisplay();
+        $this->assertSame(
+            "php " . dirname(__DIR__) . "/app/app.php docker:manage "
+            . "--detached --interactive --tty --phpversion 7.0.29 --threadsafe nts --port 8181:80 "
+            . "--volume \${PWD}/:/srv/www --script 'echo '\''<?php phpinfo();'\'' > /srv/www/index.php,,,lfphp' run"
+            . PHP_EOL
+            . "php " . dirname(__DIR__) . "/app/app.php docker:manage "
+            . "--detached --interactive --tty --phpversion 5.6.35 --threadsafe nts --port 8282:80 "
+            . "--volume \${PWD}/:/srv/www --script 'echo '\''<?php phpinfo();'\'' > /srv/www/index.php,,,lfphp' run"
             . PHP_EOL,
             $output
         );
@@ -610,11 +642,11 @@ class DockerParsejsonCommandTest extends KernelTestCase
         $this->assertSame(
             'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 7.0.29 --threadsafe nts --port 8181:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL
             . 'php '. dirname(__DIR__) . '/app/app.php docker:manage '
             .'--detached --interactive --tty --phpversion 5.6.35 --threadsafe nts --port 8282:80 '
-            .'--volume ${PWD}/:/srv/www --script lfphp run'
+            .'--volume ${PWD}/:/srv/www --script \'lfphp\' run'
             . PHP_EOL,
             $output
         );

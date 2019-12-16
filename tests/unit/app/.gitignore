@@ -13,6 +13,7 @@
 !linuxforcomposer.test.missing.script.json
 !linuxforcomposer.test.missing.ts.json
 !linuxforcomposer.test.multiple.ports.json
+!linuxforcomposer.test.multiple.scripts.json
 !linuxforcomposer.test.multiple.volumes.json
 !linuxforcomposer.test.one.port.json
 !linuxforcomposer.test.one.port.noarray.json

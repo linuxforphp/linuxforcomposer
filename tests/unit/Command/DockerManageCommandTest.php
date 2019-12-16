@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Linux for PHP/Linux for Composer
  *
@@ -139,8 +138,10 @@ class DockerManageCommandTest extends KernelTestCase
     public function testCheckImageWithImageAvailabilitySuccess()
     {
         // Redirect output to command output
-        $this->setOutputCallback(function () {
-        });
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
 
         $this->createMocksForUnixEnv();
 
@@ -182,7 +183,7 @@ class DockerManageCommandTest extends KernelTestCase
         );
 
         $this->assertSame(
-            'asclinux/linuxforphp-8.1:7.2.5-nts lfphp',
+            'asclinux/linuxforphp-8.1-ultimate:7.2.5-nts /bin/bash -c "lfphp"',
             $output
         );
 
@@ -210,7 +211,7 @@ class DockerManageCommandTest extends KernelTestCase
         );
 
         $this->assertSame(
-            'asclinux/linuxforphp-8.1:7.1.16-zts /bin/bash',
+            'asclinux/linuxforphp-8.1-ultimate:7.1.16-zts /bin/bash -c "/bin/bash"',
             $output2
         );
 
@@ -220,16 +221,20 @@ class DockerManageCommandTest extends KernelTestCase
         );
 
         $this->assertSame(
-            'asclinux/linuxforphp-8.1:7.0.29-nts /bin/bash',
+            'asclinux/linuxforphp-8.1-ultimate:7.0.29-nts /bin/bash -c "/bin/bash"',
             $output3
         );
+
+        ob_end_clean();
     }
 
     public function testCheckImageWithImageAvailabilityFailure()
     {
         // Redirect output to command output
-        $this->setOutputCallback(function () {
-        });
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
 
         $this->createMocksForUnixEnv();
 
@@ -271,8 +276,8 @@ class DockerManageCommandTest extends KernelTestCase
         );
 
         $this->assertSame(
-            'asclinux/linuxforphp-8.1:src '
-            . '/bin/bash -c \'lfphp-compile 7.3.5 nts ; lfphp\'',
+            'asclinux/linuxforphp-8.1-ultimate:src '
+            . '/bin/bash -c "lfphp-compile 7.3.5 nts ; lfphp"',
             $output
         );
 
@@ -293,6 +298,8 @@ class DockerManageCommandTest extends KernelTestCase
             . PHP_EOL,
             $this->getActualOutput()
         );
+
+        ob_end_clean();
     }
 
     public function testFormatInput()
@@ -353,7 +360,7 @@ class DockerManageCommandTest extends KernelTestCase
 
         $this->assertSame(
             'docker run --restart=always -i -t -d -p 8181:80 '
-            . '-v ${PWD}/:/srv/www asclinux/linuxforphp-8.1:7.2.5-nts lfphp',
+            . '-v ${PWD}/:/srv/www asclinux/linuxforphp-8.1-ultimate:7.2.5-nts /bin/bash -c "lfphp"',
             $output
         );
 
@@ -415,7 +422,7 @@ class DockerManageCommandTest extends KernelTestCase
 
         $this->assertSame(
             'docker run --restart=always -i -t -d -p 8181:80 -p 3306:3306 '
-            . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test asclinux/linuxforphp-8.1:7.2.5-nts lfphp',
+            . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test asclinux/linuxforphp-8.1-ultimate:7.2.5-nts /bin/bash -c "lfphp"',
             $output
         );
 
@@ -459,7 +466,7 @@ class DockerManageCommandTest extends KernelTestCase
 
         $this->assertSame(
             'docker run --restart=always -i -t -d -p 8181:80 -p 3306:3306 '
-            . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test asclinux/linuxforphp-8.1:custom-7.2.5-nts lfphp',
+            . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test asclinux/linuxforphp-8.1-ultimate:custom-7.2.5-nts /bin/bash -c "lfphp"',
             $output
         );
     }
