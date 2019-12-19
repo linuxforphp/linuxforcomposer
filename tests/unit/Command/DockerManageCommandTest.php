@@ -179,11 +179,11 @@ class DockerManageCommandTest extends KernelTestCase
 
         $output = $commandMethods['checkImage']->invokeArgs(
             $command,
-            ['7.2.5-nts', 'nts', 'lfphp']
+            ['7.2.5-nts', 'nts']
         );
 
         $this->assertSame(
-            'asclinux/linuxforphp-8.1-ultimate:7.2.5-nts /bin/bash -c "lfphp"',
+            '',
             $output
         );
 
@@ -207,21 +207,21 @@ class DockerManageCommandTest extends KernelTestCase
 
         $output2 = $commandMethods['checkImage']->invokeArgs(
             $command,
-            ['7.1.16-zts', 'zts', '/bin/bash']
+            ['7.1.16-zts', 'zts']
         );
 
         $this->assertSame(
-            'asclinux/linuxforphp-8.1-ultimate:7.1.16-zts /bin/bash -c "/bin/bash"',
+            '',
             $output2
         );
 
         $output3 = $commandMethods['checkImage']->invokeArgs(
             $command,
-            ['7.0.29-nts', 'nts', '/bin/bash']
+            ['7.0.29-nts', 'nts']
         );
 
         $this->assertSame(
-            'asclinux/linuxforphp-8.1-ultimate:7.0.29-nts /bin/bash -c "/bin/bash"',
+            '',
             $output3
         );
 
@@ -272,12 +272,11 @@ class DockerManageCommandTest extends KernelTestCase
 
         $output = $commandMethods['checkImage']->invokeArgs(
             $command,
-            ['7.3.5-nts', 'nts', 'lfphp']
+            ['7.3.5-nts', 'nts']
         );
 
         $this->assertSame(
-            'asclinux/linuxforphp-8.1-ultimate:src '
-            . '/bin/bash -c "lfphp-compile 7.3.5 nts ; lfphp"',
+            'asclinux/linuxforphp-8.1-ultimate:src ',
             $output
         );
 
@@ -302,11 +301,13 @@ class DockerManageCommandTest extends KernelTestCase
         ob_end_clean();
     }
 
-    public function testFormatInput()
+    public function testFormatInputWithExistingPHPVersion()
     {
         // Redirect output to command output
-        $this->setOutputCallback(function () {
-        });
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
 
         $this->createMocksForUnixEnv();
 
@@ -466,9 +467,261 @@ class DockerManageCommandTest extends KernelTestCase
 
         $this->assertSame(
             'docker run --restart=always -i -t -d -p 8181:80 -p 3306:3306 '
-            . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test asclinux/linuxforphp-8.1-ultimate:custom-7.2.5-nts /bin/bash -c "lfphp"',
+            . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test '
+            . 'asclinux/linuxforphp-8.1-ultimate:custom-7.2.5-nts '
+            . '/bin/bash -c "lfphp"',
             $output
         );
+
+        $dockerManageCommandFake = new DockerManageCommand();
+        $commandReflection = new \ReflectionClass($dockerManageCommandFake);
+
+        $methodsList = $commandReflection->getMethods();
+
+        for ($i = 0; $i < count($methodsList); $i++) {
+            $key = $methodsList[$i]->name;
+            $commandMethods[$key] = $methodsList[$i];
+            $commandMethods[$key]->setAccessible(true);
+        }
+
+        $propertiesList = $commandReflection->getProperties();
+
+        for ($i = 0; $i < count($propertiesList); $i++) {
+            $key = $propertiesList[$i]->name;
+            $commandProperties[$key] = $propertiesList[$i];
+            $commandProperties[$key]->setAccessible(true);
+        }
+
+        $arguments = [
+            'command' => 'docker:run',
+            'interactive' => true,
+            'tty'  => true,
+            'detached'  => true,
+            'phpversion' => '7.2.5',
+            'threadsafe' => 'nts',
+            'port' => [
+                '8181:80',
+                '3306:3306',
+            ],
+            'volume' => [
+                '${PWD}/:/srv/www',
+                '${PWD}/:/srv/test',
+            ],
+            'script' => "echo '<?php phpinfo();' > /srv/www/index.php,,,lfphp",
+            'execute' => 'run',
+        ];
+
+        $arrayInputFake = new InputMock();
+        $arrayInputFake->setArguments($arguments);
+
+        $output = $commandMethods['formatInput']->invokeArgs(
+            $dockerManageCommandFake,
+            [$arrayInputFake]
+        );
+
+        $this->assertSame(
+            'docker run --restart=always -i -t -d -p 8181:80 -p 3306:3306 '
+            . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test '
+            . '-v ' . $commandProperties['tempScriptFile']->getValue($dockerManageCommandFake)
+            . ':/tmp/script.bash --entrypoint /tmp/script.bash '
+            . 'asclinux/linuxforphp-8.1-ultimate:7.2.5-nts',
+            $output
+        );
+
+        $dockerManageCommandFake = new DockerManageCommand();
+        $commandReflection = new \ReflectionClass($dockerManageCommandFake);
+
+        $methodsList = $commandReflection->getMethods();
+
+        for ($i = 0; $i < count($methodsList); $i++) {
+            $key = $methodsList[$i]->name;
+            $commandMethods[$key] = $methodsList[$i];
+            $commandMethods[$key]->setAccessible(true);
+        }
+
+        $propertiesList = $commandReflection->getProperties();
+
+        for ($i = 0; $i < count($propertiesList); $i++) {
+            $key = $propertiesList[$i]->name;
+            $commandProperties[$key] = $propertiesList[$i];
+            $commandProperties[$key]->setAccessible(true);
+        }
+
+        $arguments = [
+            'command' => 'docker:run',
+            'interactive' => true,
+            'tty'  => true,
+            'detached'  => true,
+            'phpversion' => 'custom-7.2.5',
+            'threadsafe' => 'nts',
+            'port' => [
+                '8181:80',
+                '3306:3306',
+            ],
+            'volume' => [
+                '${PWD}/:/srv/www',
+                '${PWD}/:/srv/test',
+            ],
+            'script' => "echo '<?php phpinfo();' > /srv/www/index.php,,,lfphp",
+            'execute' => 'run',
+        ];
+
+        $arrayInputFake = new InputMock();
+        $arrayInputFake->setArguments($arguments);
+
+        $output = $commandMethods['formatInput']->invokeArgs(
+            $dockerManageCommandFake,
+            [$arrayInputFake]
+        );
+
+        $this->assertSame(
+            'docker run --restart=always -i -t -d -p 8181:80 -p 3306:3306 '
+            . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test '
+            . '-v ' . $commandProperties['tempScriptFile']->getValue($dockerManageCommandFake)
+            . ':/tmp/script.bash --entrypoint /tmp/script.bash '
+            . 'asclinux/linuxforphp-8.1-ultimate:custom-7.2.5-nts',
+            $output
+        );
+
+        ob_end_clean();
+    }
+
+    public function testFormatInputWhenCreatingNewPHPVersion()
+    {
+        // Redirect output to command output
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
+
+        $this->createMocksForUnixEnv();
+
+        $this->dockerLfcProcessMock
+            ->shouldReceive('isRunning')
+            ->andReturn(false);
+        $this->dockerLfcProcessMock
+            ->shouldReceive('isSuccessful')
+            ->andReturn(true);
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getOutput')
+            ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getErrorOutput')
+            ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(1);
+
+        $dockerManageCommandFake = new DockerManageCommand();
+        $commandReflection = new \ReflectionClass($dockerManageCommandFake);
+
+        $methodsList = $commandReflection->getMethods();
+
+        for ($i = 0; $i < count($methodsList); $i++) {
+            $key = $methodsList[$i]->name;
+            $commandMethods[$key] = $methodsList[$i];
+            $commandMethods[$key]->setAccessible(true);
+        }
+
+        $propertiesList = $commandReflection->getProperties();
+
+        for ($i = 0; $i < count($propertiesList); $i++) {
+            $key = $propertiesList[$i]->name;
+            $commandProperties[$key] = $propertiesList[$i];
+            $commandProperties[$key]->setAccessible(true);
+        }
+
+        $arguments = [
+            'command' => 'docker:run',
+            'interactive' => true,
+            'tty'  => true,
+            'detached'  => true,
+            'phpversion' => '8.0',
+            'threadsafe' => 'nts',
+            'port' => [
+                '8181:80',
+                '3306:3306',
+            ],
+            'volume' => [
+                '${PWD}/:/srv/www',
+                '${PWD}/:/srv/test',
+            ],
+            'script' => "lfphp",
+            'execute' => 'run',
+        ];
+
+        $arrayInputFake = new InputMock();
+        $arrayInputFake->setArguments($arguments);
+
+        $output = $commandMethods['formatInput']->invokeArgs(
+            $dockerManageCommandFake,
+            [$arrayInputFake]
+        );
+
+        $this->assertSame(
+            'docker run --restart=always -i -t -d -p 8181:80 -p 3306:3306 '
+            . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test '
+            . 'asclinux/linuxforphp-8.1-ultimate:src '
+            . '/bin/bash -c "lfphp-compile 8.0 nts ; lfphp"',
+            $output
+        );
+
+        $dockerManageCommandFake = new DockerManageCommand();
+        $commandReflection = new \ReflectionClass($dockerManageCommandFake);
+
+        $methodsList = $commandReflection->getMethods();
+
+        for ($i = 0; $i < count($methodsList); $i++) {
+            $key = $methodsList[$i]->name;
+            $commandMethods[$key] = $methodsList[$i];
+            $commandMethods[$key]->setAccessible(true);
+        }
+
+        $propertiesList = $commandReflection->getProperties();
+
+        for ($i = 0; $i < count($propertiesList); $i++) {
+            $key = $propertiesList[$i]->name;
+            $commandProperties[$key] = $propertiesList[$i];
+            $commandProperties[$key]->setAccessible(true);
+        }
+
+        $arguments = [
+            'command' => 'docker:run',
+            'interactive' => true,
+            'tty'  => true,
+            'detached'  => true,
+            'phpversion' => '8.0',
+            'threadsafe' => 'nts',
+            'port' => [
+                '8181:80',
+                '3306:3306',
+            ],
+            'volume' => [
+                '${PWD}/:/srv/www',
+                '${PWD}/:/srv/test',
+            ],
+            'script' => "echo '<?php phpinfo();' > /srv/www/index.php,,,lfphp",
+            'execute' => 'run',
+        ];
+
+        $arrayInputFake = new InputMock();
+        $arrayInputFake->setArguments($arguments);
+
+        $output = $commandMethods['formatInput']->invokeArgs(
+            $dockerManageCommandFake,
+            [$arrayInputFake]
+        );
+
+        $this->assertSame(
+            'docker run --restart=always -i -t -d -p 8181:80 -p 3306:3306 '
+            . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test '
+            . '-v ' . $commandProperties['tempScriptFile']->getValue($dockerManageCommandFake)
+            . ':/tmp/script.bash --entrypoint /tmp/script.bash '
+            . 'asclinux/linuxforphp-8.1-ultimate:src',
+            $output
+        );
+
+        ob_end_clean();
     }
 
     public function testExecuteWithRunCommand()

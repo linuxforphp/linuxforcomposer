@@ -50,6 +50,8 @@ class DockerManageCommand extends Command
 
     protected $dockerRunCommand = 'docker run --restart=always ';
 
+    protected $tempScriptFile = '';
+
     public function __construct()
     {
         // you *must* call the parent constructor
@@ -75,11 +77,10 @@ class DockerManageCommand extends Command
             ->addOption('script', null, InputOption::VALUE_OPTIONAL);
     }
 
-    protected function checkImage($phpversionFull, $threadsafe, $script)
+    protected function checkImage($phpversionFull, $threadsafe)
     {
         $phpversionFull = (string) $phpversionFull;
         $threadsafe = (string) $threadsafe;
-        $script = (string) $script;
 
         echo PHP_EOL . 'Checking for image availability and downloading if necessary.' . PHP_EOL;
 
@@ -136,19 +137,8 @@ class DockerManageCommand extends Command
 
         $imageName = '';
 
-        $phpversionFullArray = explode('-', $phpversionFull);
-
-        $phpversion = $phpversionFullArray[0];
-
         if ($checkLocalExitCode !== 0) {
             $imageName .= DockerManageCommand::LFPHPDEFAULTVERSION . ':src ';
-            $imageName .=
-                '/bin/bash -c "lfphp-compile '
-                . $phpversion . ' ' . $threadsafe
-                . ' ; '. $script . '"';
-        } else {
-            $imageName .= DockerManageCommand::LFPHPDEFAULTVERSION . ':' . $phpversionFull . ' ';
-            $imageName .= '/bin/bash -c "' . $script . '"';
         }
 
         return $imageName;
@@ -182,12 +172,34 @@ class DockerManageCommand extends Command
             if (!empty($volumes) && !in_array('', $volumes)) {
                 foreach ($volumes as $volumeMap) {
                     if (!empty($volumeMap)) {
+                        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                            // @codeCoverageIgnoreStart
+                            if (strstr(php_uname('v'), 'Windows 10') === false && php_uname('r') != '10.0') {
+                                $volumeMap = $this->win8NormalizePath($volumeMap);
+                                $volumeMap = lcfirst($volumeMap);
+                                $volumeMap = str_replace(':/', '/', $volumeMap);
+                                $volumeMap = '/' . $volumeMap;
+                            }
+                            // @codeCoverageIgnoreEnd
+                        }
+
                         $this->dockerRunCommand .= '-v ' . $volumeMap . ' ';
                     }
                 }
             }
         } else {
             if (!empty($volumes)) {
+                if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                    // @codeCoverageIgnoreStart
+                    if (strstr(php_uname('v'), 'Windows 10') === false && php_uname('r') != '10.0') {
+                        $volumes = $this->win8NormalizePath($volumes);
+                        $volumes = lcfirst($volumes);
+                        $volumes = str_replace(':/', '/', $volumes);
+						$volumes = '/' . $volumes;
+                    }
+                    // @codeCoverageIgnoreEnd
+                }
+
                 $this->dockerRunCommand .= '-v ' . $volumes . ' ';
             }
         }
@@ -201,18 +213,74 @@ class DockerManageCommand extends Command
 
         $phpversionFull = $phpversion . '-'. $threadsafe;
 
+        $checkImageName = '';
+
+        if (strpos($phpversionFull, 'custom') === false) {
+            $checkImageName = $this->checkImage($phpversionFull, $threadsafe);
+        }
+
         $script = ($input->getOption('script')) ?: 'lfphp';
 
-        $script = str_replace(',,,', ' ; ', $script);
+        $tempScriptFile = '';
 
-        if (strpos($phpversionFull, 'custom') !== false) {
-            $this->dockerRunCommand .= DockerManageCommand::LFPHPDEFAULTVERSION
-                . ':' . $phpversionFull
-                . ' '
-                . '/bin/bash -c "' . $script . '"';
+        if (strpos($script, ',,,') === false) {
+            if (!empty($checkImageName)) {
+                $this->dockerRunCommand .= $checkImageName;
+
+                $this->dockerRunCommand .=
+                    '/bin/bash -c "lfphp-compile '
+                    . $phpversion . ' ' . $threadsafe
+                    . ' ; '. $script . '"';
+            } else {
+                $this->dockerRunCommand .= DockerManageCommand::LFPHPDEFAULTVERSION . ':' . $phpversionFull . ' ';
+
+                $this->dockerRunCommand .= '/bin/bash -c "' . $script . '"';
+            }
         } else {
-            $this->dockerRunCommand .= $this->checkImage($phpversionFull, $threadsafe, $script);
+            $scriptArray = explode(',,,', $script);
+
+            if (!empty($checkImageName)) {
+                array_unshift($scriptArray, 'lfphp-compile ' . $phpversion . ' ' . $threadsafe);
+            }
+
+            $script = implode("\n", $scriptArray);
+
+            $tempScriptFile = tempnam(sys_get_temp_dir(), 'entryscript');
+
+            $tempScriptFilePath = '';
+
+            $handle = fopen($tempScriptFile, 'w+');
+            fwrite($handle, '#!/usr/bin/env bash' . "\n");
+            fwrite($handle, $script);
+            fclose($handle);
+            chmod($tempScriptFile, 755);
+
+
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                // @codeCoverageIgnoreStart
+                if (strstr(php_uname('v'), 'Windows 10') === false && php_uname('r') != '10.0') {
+                    $tempScriptFilePath = $this->win8NormalizePath($tempScriptFile);
+                    $tempScriptFilePath = lcfirst($tempScriptFilePath);
+                    $tempScriptFilePath = str_replace(':/', '/', $tempScriptFilePath);
+                    $tempScriptFilePath = '/' . $tempScriptFilePath;
+                }
+                // @codeCoverageIgnoreEnd
+            }
+
+            if (empty($tempScriptFilePath)) {
+                $tempScriptFilePath = $tempScriptFile;
+            }
+
+            $this->dockerRunCommand .= '-v ' . $tempScriptFilePath . ':/tmp/script.bash --entrypoint /tmp/script.bash ';
+
+            if (!empty($checkImageName)) {
+                $this->dockerRunCommand .= trim($checkImageName);
+            } else {
+                $this->dockerRunCommand .= DockerManageCommand::LFPHPDEFAULTVERSION . ':' . $phpversionFull;
+            }
         }
+
+        $this->tempScriptFile = $tempScriptFile;
 
         return $this->dockerRunCommand;
     }
@@ -298,6 +366,14 @@ class DockerManageCommand extends Command
                         FILE_APPEND
                     );
                 }
+
+                // @codeCoverageIgnoreStart
+                if (!empty($this->tempScriptFile)) {
+                    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+                        unlink($this->tempScriptFile);
+                    }
+                }
+                // @codeCoverageIgnoreEnd
 
                 //throw new ProcessFailedException($process);
 
