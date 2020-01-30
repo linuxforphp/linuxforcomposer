@@ -40,7 +40,7 @@ use Linuxforcomposer\Helper\LinuxForComposerProcess;
 
 class DockerManageCommand extends Command
 {
-    const LFPHPDEFAULTVERSION = 'asclinux/linuxforphp-8.1-ultimate';
+    const LFPHPDEFAULTVERSION = 'asclinux/linuxforphp-8.2-ultimate';
 
     const PHPDEFAULTVERSION = 'master';
 

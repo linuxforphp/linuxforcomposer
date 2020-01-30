@@ -276,7 +276,7 @@ class DockerManageCommandTest extends KernelTestCase
         );
 
         $this->assertSame(
-            'asclinux/linuxforphp-8.1-ultimate:src ',
+            'asclinux/linuxforphp-8.2-ultimate:src ',
             $output
         );
 
@@ -361,7 +361,7 @@ class DockerManageCommandTest extends KernelTestCase
 
         $this->assertSame(
             'docker run --restart=always -i -t -d -p 8181:80 '
-            . '-v ${PWD}/:/srv/www asclinux/linuxforphp-8.1-ultimate:7.2.5-nts /bin/bash -c "lfphp"',
+            . '-v ${PWD}/:/srv/www asclinux/linuxforphp-8.2-ultimate:7.2.5-nts /bin/bash -c "lfphp"',
             $output
         );
 
@@ -423,7 +423,7 @@ class DockerManageCommandTest extends KernelTestCase
 
         $this->assertSame(
             'docker run --restart=always -i -t -d -p 8181:80 -p 3306:3306 '
-            . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test asclinux/linuxforphp-8.1-ultimate:7.2.5-nts /bin/bash -c "lfphp"',
+            . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test asclinux/linuxforphp-8.2-ultimate:7.2.5-nts /bin/bash -c "lfphp"',
             $output
         );
 
@@ -468,7 +468,7 @@ class DockerManageCommandTest extends KernelTestCase
         $this->assertSame(
             'docker run --restart=always -i -t -d -p 8181:80 -p 3306:3306 '
             . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test '
-            . 'asclinux/linuxforphp-8.1-ultimate:custom-7.2.5-nts '
+            . 'asclinux/linuxforphp-8.2-ultimate:custom-7.2.5-nts '
             . '/bin/bash -c "lfphp"',
             $output
         );
@@ -524,7 +524,7 @@ class DockerManageCommandTest extends KernelTestCase
             . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test '
             . '-v ' . $commandProperties['tempScriptFile']->getValue($dockerManageCommandFake)
             . ':/tmp/script.bash --entrypoint /tmp/script.bash '
-            . 'asclinux/linuxforphp-8.1-ultimate:7.2.5-nts',
+            . 'asclinux/linuxforphp-8.2-ultimate:7.2.5-nts',
             $output
         );
 
@@ -579,7 +579,7 @@ class DockerManageCommandTest extends KernelTestCase
             . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test '
             . '-v ' . $commandProperties['tempScriptFile']->getValue($dockerManageCommandFake)
             . ':/tmp/script.bash --entrypoint /tmp/script.bash '
-            . 'asclinux/linuxforphp-8.1-ultimate:custom-7.2.5-nts',
+            . 'asclinux/linuxforphp-8.2-ultimate:custom-7.2.5-nts',
             $output
         );
 
@@ -661,7 +661,7 @@ class DockerManageCommandTest extends KernelTestCase
         $this->assertSame(
             'docker run --restart=always -i -t -d -p 8181:80 -p 3306:3306 '
             . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test '
-            . 'asclinux/linuxforphp-8.1-ultimate:src '
+            . 'asclinux/linuxforphp-8.2-ultimate:src '
             . '/bin/bash -c "lfphp-compile 8.0 nts ; lfphp"',
             $output
         );
@@ -717,7 +717,7 @@ class DockerManageCommandTest extends KernelTestCase
             . '-v ${PWD}/:/srv/www -v ${PWD}/:/srv/test '
             . '-v ' . $commandProperties['tempScriptFile']->getValue($dockerManageCommandFake)
             . ':/tmp/script.bash --entrypoint /tmp/script.bash '
-            . 'asclinux/linuxforphp-8.1-ultimate:src',
+            . 'asclinux/linuxforphp-8.2-ultimate:src',
             $output
         );
 
