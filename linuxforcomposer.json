@@ -2,11 +2,9 @@
     "name": "linuxforphp/linuxforcomposer",
     "description": "A Composer interface to run 'Linux for PHP' Docker containers.",
     "php-versions": [
+        "7.4",
         "7.3",
-        "7.2",
-        "7.1",
-        "7.0",
-        "5.6"
+        "7.2"
     ],
     "modes": {
         "mode1": "detached",
@@ -15,11 +13,9 @@
     },
     "ports": {
         "port1": [
+            "7474:80",
             "7373:80",
-            "7272:80",
-            "7171:80",
-            "7070:80",
-            "5656:80"
+            "7272:80"
         ]
     },
     "volumes": {
