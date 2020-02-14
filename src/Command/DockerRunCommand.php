@@ -62,33 +62,7 @@ class DockerRunCommand extends Command
     {
         switch ($input->getArgument('execute')) {
             case 'start':
-                $parseCommand = $this->getApplication()->find('docker:parsejson');
-
-                $jsonFile = ($input->getOption('jsonfile')) ?: null;
-
-                if ($jsonFile !== null) {
-                    $arguments = [
-                        '--jsonfile' => $jsonFile,
-                    ];
-                } else {
-                    $arguments = [];
-                }
-
-                $parseInput = new ArrayInput($arguments);
-
-                $parseOutput = new BufferedOutput();
-
-                $returnCode = (int) $parseCommand->run($parseInput, $parseOutput);
-
-                if ($returnCode > 1) {
-                    echo PHP_EOL . 'You must choose at least one PHP version to run.' . PHP_EOL . PHP_EOL;
-                    break;
-                } elseif ($returnCode === 1) {
-                    echo PHP_EOL . "The 'Linux for Composer' JSON file is invalid." . PHP_EOL . PHP_EOL;
-                    break;
-                }
-
-                $dockerManageCommandsArray = explode("\n", $parseOutput->fetch());
+                $dockerManageCommandsArray = $this->getParsedJsonFile($input);
 
                 foreach ($dockerManageCommandsArray as $key => $value) {
                     if (empty($value)) {
@@ -134,9 +108,25 @@ class DockerRunCommand extends Command
                 break;
 
             case 'stop':
-                $dockerManageCommand = 'php '
-                    . PHARFILENAME
-                    . ' docker:manage stop';
+                $dockerManageCommandsArray = $this->getParsedJsonFile($input);
+
+                if (($position = strrpos($dockerManageCommandsArray[0], 'build')) !== false) {
+                    $searchLength = strlen('build');
+                    $dockerManageCommand = substr_replace(
+                        $dockerManageCommandsArray[0],
+                        'stop',
+                        $position, $searchLength
+                    );
+                }
+
+                if (($position = strrpos($dockerManageCommandsArray[0], 'run')) !== false) {
+                    $searchLength = strlen('run');
+                    $dockerManageCommand = substr_replace(
+                        $dockerManageCommandsArray[0],
+                        'stop',
+                        $position, $searchLength
+                    );
+                }
 
                 $process = new LinuxForComposerProcess($dockerManageCommand);
 
@@ -168,5 +158,36 @@ class DockerRunCommand extends Command
                 echo PHP_EOL . 'Wrong command given!' . PHP_EOL . PHP_EOL;
                 break;
         }
+    }
+
+    protected function getParsedJsonFile(InputInterface $input)
+    {
+        $parseCommand = $this->getApplication()->find('docker:parsejson');
+
+        $jsonFile = ($input->getOption('jsonfile')) ?: null;
+
+        if ($jsonFile !== null) {
+            $arguments = [
+                '--jsonfile' => $jsonFile,
+            ];
+        } else {
+            $arguments = [];
+        }
+
+        $parseInput = new ArrayInput($arguments);
+
+        $parseOutput = new BufferedOutput();
+
+        $returnCode = (int) $parseCommand->run($parseInput, $parseOutput);
+
+        if ($returnCode > 1) {
+            echo PHP_EOL . 'You must choose at least one PHP version to run.' . PHP_EOL . PHP_EOL;
+            exit;
+        } elseif ($returnCode === 1) {
+            echo PHP_EOL . "The 'Linux for Composer' JSON file is invalid." . PHP_EOL . PHP_EOL;
+            exit;
+        }
+
+        return explode("\n", $parseOutput->fetch());
     }
 }
