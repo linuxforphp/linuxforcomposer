@@ -38,6 +38,8 @@ use Linuxforcomposer\Helper\LinuxForComposerProcess;
 
 class DockerRunCommand extends Command
 {
+    const LFPHPCLOUDSERVER = 'https://linuxforphp.com/api/v1/deployments';
+
     protected static $defaultName = 'docker:run';
 
     public function __construct()
@@ -150,6 +152,80 @@ class DockerRunCommand extends Command
 
                 if (!empty($processStderr)) {
                     echo $processStderr . PHP_EOL;
+                }
+
+                break;
+
+            case 'deploy':
+                set_time_limit(0);
+
+                $this->getParsedJsonFile($input);
+
+                $jsonFile = ($input->getOption('jsonfile')) ?: null;
+
+                if (($jsonFile === null || !file_exists($jsonFile)) && file_exists(JSONFILE)) {
+                    $jsonFile = JSONFILE;
+                } elseif (($jsonFile === null || !file_exists($jsonFile)) && !file_exists(JSONFILE)) {
+                    $jsonFile = JSONFILEDIST;
+                }
+
+                $fileContentsJson = file_get_contents($jsonFile);
+
+                $fileContentsArray = json_decode($fileContentsJson, true);
+
+                if ($fileContentsArray === null) {
+                    echo PHP_EOL . "The 'Linux for Composer' JSON file is invalid." . PHP_EOL . PHP_EOL;
+                    exit;
+                }
+
+                $account = $fileContentsArray['lfphp-cloud']['account'];
+
+                $username = $fileContentsArray['lfphp-cloud']['username'];
+
+                $token = $fileContentsArray['lfphp-cloud']['token'];
+
+                $cloudServerUrl = DockerRunCommand::LFPHPCLOUDSERVER . '/' . $account;
+
+                $ch = \curl_init($cloudServerUrl);
+                \curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+                \curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                \curl_setopt($ch, CURLOPT_POST, true);
+
+                $postData = [
+                    'username' => $username,
+                    'token' => $token,
+                    'json' => $fileContentsJson,
+                ];
+
+                if (
+                    isset($fileContentsArray['single']['image']['dockerfile'])
+                    && !empty($fileContentsArray['single']['image']['dockerfile']['url'])
+                ) {
+                    $url = $fileContentsArray['single']['image']['dockerfile']['url'];
+
+                    $urlArray = parse_url($url);
+
+                    $pathArray = explode('/', $urlArray['path']);
+
+                    $filename = array_pop($pathArray);
+
+                    $path = BASEDIR . DIRECTORY_SEPARATOR . $filename;
+
+                    if (!isset($urlArray['host']) && !isset($urlArray['scheme'])) {
+                        if (file_exists($path)) {
+                            $curlFile = curl_file_create($path);
+                            $postData['file'] = $curlFile;
+                        }
+                    }
+                }
+
+                \curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+                \curl_exec($ch);
+                \curl_close($ch);
+
+                if (isset($fp) && is_resource($fp)) {
+                    fclose($fp);
                 }
 
                 break;

@@ -50,5 +50,10 @@
         "url": "",
         "username": "",
         "token": ""
+    },
+    "lfphp-cloud": {
+        "account": "",
+        "username": "",
+        "token": ""
     }
 }
