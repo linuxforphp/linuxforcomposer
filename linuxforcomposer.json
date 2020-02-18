@@ -43,6 +43,15 @@
             "volumes": {
                 "volume1": "",
                 "volume2": ""
+            },
+            "persist-data": {
+                "mount": "false",
+                "directories": {
+                    "directory1": "",
+                    "directory2": "",
+                    "directory3": ""
+                },
+                "root-name": ""
             }
         }
     },

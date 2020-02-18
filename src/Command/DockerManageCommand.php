@@ -73,192 +73,40 @@ class DockerManageCommand extends Command
             ->addOption('phpversion', null, InputOption::VALUE_REQUIRED, 'The version of PHP you want to run.')
             ->addOption('threadsafe', null, InputOption::VALUE_REQUIRED, 'Enable (zts) or disable (nts) thread-safety.')
             ->addOption('port', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY)
+            ->addOption('mount', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY)
             ->addOption('volume', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY)
             ->addOption('script', null, InputOption::VALUE_OPTIONAL);
     }
 
-    protected function checkImage($phpversionFull, $threadsafe)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $phpversionFull = (string) $phpversionFull;
-        $threadsafe = (string) $threadsafe;
+        $command = $input->getArgument('execute');
 
-        echo PHP_EOL . 'Checking for image availability and downloading if necessary.' . PHP_EOL;
+        $mount = $input->getOption('mount');
 
-        echo PHP_EOL . 'This may take a few minutes...' . PHP_EOL . PHP_EOL;
-
-        $this->dockerPullCommand .= DockerManageCommand::LFPHPDEFAULTVERSION . ':' . $phpversionFull;
-
-        $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprv');
-
-        $checkImageProcess = new LinuxForComposerProcess($this->dockerPullCommand);
-
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            // @codeCoverageIgnoreStart
-            if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
-                $checkImageProcess->setDecorateWindowsWithReturnCode(true, $temp_filename);
-            } else {
-                $temp_filename = $this->win8NormalizePath($temp_filename);
-                $checkImageProcess->setDecorateWindowsLegacyWithReturnCode(true, $temp_filename);
-            }
-            // @codeCoverageIgnoreEnd
-        }
-
-        $checkImageProcess->setTty($checkImageProcess->isTtySupported());
-
-        $checkImageProcess->setTimeout(null);
-
-        $checkImageProcess->prepareProcess();
-
-        $checkImageProcess->start();
-
-        $checkImageProcess->wait();
-
-        $processStdout = $checkImageProcess->getOutput();
-
-        $processStderr = $checkImageProcess->getErrorOutput();
-
-        if (!empty($processStdout)) {
-            echo $processStdout . PHP_EOL;
-        }
-
-        if (!empty($processStderr)) {
-            echo $processStderr . PHP_EOL;
-        }
-
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            // @codeCoverageIgnoreStart
-            $checkLocalExitCode = (int) trim(file_get_contents($temp_filename));
-            // @codeCoverageIgnoreEnd
-        } else {
-            $checkLocalExitCode = (int) trim($checkImageProcess->getExitCode());
-        }
-
-        echo 'Done!' . PHP_EOL . PHP_EOL;
-
-        $imageName = '';
-
-        if ($checkLocalExitCode !== 0) {
-            $imageName .= DockerManageCommand::LFPHPDEFAULTVERSION . ':src ';
-        }
-
-        return $imageName;
-    }
-
-    protected function formatInput(InputInterface $input)
-    {
-        $this->dockerRunCommand .= ($input->getOption('detached')) ? '-d ' : null;
-        $this->dockerRunCommand .= ($input->getOption('interactive')) ? '-i ' : null;
-        $this->dockerRunCommand .= ($input->getOption('tty')) ? '-t ' : null;
+        $modeOptions = '';
+        $modeOptions .= ($input->getOption('detached')) ? '-d ' : null;
+        $modeOptions .= ($input->getOption('interactive')) ? '-i ' : null;
+        $modeOptions .= ($input->getOption('tty')) ? '-t ' : null;
 
         $ports = $input->getOption('port');
 
-        $this->dockerRunCommand .= $this->getPortOptions($ports);
+        $portOptions = $this->getPortOptions($ports);
 
         $volumes = $input->getOption('volume');
 
-        $this->dockerRunCommand .= $this->getVolumeOptions($volumes);
+        $volumeOptions = $this->getVolumeOptions($volumes);
 
-        $threadsafe = $input->getOption('threadsafe');
+        $script = $input->getOption('script');
 
-        $phpversion =
-            !empty($input->getOption('phpversion'))
-                ? $input->getOption('phpversion')
-                : DockerManageCommand::PHPDEFAULTVERSION;
+        $scriptArray = $this->getScriptOptions($script);
 
-        $phpversionFull = $phpversion . '-'. $threadsafe;
+        $mountNames = '';
 
-        $checkImageName = '';
+        $mountOptions = '';
 
-        if (strpos($phpversionFull, 'custom') === false) {
-            $checkImageName = $this->checkImage($phpversionFull, $threadsafe);
-        }
-
-        $script = ($input->getOption('script')) ?: 'lfphp';
-
-        $tempScriptFile = '';
-
-        if (strpos($script, ',,,') === false) {
-            if (!empty($checkImageName)) {
-                $this->dockerRunCommand .= $checkImageName;
-
-                $this->dockerRunCommand .=
-                    '/bin/bash -c "lfphp-compile '
-                    . $phpversion . ' ' . $threadsafe
-                    . ' ; '. $script . '"';
-            } else {
-                $this->dockerRunCommand .= DockerManageCommand::LFPHPDEFAULTVERSION . ':' . $phpversionFull . ' ';
-
-                $this->dockerRunCommand .= '/bin/bash -c "' . $script . '"';
-            }
-        } else {
-            $scriptArray = explode(',,,', $script);
-
-            if (!empty($checkImageName)) {
-                array_unshift($scriptArray, 'lfphp-compile ' . $phpversion . ' ' . $threadsafe);
-            }
-
-            $script = implode("\n", $scriptArray);
-
-            $tempScriptFile = tempnam(sys_get_temp_dir(), 'entryscript');
-
-            $tempScriptFilePath = '';
-
-            $handle = fopen($tempScriptFile, 'w+');
-            fwrite($handle, '#!/usr/bin/env bash' . "\n");
-            fwrite($handle, $script);
-            fclose($handle);
-            chmod($tempScriptFile, 777); // Must be world-writable for Mac computers.
-
-            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                // @codeCoverageIgnoreStart
-                if (strstr(php_uname('v'), 'Windows 10') === false && php_uname('r') != '10.0') {
-                    $tempScriptFilePath = $this->win8NormalizePath($tempScriptFile);
-                    $tempScriptFilePath = lcfirst($tempScriptFilePath);
-                    $tempScriptFilePath = str_replace(':/', '/', $tempScriptFilePath);
-                    $tempScriptFilePath = '/' . $tempScriptFilePath;
-                }
-                // @codeCoverageIgnoreEnd
-            }
-
-            if (empty($tempScriptFilePath)) {
-                $tempScriptFilePath = $tempScriptFile;
-            }
-
-            $this->dockerRunCommand .= '-v ' . $tempScriptFilePath . ':/tmp/script.bash --entrypoint /tmp/script.bash ';
-
-            if (!empty($checkImageName)) {
-                $this->dockerRunCommand .= trim($checkImageName);
-            } else {
-                $this->dockerRunCommand .= DockerManageCommand::LFPHPDEFAULTVERSION . ':' . $phpversionFull;
-            }
-        }
-
-        $this->tempScriptFile = $tempScriptFile;
-
-        return $this->dockerRunCommand;
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        switch ($input->getArgument('execute')) {
+        switch ($command) {
             case 'build':
-                $modeOptions = '';
-                $modeOptions .= ($input->getOption('detached')) ? '-d ' : null;
-                $modeOptions .= ($input->getOption('interactive')) ? '-i ' : null;
-                $modeOptions .= ($input->getOption('tty')) ? '-t ' : null;
-
-                $ports = $input->getOption('port');
-
-                $portOptions = $this->getPortOptions($ports);
-
-                $volumes = $input->getOption('volume');
-
-                $volumeOptions = $this->getVolumeOptions($volumes);
-
-                $script = $input->getOption('script');
-
-                $scriptArray = $this->getScriptOptions($script);
-
                 $engine = $scriptArray['engine'];
 
                 $url = $scriptArray['url'];
@@ -398,6 +246,122 @@ class DockerManageCommand extends Command
                     return 5;
                 }
 
+                // @codeCoverageIgnoreStart
+                if (
+                    $engine === 'dockerfile'
+                    && isset($mount)
+                    && !empty($mount)
+                    && strpos($mount[0], ':') === false
+                ) {
+                    $mountNames = $this->getMountNames($mount);
+
+                    $mountOptions = $this->getMountOptions($mount);
+
+                    $mountOptionsArray = explode('=', $mountOptions);
+
+                    $directory = trim(array_pop($mountOptionsArray));
+
+                    foreach ($mountNames as $mountName => $mountOption) {
+                        $checkVolumeCommand = 'docker volume ls -q --filter name=' . $mountName;
+
+                        $checkVolumeProcess =
+                            new LinuxForComposerProcess($checkVolumeCommand);
+
+                        $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprvcheck');
+
+                        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                            if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                                $checkVolumeProcess->setDecorateWindowsWithStdout(true, $temp_filename);
+                            } else {
+                                $temp_filename = $this->win8NormalizePath($temp_filename);
+                                $checkVolumeProcess->setDecorateWindowsLegacyWithStdout(true, $temp_filename);
+                            }
+                        } else {
+                            $checkVolumeProcess->setTempFilename($temp_filename);
+
+                            $checkVolumeProcess->setDockerCommand('/bin/bash & '
+                                . $checkVolumeCommand
+                                . ' > '
+                                . $temp_filename);
+                        }
+
+                        $checkVolumeProcess->setTty($checkVolumeProcess->isTtySupported());
+
+                        $checkVolumeProcess->setTimeout(null);
+
+                        $checkVolumeProcess->prepareProcess();
+
+                        $checkVolumeProcess->start();
+
+                        $checkVolumeProcess->wait();
+
+                        $processStdout = trim(file_get_contents(($temp_filename)));
+
+                        //$output->writeln($process->getErrorOutput());
+                        if (empty($processStdout)) {
+                            $createVolumeCommand = 'docker volume create ' . $mountName;
+
+                            $createVolumeProcess =
+                                new LinuxForComposerProcess($createVolumeCommand);
+
+                            $createVolumeProcess->setTty($createVolumeProcess->isTtySupported());
+
+                            $createVolumeProcess->setTimeout(null);
+
+                            $createVolumeProcess->prepareProcess();
+
+                            $createVolumeProcess->start();
+
+                            $createVolumeProcess->wait();
+
+                            $processStderr = $createVolumeProcess->getErrorOutput();
+
+                            $returnCode = $createVolumeProcess->getExitCode();
+
+                            //$output->writeln($process->getErrorOutput());
+                            if (!empty($processStderr) || $returnCode > 0) {
+                                echo $processStderr . PHP_EOL;
+
+                                return 5;
+                            }
+
+                            $initializeVolumeCommand =
+                                'docker run --rm --mount source='
+                                . $mountName
+                                . ',target=/tmp/tempo '
+                                . $scriptArray['image_name'] . ' '
+                                . 'bash -c "rsync -avP --delete-before '
+                                . $directory
+                                . '/ /tmp/tempo/ >/dev/null"';
+
+                            $initializeVolumeProcess =
+                                new LinuxForComposerProcess($initializeVolumeCommand);
+
+                            $initializeVolumeProcess->setTty($initializeVolumeProcess->isTtySupported());
+
+                            $initializeVolumeProcess->setTimeout(null);
+
+                            $initializeVolumeProcess->prepareProcess();
+
+                            $initializeVolumeProcess->start();
+
+                            $initializeVolumeProcess->wait();
+
+                            $processStderr = $initializeVolumeProcess->getErrorOutput();
+
+                            $returnCode = $initializeVolumeProcess->getExitCode();
+
+                            //$output->writeln($process->getErrorOutput());
+                            if (!empty($processStderr) || $returnCode > 0) {
+                                echo $processStderr . PHP_EOL;
+
+                                return 5;
+                            }
+                        }
+                    }
+                }
+                // @codeCoverageIgnoreEnd
+
                 if (!empty($imageName)) {
                     $containerName = $imageName . hash('sha256', 'lfphp' . time());
 
@@ -407,6 +371,7 @@ class DockerManageCommand extends Command
                         . ' --name '
                         . $containerName . ' '
                         . $portOptions
+                        . $mountOptions
                         . $volumeOptions
                         . $imageName
                     );
@@ -456,6 +421,120 @@ class DockerManageCommand extends Command
                 break;
 
             case 'run':
+                // @codeCoverageIgnoreStart
+                if (
+                    isset($mount)
+                    && !empty($mount)
+                    && strpos($mount[0], ':') === false
+                ) {
+                    $mountNames = $this->getMountNames($mount);
+
+                    $mountOptions = $this->getMountOptions($mount);
+
+                    $mountOptionsArray = explode('=', $mountOptions);
+
+                    $directory = trim(array_pop($mountOptionsArray));
+
+                    foreach ($mountNames as $mountName => $mountOption) {
+                        $checkVolumeCommand = 'docker volume ls -q --filter name=' . $mountName;
+
+                        $checkVolumeProcess =
+                            new LinuxForComposerProcess($checkVolumeCommand);
+
+                        $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprvcheck');
+
+                        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                            if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                                $checkVolumeProcess->setDecorateWindowsWithStdout(true, $temp_filename);
+                            } else {
+                                $temp_filename = $this->win8NormalizePath($temp_filename);
+                                $checkVolumeProcess->setDecorateWindowsLegacyWithStdout(true, $temp_filename);
+                            }
+                        } else {
+                            $checkVolumeProcess->setTempFilename($temp_filename);
+
+                            $checkVolumeProcess->setDockerCommand('/bin/bash & '
+                                . $checkVolumeCommand
+                                . ' > '
+                                . $temp_filename);
+                        }
+
+                        $checkVolumeProcess->setTty($checkVolumeProcess->isTtySupported());
+
+                        $checkVolumeProcess->setTimeout(null);
+
+                        $checkVolumeProcess->prepareProcess();
+
+                        $checkVolumeProcess->start();
+
+                        $checkVolumeProcess->wait();
+
+                        $processStdout = trim(file_get_contents(($temp_filename)));
+
+                        //$output->writeln($process->getErrorOutput());
+                        if (empty($processStdout)) {
+                            $createVolumeCommand = 'docker volume create ' . $mountName;
+
+                            $createVolumeProcess =
+                                new LinuxForComposerProcess($createVolumeCommand);
+
+                            $createVolumeProcess->setTty($createVolumeProcess->isTtySupported());
+
+                            $createVolumeProcess->setTimeout(null);
+
+                            $createVolumeProcess->prepareProcess();
+
+                            $createVolumeProcess->start();
+
+                            $createVolumeProcess->wait();
+
+                            $processStderr = $createVolumeProcess->getErrorOutput();
+
+                            $returnCode = $createVolumeProcess->getExitCode();
+
+                            //$output->writeln($process->getErrorOutput());
+                            if (!empty($processStderr) || $returnCode > 0) {
+                                echo $processStderr . PHP_EOL;
+
+                                return 5;
+                            }
+
+                            $initializeVolumeCommand =
+                                'docker run --rm --mount source='
+                                . $mountName
+                                . ',target=/tmp/tempo asclinux/linuxforphp-8.2-ultimate:7.4-nts '
+                                . 'bash -c "rsync -avP --delete-before '
+                                . $directory
+                                . '/ /tmp/tempo/ >/dev/null"';
+
+                            $initializeVolumeProcess =
+                                new LinuxForComposerProcess($initializeVolumeCommand);
+
+                            $initializeVolumeProcess->setTty($initializeVolumeProcess->isTtySupported());
+
+                            $initializeVolumeProcess->setTimeout(null);
+
+                            $initializeVolumeProcess->prepareProcess();
+
+                            $initializeVolumeProcess->start();
+
+                            $initializeVolumeProcess->wait();
+
+                            $processStderr = $initializeVolumeProcess->getErrorOutput();
+
+                            $returnCode = $initializeVolumeProcess->getExitCode();
+
+                            //$output->writeln($process->getErrorOutput());
+                            if (!empty($processStderr) || $returnCode > 0) {
+                                echo $processStderr . PHP_EOL;
+
+                                return 5;
+                            }
+                        }
+                    }
+                }
+                // @codeCoverageIgnoreEnd
+
                 $this->dockerRunCommand = $this->formatInput($input);
 
                 $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprv');
@@ -556,19 +635,27 @@ class DockerManageCommand extends Command
             case 'stop':
                 $stopForce = isset($stopForce) ?: false;
 
-                $script = $input->getOption('script');
+                if (isset($scriptArray['engine'])) {
+                    $engine = $scriptArray['engine'];
 
-                $scriptArray = $this->getScriptOptions($script);
+                    $url = $scriptArray['url'];
 
-                $engine = $scriptArray['engine'];
+                    $urlArray = parse_url($url);
 
-                $url = $scriptArray['url'];
+                    $pathArray = explode('/', $urlArray['path']);
 
-                $urlArray = parse_url($url);
+                    $path = array_pop($pathArray);
+                } else {
+                    $engine = '';
 
-                $pathArray = explode('/', $urlArray['path']);
+                    $url = '';
 
-                $path = array_pop($pathArray);
+                    $urlArray = [];
+
+                    $pathArray = [];
+
+                    $path = '';
+                }
 
                 if ($engine === 'docker-compose') {
                     if (file_exists($path)) {
@@ -1009,6 +1096,80 @@ class DockerManageCommand extends Command
                     );
                 }
 
+                if (
+                    isset($mount)
+                    && !empty($mount)
+                    && strpos($mount[0], ':') !== false
+                ) {
+                    $mountNames = $this->getMountNames($mount);
+
+                    foreach ($mountNames as $mountName => $mountOption) {
+                        $checkVolumeCommand = 'docker volume ls -q --filter name=' . $mountName;
+
+                        $checkVolumeProcess =
+                            new LinuxForComposerProcess($checkVolumeCommand);
+
+                        $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprvcheck');
+
+                        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                            if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                                $checkVolumeProcess->setDecorateWindowsWithStdout(true, $temp_filename);
+                            } else {
+                                $temp_filename = $this->win8NormalizePath($temp_filename);
+                                $checkVolumeProcess->setDecorateWindowsLegacyWithStdout(true, $temp_filename);
+                            }
+                        } else {
+                            $checkVolumeProcess->setTempFilename($temp_filename);
+
+                            $checkVolumeProcess->setDockerCommand('/bin/bash & '
+                                . $checkVolumeCommand
+                                . ' > '
+                                . $temp_filename);
+                        }
+
+                        $checkVolumeProcess->setTty($checkVolumeProcess->isTtySupported());
+
+                        $checkVolumeProcess->setTimeout(null);
+
+                        $checkVolumeProcess->prepareProcess();
+
+                        $checkVolumeProcess->start();
+
+                        $checkVolumeProcess->wait();
+
+                        $processStdout = trim(file_get_contents(($temp_filename)));
+
+                        //$output->writeln($process->getErrorOutput());
+                        if (!empty($processStdout)) {
+                            $createVolumeCommand = 'docker volume rm ' . $mountName;
+
+                            $createVolumeProcess =
+                                new LinuxForComposerProcess($createVolumeCommand);
+
+                            $createVolumeProcess->setTty($createVolumeProcess->isTtySupported());
+
+                            $createVolumeProcess->setTimeout(null);
+
+                            $createVolumeProcess->prepareProcess();
+
+                            $createVolumeProcess->start();
+
+                            $createVolumeProcess->wait();
+
+                            $processStderr = $createVolumeProcess->getErrorOutput();
+
+                            $returnCode = $createVolumeProcess->getExitCode();
+
+                            //$output->writeln($process->getErrorOutput());
+                            if (!empty($processStderr) || $returnCode > 0) {
+                                echo $processStderr . PHP_EOL;
+
+                                return 5;
+                            }
+                        }
+                    }
+                }
+
                 break;
 
             default:
@@ -1020,6 +1181,177 @@ class DockerManageCommand extends Command
         }
 
         return 0;
+    }
+
+    protected function checkImage($phpversionFull, $threadsafe)
+    {
+        $phpversionFull = (string) $phpversionFull;
+        $threadsafe = (string) $threadsafe;
+
+        echo PHP_EOL . 'Checking for image availability and downloading if necessary.' . PHP_EOL;
+
+        echo PHP_EOL . 'This may take a few minutes...' . PHP_EOL . PHP_EOL;
+
+        $this->dockerPullCommand .= DockerManageCommand::LFPHPDEFAULTVERSION . ':' . $phpversionFull;
+
+        $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprv');
+
+        $checkImageProcess = new LinuxForComposerProcess($this->dockerPullCommand);
+
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            // @codeCoverageIgnoreStart
+            if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                $checkImageProcess->setDecorateWindowsWithReturnCode(true, $temp_filename);
+            } else {
+                $temp_filename = $this->win8NormalizePath($temp_filename);
+                $checkImageProcess->setDecorateWindowsLegacyWithReturnCode(true, $temp_filename);
+            }
+            // @codeCoverageIgnoreEnd
+        }
+
+        $checkImageProcess->setTty($checkImageProcess->isTtySupported());
+
+        $checkImageProcess->setTimeout(null);
+
+        $checkImageProcess->prepareProcess();
+
+        $checkImageProcess->start();
+
+        $checkImageProcess->wait();
+
+        $processStdout = $checkImageProcess->getOutput();
+
+        $processStderr = $checkImageProcess->getErrorOutput();
+
+        if (!empty($processStdout)) {
+            echo $processStdout . PHP_EOL;
+        }
+
+        if (!empty($processStderr)) {
+            echo $processStderr . PHP_EOL;
+        }
+
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            // @codeCoverageIgnoreStart
+            $checkLocalExitCode = (int) trim(file_get_contents($temp_filename));
+            // @codeCoverageIgnoreEnd
+        } else {
+            $checkLocalExitCode = (int) trim($checkImageProcess->getExitCode());
+        }
+
+        echo 'Done!' . PHP_EOL . PHP_EOL;
+
+        $imageName = '';
+
+        if ($checkLocalExitCode !== 0) {
+            $imageName .= DockerManageCommand::LFPHPDEFAULTVERSION . ':src ';
+        }
+
+        return $imageName;
+    }
+
+    protected function formatInput(InputInterface $input)
+    {
+        $this->dockerRunCommand .= ($input->getOption('detached')) ? '-d ' : null;
+        $this->dockerRunCommand .= ($input->getOption('interactive')) ? '-i ' : null;
+        $this->dockerRunCommand .= ($input->getOption('tty')) ? '-t ' : null;
+
+        $ports = $input->getOption('port');
+
+        $this->dockerRunCommand .= $this->getPortOptions($ports);
+
+        $mount = $input->getOption('mount');
+
+        if (
+            isset($mount)
+            && !empty($mount)
+            && strpos($mount[0], ':') === false
+        ) {
+            $this->dockerRunCommand .= $this->getMountOptions($mount);
+        }
+
+        $volumes = $input->getOption('volume');
+
+        $this->dockerRunCommand .= $this->getVolumeOptions($volumes);
+
+        $threadsafe = $input->getOption('threadsafe');
+
+        $phpversion =
+            !empty($input->getOption('phpversion'))
+                ? $input->getOption('phpversion')
+                : DockerManageCommand::PHPDEFAULTVERSION;
+
+        $phpversionFull = $phpversion . '-'. $threadsafe;
+
+        $checkImageName = '';
+
+        if (strpos($phpversionFull, 'custom') === false) {
+            $checkImageName = $this->checkImage($phpversionFull, $threadsafe);
+        }
+
+        $script = ($input->getOption('script')) ?: 'lfphp';
+
+        $tempScriptFile = '';
+
+        if (strpos($script, ',,,') === false) {
+            if (!empty($checkImageName)) {
+                $this->dockerRunCommand .= $checkImageName;
+
+                $this->dockerRunCommand .=
+                    '/bin/bash -c "lfphp-compile '
+                    . $phpversion . ' ' . $threadsafe
+                    . ' ; '. $script . '"';
+            } else {
+                $this->dockerRunCommand .= DockerManageCommand::LFPHPDEFAULTVERSION . ':' . $phpversionFull . ' ';
+
+                $this->dockerRunCommand .= '/bin/bash -c "' . $script . '"';
+            }
+        } else {
+            $scriptArray = explode(',,,', $script);
+
+            if (!empty($checkImageName)) {
+                array_unshift($scriptArray, 'lfphp-compile ' . $phpversion . ' ' . $threadsafe);
+            }
+
+            $script = implode("\n", $scriptArray);
+
+            $tempScriptFile = tempnam(sys_get_temp_dir(), 'entryscript');
+
+            $tempScriptFilePath = '';
+
+            $handle = fopen($tempScriptFile, 'w+');
+            fwrite($handle, '#!/usr/bin/env bash' . "\n");
+            fwrite($handle, $script);
+            fclose($handle);
+            chmod($tempScriptFile, 777); // Must be world-writable for Mac computers.
+
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                // @codeCoverageIgnoreStart
+                if (strstr(php_uname('v'), 'Windows 10') === false && php_uname('r') != '10.0') {
+                    $tempScriptFilePath = $this->win8NormalizePath($tempScriptFile);
+                    $tempScriptFilePath = lcfirst($tempScriptFilePath);
+                    $tempScriptFilePath = str_replace(':/', '/', $tempScriptFilePath);
+                    $tempScriptFilePath = '/' . $tempScriptFilePath;
+                }
+                // @codeCoverageIgnoreEnd
+            }
+
+            if (empty($tempScriptFilePath)) {
+                $tempScriptFilePath = $tempScriptFile;
+            }
+
+            $this->dockerRunCommand .= '-v ' . $tempScriptFilePath . ':/tmp/script.bash --entrypoint /tmp/script.bash ';
+
+            if (!empty($checkImageName)) {
+                $this->dockerRunCommand .= trim($checkImageName);
+            } else {
+                $this->dockerRunCommand .= DockerManageCommand::LFPHPDEFAULTVERSION . ':' . $phpversionFull;
+            }
+        }
+
+        $this->tempScriptFile = $tempScriptFile;
+
+        return $this->dockerRunCommand;
     }
 
     protected function getPortOptions($ports)
@@ -1043,11 +1375,57 @@ class DockerManageCommand extends Command
         return $portOptions;
     }
 
+    protected function getMountNames($mount)
+    {
+        $mountNames = [];
+
+        if (is_array($mount)) {
+            $mountArray = explode(',,,,', $mount[0]);
+
+            foreach ($mountArray as $singleMount) {
+                if (!empty($singleMount)) {
+                    $singleMountArray = explode(',,,', $singleMount);
+
+                    if (count($singleMountArray) === 1 && strpos($singleMountArray[0], ':') !== false) {
+                        $singleMountArray[0] = str_replace(':', '', $singleMountArray[0]);
+
+                        $mountNames[$singleMountArray[0]] = $singleMountArray[0];
+                    } else {
+                        $mountNames[$singleMountArray[1]] = $singleMountArray[0];
+                    }
+                }
+            }
+        } else {
+            $singleMountArray = explode(',,,', $mount[0]);
+
+            $mountNames[$singleMountArray[1]] = $singleMountArray[0];
+        }
+
+        return $mountNames;
+    }
+
+    protected function getMountOptions($mount)
+    {
+        $mountNames = $this->getMountNames($mount);
+
+        $mountOptions = '';
+
+        foreach ($mountNames as $singleMount) {
+            $mountOptions .= '--mount ';
+
+            $mountOptions .= $singleMount;
+
+            $mountOptions .= ' ';
+        }
+
+        return $mountOptions;
+    }
+
     protected function getVolumeOptions($volumes)
     {
         $volumeOptions = '';
 
-        if (isset($volumes) && is_array($volumes)) {
+        if (is_array($volumes)) {
             if (!empty($volumes) && !in_array('', $volumes)) {
                 foreach ($volumes as $volumeMap) {
                     if (!empty($volumeMap)) {
@@ -1092,23 +1470,30 @@ class DockerManageCommand extends Command
 
         $scriptOptions = [];
 
-        $scriptOptions['engine'] = $scriptArray[0];
+        if (
+            strpos($scriptArray[0], 'dockerfile') !== false
+            || strpos($scriptArray[0], 'docker-compose') !== false
+        ) {
+            $scriptOptions['engine'] = $scriptArray[0];
 
-        $scriptOptions['url'] = $scriptArray[1];
+            $scriptOptions['url'] = $scriptArray[1];
 
-        if (isset($scriptArray[2]) && strpos($scriptArray[2], ':') !== false) {
-            $scriptOptions['auth'] = $scriptArray[2];
-        } elseif (isset($scriptArray[2]) && strpos($scriptArray[2], ':') === false) {
-            $scriptOptions['auth'] = '';
-            $scriptOptions['image_name'] = $scriptArray[2];
+            if (isset($scriptArray[2]) && strpos($scriptArray[2], ':') !== false) {
+                $scriptOptions['auth'] = $scriptArray[2];
+            } elseif (isset($scriptArray[2]) && strpos($scriptArray[2], ':') === false) {
+                $scriptOptions['auth'] = '';
+                $scriptOptions['image_name'] = $scriptArray[2];
+            } else {
+                $scriptOptions['auth'] = '';
+            }
+
+            if (!isset($scriptOptions['image_name']) && isset($scriptArray[3])) {
+                $scriptOptions['image_name'] = $scriptArray[3];
+            } elseif (!isset($scriptOptions['image_name']) && !isset($scriptArray[3])) {
+                $scriptOptions['image_name'] = '';
+            }
         } else {
-            $scriptOptions['auth'] = '';
-        }
-
-        if (!isset($scriptOptions['image_name']) && isset($scriptArray[3])) {
-            $scriptOptions['image_name'] = $scriptArray[3];
-        } elseif (!isset($scriptOptions['image_name']) && !isset($scriptArray[3])) {
-            $scriptOptions['image_name'] = '';
+            $scriptOptions = $scriptArray;
         }
 
         return $scriptOptions;
