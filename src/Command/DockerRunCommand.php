@@ -109,14 +109,23 @@ class DockerRunCommand extends Command
 
                 break;
 
+            case 'stop-force':
+                $stopForce = true;
+
+                // break; Fall through. Deliberately not breaking here.
+
             case 'stop':
                 $dockerManageCommandsArray = $this->getParsedJsonFile($input);
+
+                $stopForce = isset($stopForce) ?: false;
+
+                $stopCommand = $stopForce ? 'stop-force' : 'stop';
 
                 if (($position = strrpos($dockerManageCommandsArray[0], 'build')) !== false) {
                     $searchLength = strlen('build');
                     $dockerManageCommand = substr_replace(
                         $dockerManageCommandsArray[0],
-                        'stop',
+                        $stopCommand,
                         $position, $searchLength
                     );
                 }
@@ -125,7 +134,7 @@ class DockerRunCommand extends Command
                     $searchLength = strlen('run');
                     $dockerManageCommand = substr_replace(
                         $dockerManageCommandsArray[0],
-                        'stop',
+                        $stopCommand,
                         $position, $searchLength
                     );
                 }
@@ -232,6 +241,7 @@ class DockerRunCommand extends Command
 
             default:
                 echo PHP_EOL . 'Wrong command given!' . PHP_EOL . PHP_EOL;
+
                 break;
         }
     }

@@ -519,7 +519,14 @@ class DockerManageCommand extends Command
 
                 break;
 
+            case 'stop-force':
+                $stopForce = true;
+
+                // break; Fall through. Deliberately not breaking here.
+
             case 'stop':
+                $stopForce = isset($stopForce) ?: false;
+
                 $script = $input->getOption('script');
 
                 $scriptArray = $this->getScriptOptions($script);
@@ -615,207 +622,209 @@ class DockerManageCommand extends Command
                             } else {
                                 $subvalue = substr($value, 0, 12);
 
-                                if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                                    // @codeCoverageIgnoreStart
-                                    if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
-                                        if (!file_exists(VENDORFOLDERPID . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bat')) {
-                                            if (!copy(
-                                                PHARFILENAMERET . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bat',
-                                                VENDORFOLDERPID . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bat'
-                                            )
-                                            ) {
-                                                echo PHP_EOL
-                                                    . "Could not create the linuxforcomposer-commit-info.bat file! No commits possible."
-                                                    . PHP_EOL
-                                                    . PHP_EOL;
+                                if ($stopForce === false) {
+                                    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                                        // @codeCoverageIgnoreStart
+                                        if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                                            if (!file_exists(VENDORFOLDERPID . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bat')) {
+                                                if (!copy(
+                                                    PHARFILENAMERET . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bat',
+                                                    VENDORFOLDERPID . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bat'
+                                                )
+                                                ) {
+                                                    echo PHP_EOL
+                                                        . "Could not create the linuxforcomposer-commit-info.bat file! No commits possible."
+                                                        . PHP_EOL
+                                                        . PHP_EOL;
+                                                }
                                             }
-                                        }
 
-                                        $containerCommitInfoProcess =
-                                        new LinuxForComposerProcess(
-                                            VENDORFOLDERPID
-                                            . DIRECTORY_SEPARATOR
-                                            . 'bin'
-                                            . DIRECTORY_SEPARATOR
-                                            . 'linuxforcomposer-commit-info.bat '
-                                            . $subvalue
-                                            . ' '
-                                            . VENDORFOLDERPID
-                                            . DIRECTORY_SEPARATOR
-                                            . 'composer'
-                                            . DIRECTORY_SEPARATOR
-                                        );
-                                    } else {
-                                        if (!file_exists(VENDORFOLDERPID . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bash')) {
-                                            if (!copy(
-                                                PHARFILENAMERET . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bash',
-                                                VENDORFOLDERPID . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bash'
-                                            )
-                                            ) {
-                                                echo PHP_EOL
-                                                    . "Could not create the linuxforcomposer-commit-info.bat file! No commits possible."
-                                                    . PHP_EOL
-                                                    . PHP_EOL;
-                                            }
-                                        }
-
-                                        $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprv');
-
-                                        $temp_filename = $this->win8NormalizePath($temp_filename);
-
-                                        $containerCommitInfoProcess =
-                                        new LinuxForComposerProcess(
-                                            'start /wait bash '
-                                            . VENDORFOLDERPID
-                                            . DIRECTORY_SEPARATOR
-                                            . 'bin'
-                                            . DIRECTORY_SEPARATOR
-                                            . 'linuxforcomposer-commit-info.bash '
-                                            . $subvalue
-                                            . ' '
-                                            . $temp_filename
-                                        );
-                                    }
-
-
-                                    $containerCommitInfoProcess->setTty($containerCommitInfoProcess->isTtySupported());
-                                    $containerCommitInfoProcess->setTimeout(null);
-                                    $containerCommitInfoProcess->prepareProcess();
-                                    $containerCommitInfoProcess->start();
-                                    $containerCommitInfoProcess->wait();
-
-                                    if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
-                                        $answerArray = explode(';', $containerCommitInfoProcess->getOutput());
-                                    } else {
-                                        $answerArray = explode(';', file_get_contents($temp_filename));
-                                    }
-
-                                    if (count($answerArray) < 3) {
-                                        $answerValue1 = '';
-                                        $answerValue2 = '';
-                                        $name = $answerValue2;
-                                        $answerValue3 = '';
-                                    } else {
-                                        $answerValue1 = trim($answerArray[0]);
-                                        $answerValue2 = trim($answerArray[1]);
-                                        $name = $answerValue2;
-                                        $answerValue3 = trim($answerArray[2]);
-                                    }
-
-                                    if ($answerValue1 === 'y'
-                                        || $answerValue1 === 'Y'
-                                        || $answerValue1 === 'yes'
-                                        || $answerValue1 === 'YES'
-                                    ) {
-                                        if (empty(trim($name))) {
-                                            $name = 'test' . sha1(microtime());
-                                        }
-
-                                        if ($answerValue3 === 'y'
-                                            || $answerValue3 === 'Y'
-                                            || $answerValue3 === 'yes'
-                                            || $answerValue3 === 'YES'
-                                        ) {
-                                            $dockerCommitCommand = 'php '
-                                                . PHARFILENAME
-                                                . ' docker:commit ' . $subvalue . ' ' . $name . ' -s ' . $position;
+                                            $containerCommitInfoProcess =
+                                                new LinuxForComposerProcess(
+                                                    VENDORFOLDERPID
+                                                    . DIRECTORY_SEPARATOR
+                                                    . 'bin'
+                                                    . DIRECTORY_SEPARATOR
+                                                    . 'linuxforcomposer-commit-info.bat '
+                                                    . $subvalue
+                                                    . ' '
+                                                    . VENDORFOLDERPID
+                                                    . DIRECTORY_SEPARATOR
+                                                    . 'composer'
+                                                    . DIRECTORY_SEPARATOR
+                                                );
                                         } else {
-                                            $dockerCommitCommand = 'php '
-                                                . PHARFILENAME
-                                                . ' docker:commit ' . $subvalue . ' ' . $name;
+                                            if (!file_exists(VENDORFOLDERPID . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bash')) {
+                                                if (!copy(
+                                                    PHARFILENAMERET . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bash',
+                                                    VENDORFOLDERPID . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bash'
+                                                )
+                                                ) {
+                                                    echo PHP_EOL
+                                                        . "Could not create the linuxforcomposer-commit-info.bat file! No commits possible."
+                                                        . PHP_EOL
+                                                        . PHP_EOL;
+                                                }
+                                            }
+
+                                            $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprv');
+
+                                            $temp_filename = $this->win8NormalizePath($temp_filename);
+
+                                            $containerCommitInfoProcess =
+                                                new LinuxForComposerProcess(
+                                                    'start /wait bash '
+                                                    . VENDORFOLDERPID
+                                                    . DIRECTORY_SEPARATOR
+                                                    . 'bin'
+                                                    . DIRECTORY_SEPARATOR
+                                                    . 'linuxforcomposer-commit-info.bash '
+                                                    . $subvalue
+                                                    . ' '
+                                                    . $temp_filename
+                                                );
                                         }
 
-                                        $commitContainerProcess = new LinuxForComposerProcess($dockerCommitCommand);
 
-                                        $commitContainerProcess->setTty($commitContainerProcess->isTtySupported());
+                                        $containerCommitInfoProcess->setTty($containerCommitInfoProcess->isTtySupported());
+                                        $containerCommitInfoProcess->setTimeout(null);
+                                        $containerCommitInfoProcess->prepareProcess();
+                                        $containerCommitInfoProcess->start();
+                                        $containerCommitInfoProcess->wait();
 
-                                        $commitContainerProcess->setTimeout(null);
-
-                                        $commitContainerProcess->prepareProcess();
-
-                                        $commitContainerProcess->start();
-
-                                        $commitContainerProcess->wait();
-
-                                        $processStdout = $commitContainerProcess->getOutput();
-
-                                        $processStderr = $commitContainerProcess->getErrorOutput();
-
-                                        if (!empty($processStdout)) {
-                                            echo $processStdout . PHP_EOL;
+                                        if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                                            $answerArray = explode(';', $containerCommitInfoProcess->getOutput());
+                                        } else {
+                                            $answerArray = explode(';', file_get_contents($temp_filename));
                                         }
 
-                                        if (!empty($processStderr)) {
-                                            echo $processStderr . PHP_EOL;
+                                        if (count($answerArray) < 3) {
+                                            $answerValue1 = '';
+                                            $answerValue2 = '';
+                                            $name = $answerValue2;
+                                            $answerValue3 = '';
+                                        } else {
+                                            $answerValue1 = trim($answerArray[0]);
+                                            $answerValue2 = trim($answerArray[1]);
+                                            $name = $answerValue2;
+                                            $answerValue3 = trim($answerArray[2]);
                                         }
-                                    }
-                                    // @codeCoverageIgnoreEnd
-                                } else {
-                                    $containerInfoProcess =
-                                        new LinuxForComposerProcess('docker ps -a --filter "id=' . $subvalue . '"');
-                                    $containerInfoProcess->setTty($containerInfoProcess->isTtySupported());
-                                    $containerInfoProcess->setTimeout(null);
-                                    $containerInfoProcess->prepareProcess();
-                                    $containerInfoProcess->start();
-                                    $containerInfoProcess->wait();
-                                    echo $containerInfoProcess->getOutput();
 
-                                    $helper1 = $this->getHelper('question');
-                                    $question1 = new ConfirmationQuestion(
-                                        'Commit container '
-                                        . $subvalue
-                                        . '? (y/N)',
-                                        false
-                                    );
+                                        if ($answerValue1 === 'y'
+                                            || $answerValue1 === 'Y'
+                                            || $answerValue1 === 'yes'
+                                            || $answerValue1 === 'YES'
+                                        ) {
+                                            if (empty(trim($name))) {
+                                                $name = 'test' . sha1(microtime());
+                                            }
 
-                                    // @codeCoverageIgnoreStart
-                                    if ($helper1->ask($input, $output, $question1)) {
-                                        $helper2 = $this->getHelper('question');
-                                        $question2 = new Question(
-                                            'Please enter the name of the new commit: ',
-                                            'test' . sha1(microtime())
-                                        );
+                                            if ($answerValue3 === 'y'
+                                                || $answerValue3 === 'Y'
+                                                || $answerValue3 === 'yes'
+                                                || $answerValue3 === 'YES'
+                                            ) {
+                                                $dockerCommitCommand = 'php '
+                                                    . PHARFILENAME
+                                                    . ' docker:commit ' . $subvalue . ' ' . $name . ' -s ' . $position;
+                                            } else {
+                                                $dockerCommitCommand = 'php '
+                                                    . PHARFILENAME
+                                                    . ' docker:commit ' . $subvalue . ' ' . $name;
+                                            }
 
-                                        $name = $helper2->ask($input, $output, $question2);
+                                            $commitContainerProcess = new LinuxForComposerProcess($dockerCommitCommand);
 
-                                        $helper3 = $this->getHelper('question');
-                                        $question3 = new ConfirmationQuestion(
-                                            'Save to linuxforcomposer.json file? (y/N)',
+                                            $commitContainerProcess->setTty($commitContainerProcess->isTtySupported());
+
+                                            $commitContainerProcess->setTimeout(null);
+
+                                            $commitContainerProcess->prepareProcess();
+
+                                            $commitContainerProcess->start();
+
+                                            $commitContainerProcess->wait();
+
+                                            $processStdout = $commitContainerProcess->getOutput();
+
+                                            $processStderr = $commitContainerProcess->getErrorOutput();
+
+                                            if (!empty($processStdout)) {
+                                                echo $processStdout . PHP_EOL;
+                                            }
+
+                                            if (!empty($processStderr)) {
+                                                echo $processStderr . PHP_EOL;
+                                            }
+                                        }
+                                        // @codeCoverageIgnoreEnd
+                                    } else {
+                                        $containerInfoProcess =
+                                            new LinuxForComposerProcess('docker ps -a --filter "id=' . $subvalue . '"');
+                                        $containerInfoProcess->setTty($containerInfoProcess->isTtySupported());
+                                        $containerInfoProcess->setTimeout(null);
+                                        $containerInfoProcess->prepareProcess();
+                                        $containerInfoProcess->start();
+                                        $containerInfoProcess->wait();
+                                        echo $containerInfoProcess->getOutput();
+
+                                        $helper1 = $this->getHelper('question');
+                                        $question1 = new ConfirmationQuestion(
+                                            'Commit container '
+                                            . $subvalue
+                                            . '? (y/N)',
                                             false
                                         );
 
-                                        if ($helper3->ask($input, $output, $question3)) {
-                                            $dockerCommitCommand = 'php '
-                                                . PHARFILENAME
-                                                . ' docker:commit ' . $subvalue . ' ' . $name . ' -s ' . $position;
-                                        } else {
-                                            $dockerCommitCommand = 'php '
-                                                . PHARFILENAME
-                                                . ' docker:commit ' . $subvalue . ' ' . $name;
-                                        }
+                                        // @codeCoverageIgnoreStart
+                                        if ($helper1->ask($input, $output, $question1)) {
+                                            $helper2 = $this->getHelper('question');
+                                            $question2 = new Question(
+                                                'Please enter the name of the new commit: ',
+                                                'test' . sha1(microtime())
+                                            );
 
-                                        $commitContainerProcess = new LinuxForComposerProcess($dockerCommitCommand);
+                                            $name = $helper2->ask($input, $output, $question2);
 
-                                        $commitContainerProcess->setTty($commitContainerProcess->isTtySupported());
+                                            $helper3 = $this->getHelper('question');
+                                            $question3 = new ConfirmationQuestion(
+                                                'Save to linuxforcomposer.json file? (y/N)',
+                                                false
+                                            );
 
-                                        $commitContainerProcess->setTimeout(null);
+                                            if ($helper3->ask($input, $output, $question3)) {
+                                                $dockerCommitCommand = 'php '
+                                                    . PHARFILENAME
+                                                    . ' docker:commit ' . $subvalue . ' ' . $name . ' -s ' . $position;
+                                            } else {
+                                                $dockerCommitCommand = 'php '
+                                                    . PHARFILENAME
+                                                    . ' docker:commit ' . $subvalue . ' ' . $name;
+                                            }
 
-                                        $commitContainerProcess->prepareProcess();
+                                            $commitContainerProcess = new LinuxForComposerProcess($dockerCommitCommand);
 
-                                        $commitContainerProcess->start();
+                                            $commitContainerProcess->setTty($commitContainerProcess->isTtySupported());
 
-                                        $commitContainerProcess->wait();
+                                            $commitContainerProcess->setTimeout(null);
 
-                                        $processStdout = $commitContainerProcess->getOutput();
+                                            $commitContainerProcess->prepareProcess();
 
-                                        $processStderr = $commitContainerProcess->getErrorOutput();
+                                            $commitContainerProcess->start();
 
-                                        if (!empty($processStdout)) {
-                                            echo $processStdout . PHP_EOL;
-                                        }
+                                            $commitContainerProcess->wait();
 
-                                        if (!empty($processStderr)) {
-                                            echo $processStderr . PHP_EOL;
+                                            $processStdout = $commitContainerProcess->getOutput();
+
+                                            $processStderr = $commitContainerProcess->getErrorOutput();
+
+                                            if (!empty($processStdout)) {
+                                                echo $processStdout . PHP_EOL;
+                                            }
+
+                                            if (!empty($processStderr)) {
+                                                echo $processStderr . PHP_EOL;
+                                            }
                                         }
                                     }
                                 }
