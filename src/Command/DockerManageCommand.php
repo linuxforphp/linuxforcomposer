@@ -281,6 +281,7 @@ class DockerManageCommand extends Command
                             set_time_limit(0);
                             $fp = fopen ($path, 'w+');
                             $ch = \curl_init($url);
+                            curl_setopt($ch, CURLOPT_HEADER, true);
                             \curl_setopt($ch, CURLOPT_TIMEOUT, 50);
                             \curl_setopt($ch, CURLOPT_FILE, $fp);
                             \curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -288,6 +289,23 @@ class DockerManageCommand extends Command
                                 \curl_setopt($ch, CURLOPT_USERPWD, $auth);
                             }
                             \curl_exec($ch);
+
+                            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+                            if ($httpCode != 200) {
+                                echo PHP_EOL
+                                    . 'URL is invalid!'
+                                    . PHP_EOL
+                                    . 'Please make sure that the URL is allowed and valid.'
+                                    . PHP_EOL
+                                    . PHP_EOL;
+
+                                \curl_close($ch);
+                                fclose($fp);
+                                unlink($path);
+                                return 4;
+                            }
+
                             \curl_close($ch);
                             fclose($fp);
                         }
@@ -318,22 +336,22 @@ class DockerManageCommand extends Command
                         . PHP_EOL
                         . PHP_EOL;
 
-                    return 1;
+                    return 4;
                 }
 
-                if ($engine === 'docker-compose') {
-                    if (file_exists($path)) {
+                if (file_exists($path)) {
+                    if ($engine === 'docker-compose') {
                         chdir($path);
-                    } else {
-                        echo PHP_EOL
-                            . 'URL is invalid!'
-                            . PHP_EOL
-                            . 'Please make sure that the URL is allowed and valid.'
-                            . PHP_EOL
-                            . PHP_EOL;
-
-                        return 1;
                     }
+                } else {
+                    echo PHP_EOL
+                        . 'URL is invalid!'
+                        . PHP_EOL
+                        . 'Please make sure that the URL is allowed and valid.'
+                        . PHP_EOL
+                        . PHP_EOL;
+
+                    return 4;
                 }
 
                 if (!empty($imageName)) {
@@ -372,6 +390,13 @@ class DockerManageCommand extends Command
                     }
                 );
                 // @codeCoverageIgnoreEnd
+
+                $returnCode = $buildContainerProcess->getExitCode();
+
+                //$output->writeln($process->getErrorOutput());
+                if ($returnCode > 0) {
+                    return 5;
+                }
 
                 if (!empty($imageName)) {
                     $containerName = $imageName . hash('sha256', 'lfphp' . time());
@@ -423,6 +448,8 @@ class DockerManageCommand extends Command
                             $containerName . PHP_EOL,
                             FILE_APPEND
                         );
+                    } else {
+                        return 5;
                     }
                 }
 
@@ -505,6 +532,8 @@ class DockerManageCommand extends Command
                         $pid . PHP_EOL,
                         FILE_APPEND
                     );
+                } else {
+                    return 5;
                 }
 
                 // @codeCoverageIgnoreStart
@@ -567,6 +596,17 @@ class DockerManageCommand extends Command
                         );
                         // @codeCoverageIgnoreEnd
 
+                        $processStderr = $buildContainerProcess->getErrorOutput();
+
+                        $returnCode = $buildContainerProcess->getExitCode();
+
+                        //$output->writeln($process->getErrorOutput());
+                        if (!empty($processStderr) || $returnCode > 0) {
+                            echo $processStderr . PHP_EOL;
+
+                            return 5;
+                        }
+
                         break;
                     } else {
                         echo PHP_EOL
@@ -576,7 +616,7 @@ class DockerManageCommand extends Command
                             . PHP_EOL
                             . PHP_EOL;
 
-                        break;
+                        return 4;
                     }
                 }
 
@@ -692,6 +732,17 @@ class DockerManageCommand extends Command
                                         $containerCommitInfoProcess->start();
                                         $containerCommitInfoProcess->wait();
 
+                                        $processStderr = $containerCommitInfoProcess->getErrorOutput();
+
+                                        $returnCode = $containerCommitInfoProcess->getExitCode();
+
+                                        //$output->writeln($process->getErrorOutput());
+                                        if (!empty($processStderr) || $returnCode > 0) {
+                                            echo $processStderr . PHP_EOL;
+
+                                            return 5;
+                                        }
+
                                         if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                                             $answerArray = explode(';', $containerCommitInfoProcess->getOutput());
                                         } else {
@@ -749,12 +800,17 @@ class DockerManageCommand extends Command
 
                                             $processStderr = $commitContainerProcess->getErrorOutput();
 
+                                            $returnCode = $commitContainerProcess->getExitCode();
+
                                             if (!empty($processStdout)) {
                                                 echo $processStdout . PHP_EOL;
                                             }
 
-                                            if (!empty($processStderr)) {
+                                            //$output->writeln($process->getErrorOutput());
+                                            if (!empty($processStderr) || $returnCode > 0) {
                                                 echo $processStderr . PHP_EOL;
+
+                                                return 5;
                                             }
                                         }
                                         // @codeCoverageIgnoreEnd
@@ -766,6 +822,18 @@ class DockerManageCommand extends Command
                                         $containerInfoProcess->prepareProcess();
                                         $containerInfoProcess->start();
                                         $containerInfoProcess->wait();
+
+                                        $processStderr = $containerInfoProcess->getErrorOutput();
+
+                                        $returnCode = $containerInfoProcess->getExitCode();
+
+                                        //$output->writeln($process->getErrorOutput());
+                                        if (!empty($processStderr) || $returnCode > 0) {
+                                            echo $processStderr . PHP_EOL;
+
+                                            return 5;
+                                        }
+
                                         echo $containerInfoProcess->getOutput();
 
                                         $helper1 = $this->getHelper('question');
@@ -818,12 +886,17 @@ class DockerManageCommand extends Command
 
                                             $processStderr = $commitContainerProcess->getErrorOutput();
 
+                                            $returnCode = $commitContainerProcess->getExitCode();
+
                                             if (!empty($processStdout)) {
                                                 echo $processStdout . PHP_EOL;
                                             }
 
-                                            if (!empty($processStderr)) {
+                                            //$output->writeln($process->getErrorOutput());
+                                            if (!empty($processStderr) || $returnCode > 0) {
                                                 echo $processStderr . PHP_EOL;
+
+                                                return 5;
                                             }
                                         }
                                     }
@@ -876,12 +949,17 @@ class DockerManageCommand extends Command
 
                             $processStderr = $stopContainerProcess->getErrorOutput();
 
+                            $returnCode = $stopContainerProcess->getExitCode();
+
                             if (!empty($processStdout)) {
                                 echo $processStdout . PHP_EOL;
                             }
 
-                            if (!empty($processStderr)) {
+                            //$output->writeln($process->getErrorOutput());
+                            if (!empty($processStderr) || $returnCode > 0) {
                                 echo $processStderr . PHP_EOL;
+
+                                return 5;
                             }
 
                             if (isset($dockerRemoveCommand)) {
@@ -903,12 +981,17 @@ class DockerManageCommand extends Command
 
                                 $processStderr = $removeContainerProcess->getErrorOutput();
 
+                                $returnCode = $removeContainerProcess->getExitCode();
+
                                 if (!empty($processStdout)) {
                                     echo $processStdout . PHP_EOL;
                                 }
 
-                                if (!empty($processStderr)) {
+                                //$output->writeln($process->getErrorOutput());
+                                if (!empty($processStderr) || $returnCode > 0) {
                                     echo $processStderr . PHP_EOL;
+
+                                    return 5;
                                 }
                                 // @codeCoverageIgnoreEnd
                             }
@@ -930,8 +1013,13 @@ class DockerManageCommand extends Command
 
             default:
                 echo PHP_EOL . 'Wrong command given!' . PHP_EOL . PHP_EOL;
+
+                return 1;
+
                 break;
         }
+
+        return 0;
     }
 
     protected function getPortOptions($ports)

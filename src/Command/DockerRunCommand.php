@@ -66,6 +66,10 @@ class DockerRunCommand extends Command
             case 'start':
                 $dockerManageCommandsArray = $this->getParsedJsonFile($input);
 
+                if (is_int($dockerManageCommandsArray)) {
+                    return $dockerManageCommandsArray;
+                }
+
                 foreach ($dockerManageCommandsArray as $key => $value) {
                     if (empty($value)) {
                         unset($dockerManageCommandsArray[$key]);
@@ -96,14 +100,18 @@ class DockerRunCommand extends Command
 
                     $processStderr = $process->getErrorOutput();
 
+                    $returnCode = $process->getExitCode();
+
                     //$output->writeln($process->getOutput());
                     if (!empty($processStdout)) {
                         echo $processStdout . PHP_EOL;
                     }
 
                     //$output->writeln($process->getErrorOutput());
-                    if (!empty($processStderr)) {
+                    if (!empty($processStderr) || $returnCode > 0) {
                         echo $processStderr . PHP_EOL;
+
+                        return $returnCode;
                     }
                 }
 
@@ -116,6 +124,10 @@ class DockerRunCommand extends Command
 
             case 'stop':
                 $dockerManageCommandsArray = $this->getParsedJsonFile($input);
+
+                if (is_int($dockerManageCommandsArray)) {
+                    return $dockerManageCommandsArray;
+                }
 
                 $stopForce = isset($stopForce) ?: false;
 
@@ -155,12 +167,18 @@ class DockerRunCommand extends Command
 
                 $processStderr = $process->getErrorOutput();
 
+                $returnCode = $process->getExitCode();
+
+                //$output->writeln($process->getOutput());
                 if (!empty($processStdout)) {
                     echo $processStdout . PHP_EOL;
                 }
 
-                if (!empty($processStderr)) {
+                //$output->writeln($process->getErrorOutput());
+                if (!empty($processStderr) || $returnCode > 0) {
                     echo $processStderr . PHP_EOL;
+
+                    return $returnCode;
                 }
 
                 break;
@@ -168,7 +186,11 @@ class DockerRunCommand extends Command
             case 'deploy':
                 set_time_limit(0);
 
-                $this->getParsedJsonFile($input);
+                $dockerManageCommandsArray = $this->getParsedJsonFile($input);
+
+                if (is_int($dockerManageCommandsArray)) {
+                    return $dockerManageCommandsArray;
+                }
 
                 $jsonFile = ($input->getOption('jsonfile')) ?: null;
 
@@ -184,7 +206,7 @@ class DockerRunCommand extends Command
 
                 if ($fileContentsArray === null) {
                     echo PHP_EOL . "The 'Linux for Composer' JSON file is invalid." . PHP_EOL . PHP_EOL;
-                    exit;
+                    return 1;
                 }
 
                 $account = $fileContentsArray['lfphp-cloud']['account'];
@@ -192,6 +214,11 @@ class DockerRunCommand extends Command
                 $username = $fileContentsArray['lfphp-cloud']['username'];
 
                 $token = $fileContentsArray['lfphp-cloud']['token'];
+
+                if (empty($account) || empty($username) || empty($token)) {
+                    echo PHP_EOL . PHP_EOL . "Insufficient information to deploy to the Cloud." . PHP_EOL . PHP_EOL;
+                    return 7;
+                }
 
                 $cloudServerUrl = DockerRunCommand::LFPHPCLOUDSERVER . '/' . $account;
 
@@ -242,8 +269,12 @@ class DockerRunCommand extends Command
             default:
                 echo PHP_EOL . 'Wrong command given!' . PHP_EOL . PHP_EOL;
 
+                return 1;
+
                 break;
         }
+
+        return 0;
     }
 
     protected function getParsedJsonFile(InputInterface $input)
@@ -267,11 +298,11 @@ class DockerRunCommand extends Command
         $returnCode = (int) $parseCommand->run($parseInput, $parseOutput);
 
         if ($returnCode > 1) {
-            echo PHP_EOL . 'You must choose at least one PHP version to run.' . PHP_EOL . PHP_EOL;
-            exit;
+            echo PHP_EOL . "Please check your 'Linux for Composer' JSON file for misconfigurations." . PHP_EOL . PHP_EOL;
+            return $returnCode;
         } elseif ($returnCode === 1) {
             echo PHP_EOL . "The 'Linux for Composer' JSON file is invalid." . PHP_EOL . PHP_EOL;
-            exit;
+            return 1;
         }
 
         return explode("\n", $parseOutput->fetch());
