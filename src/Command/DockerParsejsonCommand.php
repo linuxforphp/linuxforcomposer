@@ -70,18 +70,23 @@ class DockerParsejsonCommand extends Command
             return 1;
         }
 
-        if (
-            (!isset($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
+        if (!isset($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
                 || empty($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
-            )
-            && (!isset($fileContentsArray['single']['image']['dockerfile'])
-                || empty($fileContentsArray['single']['image']['dockerfile'])
-            )
-            && (!isset($fileContentsArray['docker-compose'])
-                || empty($fileContentsArray['docker-compose'])
-            )
         ) {
-            return 2;
+            if (
+                (!isset($fileContentsArray['single']['image']['dockerfile']['url'])
+                    || empty($fileContentsArray['single']['image']['dockerfile']['url'])
+                )
+                && (!isset($fileContentsArray['single']['image']['dockerfile']['container-name'])
+                    || empty($fileContentsArray['single']['image']['dockerfile']['container-name'])
+                )
+                && (!isset($fileContentsArray['docker-compose']['url'])
+                    || empty($fileContentsArray['docker-compose']['url'])
+                )
+            ) {
+                return 2;
+            }
+
         }
 
         if (is_array($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
