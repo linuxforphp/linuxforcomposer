@@ -137,7 +137,7 @@ class DockerManageCommand extends Command
 
                         if (!file_exists($path)) {
                             set_time_limit(0);
-                            $fp = fopen ($path, 'w+');
+                            $fp = fopen($path, 'w+');
                             $ch = \curl_init($url);
                             curl_setopt($ch, CURLOPT_HEADER, true);
                             \curl_setopt($ch, CURLOPT_TIMEOUT, 50);
@@ -257,8 +257,7 @@ class DockerManageCommand extends Command
                 }
 
                 // @codeCoverageIgnoreStart
-                if (
-                    $engine === 'dockerfile'
+                if ($engine === 'dockerfile'
                     && isset($mount)
                     && !empty($mount)
                     && strpos($mount[0], ':') === false
@@ -432,8 +431,7 @@ class DockerManageCommand extends Command
 
             case 'run':
                 // @codeCoverageIgnoreStart
-                if (
-                    isset($mount)
+                if (isset($mount)
                     && !empty($mount)
                     && strpos($mount[0], ':') === false
                 ) {
@@ -1106,8 +1104,7 @@ class DockerManageCommand extends Command
                     );
                 }
 
-                if (
-                    isset($mount)
+                if (isset($mount)
                     && !empty($mount)
                     && strpos($mount[0], ':') !== false
                 ) {
@@ -1272,8 +1269,7 @@ class DockerManageCommand extends Command
 
         $mount = $input->getOption('mount');
 
-        if (
-            isset($mount)
+        if (isset($mount)
             && !empty($mount)
             && strpos($mount[0], ':') === false
         ) {
@@ -1480,8 +1476,7 @@ class DockerManageCommand extends Command
 
         $scriptOptions = [];
 
-        if (
-            strpos($scriptArray[0], 'dockerfile') !== false
+        if (strpos($scriptArray[0], 'dockerfile') !== false
             || strpos($scriptArray[0], 'docker-compose') !== false
         ) {
             $scriptOptions['engine'] = $scriptArray[0];

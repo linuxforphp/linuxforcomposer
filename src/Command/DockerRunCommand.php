@@ -138,7 +138,8 @@ class DockerRunCommand extends Command
                     $dockerManageCommand = substr_replace(
                         $dockerManageCommandsArray[0],
                         $stopCommand,
-                        $position, $searchLength
+                        $position,
+                        $searchLength
                     );
                 }
 
@@ -147,7 +148,8 @@ class DockerRunCommand extends Command
                     $dockerManageCommand = substr_replace(
                         $dockerManageCommandsArray[0],
                         $stopCommand,
-                        $position, $searchLength
+                        $position,
+                        $searchLength
                     );
                 }
 
@@ -234,8 +236,7 @@ class DockerRunCommand extends Command
                     'json' => $fileContentsJson,
                 ];
 
-                if (
-                    isset($fileContentsArray['single']['image']['dockerfile'])
+                if (isset($fileContentsArray['single']['image']['dockerfile'])
                     && !empty($fileContentsArray['single']['image']['dockerfile']['url'])
                 ) {
                     $url = $fileContentsArray['single']['image']['dockerfile']['url'];

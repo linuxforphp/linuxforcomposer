@@ -73,8 +73,7 @@ class DockerParsejsonCommand extends Command
         if (!isset($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
                 || empty($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
         ) {
-            if (
-                (!isset($fileContentsArray['single']['image']['dockerfile']['url'])
+            if ((!isset($fileContentsArray['single']['image']['dockerfile']['url'])
                     || empty($fileContentsArray['single']['image']['dockerfile']['url'])
                 )
                 && (!isset($fileContentsArray['single']['image']['dockerfile']['container-name'])
@@ -86,7 +85,6 @@ class DockerParsejsonCommand extends Command
             ) {
                 return 2;
             }
-
         }
 
         if (is_array($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
@@ -105,8 +103,7 @@ class DockerParsejsonCommand extends Command
             $fileContentsArray['single']['containers']['modes'][] = 'detached';
         }
 
-        if (
-            isset($fileContentsArray['single']['image']['dockerfile'])
+        if (isset($fileContentsArray['single']['image']['dockerfile'])
             && !empty($fileContentsArray['single']['image']['dockerfile']['url'])
             && !empty($fileContentsArray['single']['image']['dockerfile']['container-name'])
         ) {
@@ -126,8 +123,7 @@ class DockerParsejsonCommand extends Command
                 '--script dockerfile,,,'
                 . $fileContentsArray['single']['image']['dockerfile']['url'];
 
-            if (
-                isset($fileContentsArray['single']['image']['dockerfile']['username'])
+            if (isset($fileContentsArray['single']['image']['dockerfile']['username'])
                 && isset($fileContentsArray['single']['image']['dockerfile']['token'])
                 && !empty($fileContentsArray['single']['image']['dockerfile']['username'])
                 && !empty($fileContentsArray['single']['image']['dockerfile']['token'])
@@ -165,8 +161,7 @@ class DockerParsejsonCommand extends Command
                 '--script docker-compose,,,'
                 . $fileContentsArray['docker-compose']['url'];
 
-            if (
-                isset($fileContentsArray['docker-compose']['username'])
+            if (isset($fileContentsArray['docker-compose']['username'])
                 && isset($fileContentsArray['docker-compose']['token'])
                 && !empty($fileContentsArray['docker-compose']['username'])
                 && !empty($fileContentsArray['docker-compose']['token'])
@@ -255,7 +250,7 @@ class DockerParsejsonCommand extends Command
         return 0;
     }
 
-    protected function getModes(Array $fileContentsArray)
+    protected function getModes(array $fileContentsArray)
     {
         $dockerManageCommand = '';
 
@@ -274,7 +269,7 @@ class DockerParsejsonCommand extends Command
         return $dockerManageCommand;
     }
 
-    protected function getPorts(Array $fileContentsArray, int $i)
+    protected function getPorts(array $fileContentsArray, int $i)
     {
         $dockerManageCommand = '';
 
@@ -304,13 +299,12 @@ class DockerParsejsonCommand extends Command
         return $dockerManageCommand;
     }
 
-    protected function getMount(Array $fileContentsArray)
+    protected function getMount(array $fileContentsArray)
     {
         $dockerManageCommand = '';
 
         if (isset($fileContentsArray['single']['containers']['persist-data']['mount'])) {
-            if (
-                isset($fileContentsArray['single']['containers']['persist-data']['directories'])
+            if (isset($fileContentsArray['single']['containers']['persist-data']['directories'])
                 && is_array($fileContentsArray['single']['containers']['persist-data']['directories'])
                 && isset($fileContentsArray['single']['containers']['persist-data']['directories']['directory1'])
                 && !empty($fileContentsArray['single']['containers']['persist-data']['directories']['directory1'])
@@ -345,8 +339,6 @@ class DockerParsejsonCommand extends Command
                         }
                     }
                 }
-
-
             }
         } else {
             $dockerManageCommand = '';
@@ -359,7 +351,7 @@ class DockerParsejsonCommand extends Command
         return $dockerManageCommand;
     }
 
-    protected function getVolumes(Array $fileContentsArray)
+    protected function getVolumes(array $fileContentsArray)
     {
         $dockerManageCommand = '';
 
