@@ -294,6 +294,18 @@ class DockerParsejsonCommand extends Command
                     $dockerManageCommand .= $portNumber . ' ';
                 }
             }
+        } else {
+            $portNumber =
+                isset($fileContentsArray['single']['containers']['ports'])
+                && !empty($fileContentsArray['single']['containers']['ports'])
+                    ? $fileContentsArray['single']['containers']['ports']
+                    : '';
+
+            if (!empty($portNumber) && $i === 0) {
+                $dockerManageCommand .= '--port ';
+
+                $dockerManageCommand .= $portNumber . ' ';
+            }
         }
 
         return $dockerManageCommand;
@@ -303,40 +315,39 @@ class DockerParsejsonCommand extends Command
     {
         $dockerManageCommand = '';
 
-        if (isset($fileContentsArray['single']['containers']['persist-data']['mount'])) {
-            if (isset($fileContentsArray['single']['containers']['persist-data']['directories'])
-                && is_array($fileContentsArray['single']['containers']['persist-data']['directories'])
-                && isset($fileContentsArray['single']['containers']['persist-data']['directories']['directory1'])
-                && !empty($fileContentsArray['single']['containers']['persist-data']['directories']['directory1'])
-                && isset($fileContentsArray['single']['containers']['persist-data']['root-name'])
-                && !empty($fileContentsArray['single']['containers']['persist-data']['root-name'])
+        if (isset($fileContentsArray['single']['containers']['persist-data']['mount'])
+            && isset($fileContentsArray['single']['containers']['persist-data']['directories'])
+            && is_array($fileContentsArray['single']['containers']['persist-data']['directories'])
+            && isset($fileContentsArray['single']['containers']['persist-data']['directories']['directory1'])
+            && !empty($fileContentsArray['single']['containers']['persist-data']['directories']['directory1'])
+            && isset($fileContentsArray['single']['containers']['persist-data']['root-name'])
+            && !empty($fileContentsArray['single']['containers']['persist-data']['root-name'])
             ) {
-                $dockerManageCommand .= '--mount ';
+            $dockerManageCommand .= '--mount ';
 
-                if ($fileContentsArray['single']['containers']['persist-data']['mount'] == 'true') {
-                    foreach ($fileContentsArray['single']['containers']['persist-data']['directories'] as $directory) {
-                        if (!empty($directory)) {
-                            $dockerManageCommand .=
-                                'source='
-                                . $fileContentsArray['single']['containers']['persist-data']['root-name']
-                                . str_replace(DIRECTORY_SEPARATOR, '_', $directory)
-                                . ',target='
-                                . $directory
-                                . ',,,'
-                                . $fileContentsArray['single']['containers']['persist-data']['root-name']
-                                . str_replace(DIRECTORY_SEPARATOR, '_', $directory)
-                                . ',,,,';
-                        }
+            if ($fileContentsArray['single']['containers']['persist-data']['mount'] == 'true') {
+                foreach ($fileContentsArray['single']['containers']['persist-data']['directories'] as $directory) {
+                    if (!empty($directory)) {
+                        $dockerManageCommand .=
+                            'source='
+                            . $fileContentsArray['single']['containers']['persist-data']['root-name']
+                            . str_replace(DIRECTORY_SEPARATOR, '_', $directory)
+                            . ',target='
+                            . $directory
+                            . ',,,'
+                            . $fileContentsArray['single']['containers']['persist-data']['root-name']
+                            . str_replace(DIRECTORY_SEPARATOR, '_', $directory)
+                            . ',,,,';
                     }
-                } else {
-                    foreach ($fileContentsArray['single']['containers']['persist-data']['directories'] as $directory) {
-                        if (!empty($directory)) {
-                            $dockerManageCommand .=
-                                ':'
-                                . $fileContentsArray['single']['containers']['persist-data']['root-name']
-                                . str_replace(DIRECTORY_SEPARATOR, '_', $directory)
-                                . ',,,,';
-                        }
+                }
+            } else {
+                foreach ($fileContentsArray['single']['containers']['persist-data']['directories'] as $directory) {
+                    if (!empty($directory)) {
+                        $dockerManageCommand .=
+                            ':'
+                            . $fileContentsArray['single']['containers']['persist-data']['root-name']
+                            . str_replace(DIRECTORY_SEPARATOR, '_', $directory)
+                            . ',,,,';
                     }
                 }
             }

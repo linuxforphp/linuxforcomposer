@@ -6,15 +6,19 @@
             "linuxforcomposer": {
                 "php-versions": [
                     "7.4",
-                    "7.3"
+                    "7.3",
+                    "7.2"
+                ],
+                "script": [
+                    "lfphp --mysql --phpfpm --apache"
                 ],
                 "thread-safe": "false"
             },
             "dockerfile": {
-                "url": "",
-                "container-name": "",
-                "username": "",
-                "token": ""
+                "url": "Dockerfile",
+                "container-name": "dockerfiletest",
+                "username": "user1",
+                "token": "secret"
             }
         },
         "containers": {
@@ -28,10 +32,15 @@
                     "7474:80",
                     "7373:80",
                     "7272:80"
+                ],
+                "port2": [
+                    "13306:3306",
+                    "13307:3306",
+                    "13308:3306"
                 ]
             },
             "volumes": {
-                "volume1": "${PWD}/:/srv/www",
+                "volume1": "",
                 "volume2": ""
             },
             "persist-data": {

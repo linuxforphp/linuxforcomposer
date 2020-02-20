@@ -82,6 +82,7 @@ class DockerManageCommand extends Command
     {
         $command = $input->getArgument('execute');
 
+        // @codeCoverageIgnoreStart
         $this->dockerRunCommand .=
             ($command == 'build' || $command == 'run')
             && LFPHP
@@ -91,6 +92,7 @@ class DockerManageCommand extends Command
                     . '--cpu-period=' . LFPHP_PERIOD . ' '
                     . '--cpu-quota=' . LFPHP_QUOTA . ' '
                 : '';
+        // @codeCoverageIgnoreEnd
 
         $mount = $input->getOption('mount');
 
@@ -131,6 +133,7 @@ class DockerManageCommand extends Command
 
                 if (isset($urlArray['host']) && strpos($urlArray['scheme'], 'http') !== false) {
                     if ($engine === 'dockerfile') {
+                        // @codeCoverageIgnoreStart
                         $filename = array_pop($pathArray);
 
                         $path = BASEDIR . DIRECTORY_SEPARATOR . $filename;
@@ -167,9 +170,11 @@ class DockerManageCommand extends Command
                             \curl_close($ch);
                             fclose($fp);
                         }
+                    // @codeCoverageIgnoreEnd
                     } else {
                         $path = array_pop($pathArray);
 
+                        // @codeCoverageIgnoreStart
                         if (!file_exists($path)) {
                             $processGit = new LinuxForComposerProcess('git clone ' . $url);
                             $processGit->setTimeout(null);
@@ -177,15 +182,18 @@ class DockerManageCommand extends Command
                             $processGit->start();
                             $processGit->wait();
                         }
+                        // @codeCoverageIgnoreEnd
                     }
                 } elseif (!isset($urlArray['host'])) {
                     $path = $urlArray['path'];
 
+                    // @codeCoverageIgnoreStart
                     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                         if (strstr(php_uname('v'), 'Windows 10') === false && php_uname('r') != '10.0') {
                             $path = $this->win8NormalizePath($path);
                         }
                     }
+                    // @codeCoverageIgnoreEnd
                 } else {
                     echo PHP_EOL
                         . 'URL is invalid!'
@@ -225,6 +233,7 @@ class DockerManageCommand extends Command
 
                 echo 'Building all containers...' . PHP_EOL;
 
+                // @codeCoverageIgnoreStart
                 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                     if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                         $buildContainerProcess->setDecorateWindows(true);
@@ -232,6 +241,7 @@ class DockerManageCommand extends Command
                         $buildContainerProcess->setDecorateWindowsLegacy(true);
                     }
                 }
+                // @codeCoverageIgnoreEnd
 
                 $buildContainerProcess->setTty($buildContainerProcess->isTtySupported());
 
@@ -251,12 +261,13 @@ class DockerManageCommand extends Command
 
                 $returnCode = $buildContainerProcess->getExitCode();
 
+                // @codeCoverageIgnoreStart
                 //$output->writeln($process->getErrorOutput());
                 if ($returnCode > 0) {
                     return 5;
                 }
+                // @codeCoverageIgnoreEnd
 
-                // @codeCoverageIgnoreStart
                 if ($engine === 'dockerfile'
                     && isset($mount)
                     && !empty($mount)
@@ -278,6 +289,7 @@ class DockerManageCommand extends Command
 
                         $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprvcheck');
 
+                        // @codeCoverageIgnoreStart
                         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                             if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                                 $checkVolumeProcess->setDecorateWindowsWithStdout(true, $temp_filename);
@@ -285,6 +297,7 @@ class DockerManageCommand extends Command
                                 $temp_filename = $this->win8NormalizePath($temp_filename);
                                 $checkVolumeProcess->setDecorateWindowsLegacyWithStdout(true, $temp_filename);
                             }
+                        // @codeCoverageIgnoreEnd
                         } else {
                             $checkVolumeProcess->setTempFilename($temp_filename);
 
@@ -327,12 +340,14 @@ class DockerManageCommand extends Command
 
                             $returnCode = $createVolumeProcess->getExitCode();
 
+                            // @codeCoverageIgnoreStart
                             //$output->writeln($process->getErrorOutput());
                             if (!empty($processStderr) || $returnCode > 0) {
                                 echo $processStderr . PHP_EOL;
 
                                 return 5;
                             }
+                            // @codeCoverageIgnoreEnd
 
                             $initializeVolumeCommand =
                                 'docker run --rm --mount source='
@@ -360,16 +375,17 @@ class DockerManageCommand extends Command
 
                             $returnCode = $initializeVolumeProcess->getExitCode();
 
+                            // @codeCoverageIgnoreStart
                             //$output->writeln($process->getErrorOutput());
                             if (!empty($processStderr) || $returnCode > 0) {
                                 echo $processStderr . PHP_EOL;
 
                                 return 5;
                             }
+                            // @codeCoverageIgnoreEnd
                         }
                     }
                 }
-                // @codeCoverageIgnoreEnd
 
                 if (!empty($imageName)) {
                     $containerName = $imageName . hash('sha256', 'lfphp' . time());
@@ -387,6 +403,7 @@ class DockerManageCommand extends Command
 
                     echo 'Starting container...' . PHP_EOL;
 
+                    // @codeCoverageIgnoreStart
                     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                         if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                             $buildContainerProcess->setDecorateWindows(true);
@@ -403,13 +420,11 @@ class DockerManageCommand extends Command
 
                     $buildContainerProcess->start();
 
-                    // @codeCoverageIgnoreStart
                     $buildContainerProcess->wait(
                         function ($type, $data) {
                             echo $data;
                         }
                     );
-                    // @codeCoverageIgnoreEnd
 
                     // executes after the command finishes
                     if ($buildContainerProcess->isSuccessful()) {
@@ -425,12 +440,12 @@ class DockerManageCommand extends Command
                     } else {
                         return 5;
                     }
+                    // @codeCoverageIgnoreEnd
                 }
 
                 break;
 
             case 'run':
-                // @codeCoverageIgnoreStart
                 if (isset($mount)
                     && !empty($mount)
                     && strpos($mount[0], ':') === false
@@ -451,6 +466,7 @@ class DockerManageCommand extends Command
 
                         $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprvcheck');
 
+                        // @codeCoverageIgnoreStart
                         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                             if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                                 $checkVolumeProcess->setDecorateWindowsWithStdout(true, $temp_filename);
@@ -458,6 +474,7 @@ class DockerManageCommand extends Command
                                 $temp_filename = $this->win8NormalizePath($temp_filename);
                                 $checkVolumeProcess->setDecorateWindowsLegacyWithStdout(true, $temp_filename);
                             }
+                        // @codeCoverageIgnoreEnd
                         } else {
                             $checkVolumeProcess->setTempFilename($temp_filename);
 
@@ -500,12 +517,14 @@ class DockerManageCommand extends Command
 
                             $returnCode = $createVolumeProcess->getExitCode();
 
+                            // @codeCoverageIgnoreStart
                             //$output->writeln($process->getErrorOutput());
                             if (!empty($processStderr) || $returnCode > 0) {
                                 echo $processStderr . PHP_EOL;
 
                                 return 5;
                             }
+                            // @codeCoverageIgnoreEnd
 
                             $initializeVolumeCommand =
                                 'docker run --rm --mount source='
@@ -532,16 +551,17 @@ class DockerManageCommand extends Command
 
                             $returnCode = $initializeVolumeProcess->getExitCode();
 
+                            // @codeCoverageIgnoreStart
                             //$output->writeln($process->getErrorOutput());
                             if (!empty($processStderr) || $returnCode > 0) {
                                 echo $processStderr . PHP_EOL;
 
                                 return 5;
                             }
+                            // @codeCoverageIgnoreEnd
                         }
                     }
                 }
-                // @codeCoverageIgnoreEnd
 
                 $this->dockerRunCommand = $this->formatInput($input);
 
@@ -577,7 +597,6 @@ class DockerManageCommand extends Command
                         }
                     }
                 }
-                // @codeCoverageIgnoreEnd
 
                 $runContainerProcess->setTty($runContainerProcess->isTtySupported());
 
@@ -587,7 +606,6 @@ class DockerManageCommand extends Command
 
                 $runContainerProcess->start();
 
-                // @codeCoverageIgnoreStart
                 $runContainerProcess->wait(
                     function ($type, $data) {
                         echo $data;
@@ -619,9 +637,11 @@ class DockerManageCommand extends Command
                         $pid . PHP_EOL,
                         FILE_APPEND
                     );
+                // @codeCoverageIgnoreStart
                 } else {
                     return 5;
                 }
+                // @codeCoverageIgnoreEnd
 
                 // @codeCoverageIgnoreStart
                 if (!empty($this->tempScriptFile)) {
@@ -695,12 +715,14 @@ class DockerManageCommand extends Command
 
                         $returnCode = $buildContainerProcess->getExitCode();
 
+                        // @codeCoverageIgnoreStart
                         //$output->writeln($process->getErrorOutput());
                         if (!empty($processStderr) || $returnCode > 0) {
                             echo $processStderr . PHP_EOL;
 
                             return 5;
                         }
+                        // @codeCoverageIgnoreEnd
 
                         break;
                     } else {
@@ -758,8 +780,8 @@ class DockerManageCommand extends Command
                                 $subvalue = substr($value, 0, 12);
 
                                 if ($stopForce === false) {
+                                    // @codeCoverageIgnoreStart
                                     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                                        // @codeCoverageIgnoreStart
                                         if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                                             if (!file_exists(VENDORFOLDERPID . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'linuxforcomposer-commit-info.bat')) {
                                                 if (!copy(
@@ -819,7 +841,6 @@ class DockerManageCommand extends Command
                                                     . $temp_filename
                                                 );
                                         }
-
 
                                         $containerCommitInfoProcess->setTty($containerCommitInfoProcess->isTtySupported());
                                         $containerCommitInfoProcess->setTimeout(null);
@@ -908,7 +929,7 @@ class DockerManageCommand extends Command
                                                 return 5;
                                             }
                                         }
-                                        // @codeCoverageIgnoreEnd
+                                    // @codeCoverageIgnoreEnd
                                     } else {
                                         $containerInfoProcess =
                                             new LinuxForComposerProcess('docker ps -a --filter "id=' . $subvalue . '"');
@@ -994,6 +1015,7 @@ class DockerManageCommand extends Command
                                                 return 5;
                                             }
                                         }
+                                        // @codeCoverageIgnoreEnd
                                     }
                                 }
                             }
@@ -1050,6 +1072,7 @@ class DockerManageCommand extends Command
                                 echo $processStdout . PHP_EOL;
                             }
 
+                            // @codeCoverageIgnoreStart
                             //$output->writeln($process->getErrorOutput());
                             if (!empty($processStderr) || $returnCode > 0) {
                                 echo $processStderr . PHP_EOL;
@@ -1058,7 +1081,6 @@ class DockerManageCommand extends Command
                             }
 
                             if (isset($dockerRemoveCommand)) {
-                                // @codeCoverageIgnoreStart
                                 $removeContainerProcess =
                                     new LinuxForComposerProcess($dockerRemoveCommand);
 
@@ -1088,8 +1110,8 @@ class DockerManageCommand extends Command
 
                                     return 5;
                                 }
-                                // @codeCoverageIgnoreEnd
                             }
+                            // @codeCoverageIgnoreEnd
 
                             $position++;
                         }
@@ -1118,6 +1140,7 @@ class DockerManageCommand extends Command
 
                         $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprvcheck');
 
+                        // @codeCoverageIgnoreStart
                         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                             if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                                 $checkVolumeProcess->setDecorateWindowsWithStdout(true, $temp_filename);
@@ -1125,6 +1148,7 @@ class DockerManageCommand extends Command
                                 $temp_filename = $this->win8NormalizePath($temp_filename);
                                 $checkVolumeProcess->setDecorateWindowsLegacyWithStdout(true, $temp_filename);
                             }
+                        // @codeCoverageIgnoreEnd
                         } else {
                             $checkVolumeProcess->setTempFilename($temp_filename);
 
@@ -1146,6 +1170,7 @@ class DockerManageCommand extends Command
 
                         $processStdout = trim(file_get_contents(($temp_filename)));
 
+                        // @codeCoverageIgnoreStart
                         //$output->writeln($process->getErrorOutput());
                         if (!empty($processStdout)) {
                             $createVolumeCommand = 'docker volume rm ' . $mountName;
@@ -1174,6 +1199,7 @@ class DockerManageCommand extends Command
                                 return 5;
                             }
                         }
+                        // @codeCoverageIgnoreEnd
                     }
                 }
 
@@ -1389,22 +1415,21 @@ class DockerManageCommand extends Command
             $mountArray = explode(',,,,', $mount[0]);
 
             foreach ($mountArray as $singleMount) {
-                if (!empty($singleMount)) {
+                if (!empty($singleMount)
+                    && strpos($singleMount, ',,,') !== false
+                    && strpos($singleMount, ':') === false
+                ) {
                     $singleMountArray = explode(',,,', $singleMount);
 
-                    if (count($singleMountArray) === 1 && strpos($singleMountArray[0], ':') !== false) {
-                        $singleMountArray[0] = str_replace(':', '', $singleMountArray[0]);
+                    $mountNames[$singleMountArray[1]] = $singleMountArray[0];
+                } elseif (!empty($singleMount)
+                    && strpos($singleMount, ':') !== false
+                ) {
+                    $singleMount = str_replace(':', '', $singleMount);
 
-                        $mountNames[$singleMountArray[0]] = $singleMountArray[0];
-                    } else {
-                        $mountNames[$singleMountArray[1]] = $singleMountArray[0];
-                    }
+                    $mountNames[$singleMount] = $singleMount;
                 }
             }
-        } else {
-            $singleMountArray = explode(',,,', $mount[0]);
-
-            $mountNames[$singleMountArray[1]] = $singleMountArray[0];
         }
 
         return $mountNames;
@@ -1417,11 +1442,13 @@ class DockerManageCommand extends Command
         $mountOptions = '';
 
         foreach ($mountNames as $singleMount) {
-            $mountOptions .= '--mount ';
+            if (strpos($singleMount, 'source=') !== false) {
+                $mountOptions .= '--mount ';
 
-            $mountOptions .= $singleMount;
+                $mountOptions .= $singleMount;
 
-            $mountOptions .= ' ';
+                $mountOptions .= ' ';
+            }
         }
 
         return $mountOptions;

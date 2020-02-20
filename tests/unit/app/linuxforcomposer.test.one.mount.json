@@ -8,6 +8,9 @@
                     "7.4",
                     "7.3"
                 ],
+                "script": [
+                    "lfphp"
+                ],
                 "thread-safe": "false"
             },
             "dockerfile": {
@@ -31,17 +34,17 @@
                 ]
             },
             "volumes": {
-                "volume1": "${PWD}/:/srv/www",
+                "volume1": "",
                 "volume2": ""
             },
             "persist-data": {
-                "mount": "false",
+                "mount": "true",
                 "directories": {
-                    "directory1": "",
+                    "directory1": "/srv",
                     "directory2": "",
                     "directory3": ""
                 },
-                "root-name": ""
+                "root-name": "unittest"
             }
         }
     },

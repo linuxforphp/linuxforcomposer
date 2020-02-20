@@ -8,6 +8,9 @@
                     "7.4",
                     "7.3"
                 ],
+                "script": [
+                    "lfphp"
+                ],
                 "thread-safe": "false"
             },
             "dockerfile": {
@@ -24,11 +27,7 @@
                 "mode3": "tty"
             },
             "ports": {
-                "port1": [
-                    "7474:80",
-                    "7373:80",
-                    "7272:80"
-                ]
+                "port1": "7474:80"
             },
             "volumes": {
                 "volume1": "${PWD}/:/srv/www",

@@ -110,8 +110,6 @@ class DockerRunCommand extends Command
                     //$output->writeln($process->getErrorOutput());
                     if (!empty($processStderr) || $returnCode > 0) {
                         echo $processStderr . PHP_EOL;
-
-                        return $returnCode;
                     }
                 }
 
@@ -185,6 +183,7 @@ class DockerRunCommand extends Command
 
                 break;
 
+            // @codeCoverageIgnoreStart
             case 'deploy':
                 set_time_limit(0);
 
@@ -266,13 +265,12 @@ class DockerRunCommand extends Command
                 }
 
                 break;
-
+            // @codeCoverageIgnoreEnd
+            
             default:
                 echo PHP_EOL . 'Wrong command given!' . PHP_EOL . PHP_EOL;
 
-                return 1;
-
-                break;
+                return 1; //break;
         }
 
         return 0;

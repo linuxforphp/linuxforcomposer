@@ -1,32 +1,68 @@
 {
     "name": "linuxforphp/linuxforcomposer",
-    "description": "A Composer interface to run 'Linux for PHP' Docker containers.",
-    "php-versions": [
-        "7.0.29",
-        "5.6.35"
-    ],
-    "modes": {
-        "mode1": "detached",
-        "mode2": "interactive",
-        "mode3": "tty"
+    "description": "A Composer interface to run 'Linux for PHP' Docker containers, Dockerfiles or docker-compose files.",
+    "single": {
+        "image": {
+            "linuxforcomposer": {
+                "php-versions": [
+                    "7.4",
+                    "7.3"
+                ],
+                "script": [
+                    "lfphp"
+                ],
+                "thread-safe": "false"
+            },
+            "dockerfile": {
+                "url": "",
+                "container-name": "",
+                "username": "",
+                "token": ""
+            }
+        },
+        "containers": {
+            "modes": {
+                "mode1": "detached",
+                "mode2": "interactive",
+                "mode3": "tty"
+            },
+            "ports": {
+                "port1": [
+                    "7474:80",
+                    "7373:80",
+                    "7272:80",
+                    "7171:80"
+                ],
+                "port2": [
+                    "3306:3306",
+                    "3307:3306",
+                    "3308:3306",
+                    "3309:3306"
+                ]
+            },
+            "volumes": {
+                "volume1": "${PWD}/:/srv/www",
+                "volume2": ""
+            },
+            "persist-data": {
+                "mount": "false",
+                "directories": {
+                    "directory1": "",
+                    "directory2": "",
+                    "directory3": ""
+                },
+                "root-name": ""
+            }
+        }
     },
-    "ports": {
-        "port1": [
-            "8181:80",
-            "8282:80",
-            "8383:80",
-            "8484:80"
-        ],
-        "port2": [
-            "3306:3306",
-            "3307:3306",
-            "3308:3306",
-            "3309:3306"
-        ]
+    "docker-compose": {
+        "url": "",
+        "username": "",
+        "token": ""
     },
-    "volumes": {
-        "volume1": "${PWD}/:/srv/www"
-    },
-    "script": "lfphp",
-    "thread-safe": "false"
+    "lfphp-cloud": {
+        "account": "",
+        "username": "",
+        "token": ""
+    }
 }

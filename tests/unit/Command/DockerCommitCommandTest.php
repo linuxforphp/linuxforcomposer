@@ -170,8 +170,10 @@ class DockerCommitCommandTest extends KernelTestCase
     public function testExecuteOutputToJsonFile()
     {
         // Redirect output to command output
-        $this->setOutputCallback(function () {
-        });
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
 
         $jsonFile = JSONFILE;
 
@@ -207,7 +209,7 @@ class DockerCommitCommandTest extends KernelTestCase
         $commandTester->execute([
             'command'  => $command->getName(),
             'pid'  => 'a1a1',
-            'name'  => '7.2.5-myversion',
+            'name'  => '7.4-myversion',
             '--savetojsonfile' => '0',
         ]);
 
@@ -223,11 +225,13 @@ class DockerCommitCommandTest extends KernelTestCase
 
         $fileContentsArray = json_decode($fileContentsJson, true);
 
-        $actual = (string) $fileContentsArray['php-versions'][0];
+        $actual = (string) $fileContentsArray['single']['image']['linuxforcomposer']['php-versions'][0];
 
-        $this->assertSame('custom-7.2.5-myversion', $actual);
+        $this->assertSame('custom-7.4-myversion', $actual);
 
         file_put_contents($jsonFile, $fileContentsJsonOriginal);
+
+        ob_end_clean();
     }
 
     public function testExecuteWithEmptyJsonFile()
@@ -275,7 +279,7 @@ class DockerCommitCommandTest extends KernelTestCase
         $commandTester->execute([
             'command'  => $command->getName(),
             'pid'  => 'a1a1',
-            'name'  => '7.2.5-myversion',
+            'name'  => '7.2-myversion',
             '--savetojsonfile' => '0',
         ]);
 
@@ -335,7 +339,7 @@ class DockerCommitCommandTest extends KernelTestCase
         $commandTester->execute([
             'command'  => $command->getName(),
             'pid'  => 'a1a1',
-            'name'  => '7.2.5-myversion',
+            'name'  => '7.2-myversion',
             '--savetojsonfile' => '0',
         ]);
 
@@ -395,7 +399,7 @@ class DockerCommitCommandTest extends KernelTestCase
         $commandTester->execute([
             'command'  => $command->getName(),
             'pid'  => 'a1a1',
-            'name'  => '7.2.5-myversion',
+            'name'  => '7.2-myversion',
             '--savetojsonfile' => '0',
         ]);
 

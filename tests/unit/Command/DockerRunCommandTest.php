@@ -218,6 +218,9 @@ class DockerRunCommandTest extends KernelTestCase
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
 
         $kernel = self::bootKernel();
 
@@ -259,6 +262,9 @@ class DockerRunCommandTest extends KernelTestCase
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
 
         $kernel = self::bootKernel();
 
@@ -301,6 +307,9 @@ class DockerRunCommandTest extends KernelTestCase
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
 
         $kernel = self::bootKernel();
 
@@ -337,8 +346,10 @@ class DockerRunCommandTest extends KernelTestCase
         unlink(JSONFILE);
 
         // Redirect output to command output
-        $this->setOutputCallback(function () {
-        });
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
 
         $this->createMocksForUnixEnv();
 
@@ -350,6 +361,9 @@ class DockerRunCommandTest extends KernelTestCase
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
 
         $kernel = self::bootKernel();
 
@@ -378,11 +392,11 @@ class DockerRunCommandTest extends KernelTestCase
             . 'Fake Docker is running!'
             . PHP_EOL
             . 'Fake Docker is running!'
-            . PHP_EOL
-            . 'Fake Docker is running!'
             . PHP_EOL,
             $this->getActualOutput()
         );
+
+        ob_end_clean();
     }
 
     public function testExecuteWithStartCommandWithInvalidJsonFile()
@@ -421,8 +435,10 @@ class DockerRunCommandTest extends KernelTestCase
     public function testExecuteWithStartCommandWithEmptyJsonFile()
     {
         // Redirect output to command output
-        $this->setOutputCallback(function () {
-        });
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
 
         $kernel = self::bootKernel();
 
@@ -444,18 +460,22 @@ class DockerRunCommandTest extends KernelTestCase
 
         $this->assertSame(
             PHP_EOL
-            . 'You must choose at least one PHP version to run.'
+            . "Please check your 'Linux for Composer' JSON file for misconfigurations."
             . PHP_EOL
             . PHP_EOL,
             $this->getActualOutput()
         );
+
+        ob_end_clean();
     }
 
     public function testExecuteWithStartCommandWithMissingPHPVersionsProperty()
     {
         // Redirect output to command output
-        $this->setOutputCallback(function () {
-        });
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
 
         $kernel = self::bootKernel();
 
@@ -477,11 +497,13 @@ class DockerRunCommandTest extends KernelTestCase
 
         $this->assertSame(
             PHP_EOL
-            . 'You must choose at least one PHP version to run.'
+            . "Please check your 'Linux for Composer' JSON file for misconfigurations."
             . PHP_EOL
             . PHP_EOL,
             $this->getActualOutput()
         );
+
+        ob_end_clean();
     }
 
     public function testExecuteWithStartCommandWithMinimumConfiguration()
@@ -500,6 +522,9 @@ class DockerRunCommandTest extends KernelTestCase
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
 
         $kernel = self::bootKernel();
 
@@ -542,6 +567,9 @@ class DockerRunCommandTest extends KernelTestCase
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
 
         $kernel = self::bootKernel();
 
@@ -586,6 +614,9 @@ class DockerRunCommandTest extends KernelTestCase
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
 
         $kernel = self::bootKernel();
 
@@ -630,6 +661,9 @@ class DockerRunCommandTest extends KernelTestCase
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
 
         $kernel = self::bootKernel();
 
@@ -674,6 +708,9 @@ class DockerRunCommandTest extends KernelTestCase
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
 
         $kernel = self::bootKernel();
 
@@ -705,8 +742,10 @@ class DockerRunCommandTest extends KernelTestCase
     public function testExecuteWithStartCommandWillReadDockerStderr()
     {
         // Redirect output to command output
-        $this->setOutputCallback(function () {
-        });
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
 
         $this->createMocksForUnixEnv();
 
@@ -718,6 +757,9 @@ class DockerRunCommandTest extends KernelTestCase
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('Error! Docker is not running.');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(1);
 
         $kernel = self::bootKernel();
 
@@ -746,6 +788,57 @@ class DockerRunCommandTest extends KernelTestCase
             . PHP_EOL,
             $this->getActualOutput()
         );
+
+        ob_end_clean();
+    }
+
+    public function testExecuteWithStartCommandWithDockerfile()
+    {
+        // Redirect output to command output
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
+
+        $this->createMocksForUnixEnv();
+
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getOutput')
+            ->once()
+            ->andReturn('Fake Docker is running!');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getErrorOutput')
+            ->once()
+            ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
+
+        $kernel = self::bootKernel();
+
+        $application = new Application($kernel);
+        $application->add(new DockerRunCommand());
+        $application->add(new DockerParsejsonCommand());
+
+        $command = $application->find('docker:run');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            'execute'  => 'start',
+            '--jsonfile' => dirname(__DIR__)
+                . DIRECTORY_SEPARATOR
+                . 'app'
+                . DIRECTORY_SEPARATOR
+                . 'linuxforcomposer.test.dockerfile.json',
+        ]);
+
+        $this->assertSame(
+            'Fake Docker is running!'
+            . PHP_EOL,
+            $this->getActualOutput()
+        );
+
+        ob_end_clean();
     }
 
     public function testExecuteWithStopCommand()
@@ -764,6 +857,9 @@ class DockerRunCommandTest extends KernelTestCase
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
 
         $kernel = self::bootKernel();
 
@@ -776,6 +872,46 @@ class DockerRunCommandTest extends KernelTestCase
         $commandTester->execute([
             'command'  => $command->getName(),
             'execute'  => 'stop',
+        ]);
+
+        $this->assertSame(
+            'Fake Docker stopped!'
+            . PHP_EOL,
+            $this->getActualOutput()
+        );
+    }
+
+    public function testExecuteWithStopForceCommand()
+    {
+        // Redirect output to command output
+        $this->setOutputCallback(function () {
+        });
+
+        $this->createMocksForUnixEnv();
+
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getOutput')
+            ->once()
+            ->andReturn('Fake Docker stopped!');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getErrorOutput')
+            ->once()
+            ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
+
+        $kernel = self::bootKernel();
+
+        $application = new Application($kernel);
+        $application->add(new DockerRunCommand());
+        $application->add(new DockerParsejsonCommand());
+
+        $command = $application->find('docker:run');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            'execute'  => 'stop-force',
         ]);
 
         $this->assertSame(
@@ -801,6 +937,9 @@ class DockerRunCommandTest extends KernelTestCase
             ->shouldReceive('getErrorOutput')
             ->once()
             ->andReturn('Error! Docker is not stopped.');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
 
         $kernel = self::bootKernel();
 
@@ -817,6 +956,88 @@ class DockerRunCommandTest extends KernelTestCase
 
         $this->assertSame(
             'Error! Docker is not stopped.'
+            . PHP_EOL,
+            $this->getActualOutput()
+        );
+    }
+
+    public function testExecuteWithStopCommandWithDockerfile()
+    {
+        // Redirect output to command output
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
+
+        $this->createMocksForUnixEnv();
+
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getOutput')
+            ->once()
+            ->andReturn('Fake Docker stopped!');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getErrorOutput')
+            ->once()
+            ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
+
+        $kernel = self::bootKernel();
+
+        $application = new Application($kernel);
+        $application->add(new DockerRunCommand());
+        $application->add(new DockerParsejsonCommand());
+
+        $command = $application->find('docker:run');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            'execute'  => 'stop',
+            '--jsonfile' => dirname(__DIR__)
+                . DIRECTORY_SEPARATOR
+                . 'app'
+                . DIRECTORY_SEPARATOR
+                . 'linuxforcomposer.test.dockerfile.json',
+        ]);
+
+        $this->assertSame(
+            'Fake Docker stopped!'
+            . PHP_EOL,
+            $this->getActualOutput()
+        );
+
+        ob_end_clean();
+    }
+
+    public function testExecuteWithStopCommandWithInvalidJsonFile()
+    {
+        // Redirect output to command output
+        $this->setOutputCallback(function () {
+        });
+
+        $kernel = self::bootKernel();
+
+        $application = new Application($kernel);
+        $application->add(new DockerRunCommand());
+        $application->add(new DockerParsejsonCommand());
+
+        $command = $application->find('docker:run');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            'execute'  => 'stop',
+            '--jsonfile' => dirname(__DIR__)
+                . DIRECTORY_SEPARATOR
+                . 'app'
+                . DIRECTORY_SEPARATOR
+                . 'linuxforcomposer.test.invalid.json',
+        ]);
+
+        $this->assertSame(
+            PHP_EOL
+            . "The 'Linux for Composer' JSON file is invalid."
+            . PHP_EOL
             . PHP_EOL,
             $this->getActualOutput()
         );
