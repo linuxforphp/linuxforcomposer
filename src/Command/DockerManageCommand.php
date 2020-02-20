@@ -82,6 +82,16 @@ class DockerManageCommand extends Command
     {
         $command = $input->getArgument('execute');
 
+        $this->dockerRunCommand .=
+            ($command == 'build' || $command == 'run')
+            && LFPHP
+                ? '--memory=' . LFPHP_MEM . ' '
+                    . '--memory-swap=' . LFPHP_SWAP . ' '
+                    . '--cpu-shares=' . LFPHP_SHARES . ' '
+                    . '--cpu-period=' . LFPHP_PERIOD . ' '
+                    . '--cpu-quota=' . LFPHP_QUOTA . ' '
+                : '';
+
         $mount = $input->getOption('mount');
 
         $modeOptions = '';
@@ -366,7 +376,7 @@ class DockerManageCommand extends Command
                     $containerName = $imageName . hash('sha256', 'lfphp' . time());
 
                     $buildContainerProcess = new LinuxForComposerProcess(
-                        'docker run '
+                        $this->dockerRunCommand
                         . $modeOptions
                         . ' --name '
                         . $containerName . ' '
