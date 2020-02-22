@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.0.0 (2020-02-24)
+
+- Adds new Dockerfile and docker-compose functionality.
+- Adds data persistence through mounted storage.
+- Adds a 'stop-force' command.
+- Updates the PHP versions to the Linux for PHP 8.2.0 pre-compiled versions.
+- Adds new deployment functionality for the LfPHP Cloud.
+
 ## 1.0.2 (2019-01-15)
 
 - Updates the PHP versions to the Linux for PHP 8.1.3 pre-compiled versions.
