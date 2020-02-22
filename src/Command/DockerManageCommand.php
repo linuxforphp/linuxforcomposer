@@ -223,12 +223,12 @@ class DockerManageCommand extends Command
                     $path = $path . ' -t ' . $imageName;
                 }
 
-                $this->dockerRunCommand =
+                $dockerBuildCommand =
                     $engine === 'dockerfile'
                         ? 'docker build . -f ' . $path
                         : 'docker-compose up -d --build';
 
-                $buildContainerProcess = new LinuxForComposerProcess($this->dockerRunCommand);
+                $buildContainerProcess = new LinuxForComposerProcess($dockerBuildCommand);
 
                 echo 'Building all containers...' . PHP_EOL;
 
