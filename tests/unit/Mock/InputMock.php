@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Linux for PHP/Linux for Composer
  *
