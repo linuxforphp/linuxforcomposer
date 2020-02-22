@@ -142,7 +142,6 @@ class DockerManageCommand extends Command
                             set_time_limit(0);
                             $fp = fopen($path, 'w+');
                             $ch = \curl_init($url);
-                            curl_setopt($ch, CURLOPT_HEADER, true);
                             \curl_setopt($ch, CURLOPT_TIMEOUT, 50);
                             \curl_setopt($ch, CURLOPT_FILE, $fp);
                             \curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
