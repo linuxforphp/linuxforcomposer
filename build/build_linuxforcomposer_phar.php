@@ -47,8 +47,6 @@ $exclude = [
     'composer.json.dev',
     'composer.lock',
     'composer.phar',
-    'Dockerfile.Example',
-    'Dockerfile.Laravel',
     'phpcs.xml',
     'phpdoc.xml',
     'phpunit.xml.dist',
