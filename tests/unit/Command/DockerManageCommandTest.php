@@ -1222,7 +1222,12 @@ class DockerManageCommandTest extends KernelTestCase
         $commandTester->execute($arguments);
 
         $this->assertSame(
-            'Building all containers...'
+            PHP_EOL
+            . 'Building all containers...'
+            . PHP_EOL
+            . PHP_EOL
+            . 'Building mount point...'
+            . PHP_EOL
             . PHP_EOL
             . 'Starting container...'
             . PHP_EOL,
@@ -1295,7 +1300,12 @@ class DockerManageCommandTest extends KernelTestCase
         $commandTester->execute($arguments);
 
         $this->assertSame(
-            'Building all containers...'
+            PHP_EOL
+            . 'Building all containers...'
+            . PHP_EOL
+            . PHP_EOL
+            . 'Building mount point...'
+            . PHP_EOL
             . PHP_EOL
             . 'Starting container...'
             . PHP_EOL,
@@ -1371,7 +1381,10 @@ class DockerManageCommandTest extends KernelTestCase
             PHP_EOL
             . 'URL is invalid!'
             . PHP_EOL
-            . 'Please make sure that the URL is allowed and valid.'
+            . PHP_EOL
+            . 'Please make sure that the URL is allowed and valid,'
+            . PHP_EOL
+            . 'and that cURL and Git are available on your system.'
             . PHP_EOL
             . PHP_EOL,
             $this->getActualOutput()
@@ -1440,7 +1453,10 @@ class DockerManageCommandTest extends KernelTestCase
             PHP_EOL
             . 'URL is invalid!'
             . PHP_EOL
-            . 'Please make sure that the URL is allowed and valid.'
+            . PHP_EOL
+            . 'Please make sure that the URL is allowed and valid,'
+            . PHP_EOL
+            . 'and that cURL and Git are available on your system.'
             . PHP_EOL
             . PHP_EOL,
             $this->getActualOutput()
@@ -1510,7 +1526,8 @@ class DockerManageCommandTest extends KernelTestCase
         $commandTester->execute($arguments);
 
         $this->assertSame(
-            'Building all containers...'
+            PHP_EOL
+            . 'Building all containers...'
             . PHP_EOL,
             $this->getActualOutput()
         );
@@ -1583,7 +1600,8 @@ class DockerManageCommandTest extends KernelTestCase
         $commandTester->execute($arguments);
 
         $this->assertSame(
-            'Building all containers...'
+            PHP_EOL
+            . 'Building all containers...'
             . PHP_EOL,
             $this->getActualOutput()
         );
@@ -1659,7 +1677,10 @@ class DockerManageCommandTest extends KernelTestCase
             PHP_EOL
             . 'URL is invalid!'
             . PHP_EOL
-            . 'Please make sure that the URL is allowed and valid.'
+            . PHP_EOL
+            . 'Please make sure that the URL is allowed and valid,'
+            . PHP_EOL
+            . 'and that cURL and Git are available on your system.'
             . PHP_EOL
             . PHP_EOL,
             $this->getActualOutput()
@@ -1671,8 +1692,10 @@ class DockerManageCommandTest extends KernelTestCase
     public function testExecuteWithRunCommand()
     {
         // Redirect output to command output
-        $this->setOutputCallback(function () {
-        });
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
 
         $this->createMocksForUnixEnv();
 
@@ -1715,17 +1738,22 @@ class DockerManageCommandTest extends KernelTestCase
             . 'Done!'
             . PHP_EOL
             . PHP_EOL
+            . PHP_EOL
             . 'Starting container...'
             . PHP_EOL,
             $this->getActualOutput()
         );
+
+        ob_end_clean();
     }
 
     public function testExecuteWithRunCommandWithStdoutAndStderrFromCommands()
     {
         // Redirect output to command output
-        $this->setOutputCallback(function () {
-        });
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
 
         $this->createMocksForUnixEnv();
 
@@ -1772,10 +1800,13 @@ class DockerManageCommandTest extends KernelTestCase
             . 'Done!'
             . PHP_EOL
             . PHP_EOL
+            . PHP_EOL
             . 'Starting container...'
             . PHP_EOL,
             $this->getActualOutput()
         );
+
+        ob_end_clean();
     }
 
     public function testExecuteWithRunCommandWithOptions()
@@ -1836,6 +1867,9 @@ class DockerManageCommandTest extends KernelTestCase
 
         $this->assertSame(
             PHP_EOL
+            . 'Building mount point...'
+            . PHP_EOL
+            . PHP_EOL
             . 'Checking for image availability and downloading if necessary.'
             . PHP_EOL
             . PHP_EOL
@@ -1843,6 +1877,7 @@ class DockerManageCommandTest extends KernelTestCase
             . PHP_EOL
             . PHP_EOL
             . 'Done!'
+            . PHP_EOL
             . PHP_EOL
             . PHP_EOL
             . 'Starting container...'
@@ -2496,7 +2531,8 @@ class DockerManageCommandTest extends KernelTestCase
         $commandTester->execute($arguments);
 
         $this->assertSame(
-            'Stopping all containers...'
+            PHP_EOL
+            . 'Stopping all containers...'
             . PHP_EOL,
             $this->getActualOutput()
         );
@@ -2508,7 +2544,83 @@ class DockerManageCommandTest extends KernelTestCase
         ob_end_clean();
     }
 
-    public function testExecuteStopForceCommandWithDockerComposeWithWrongUrl()
+    public function testExecuteStopForceCommandWithDockerComposeWithWrongLocalUrl()
+    {
+        // Redirect output to command output
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
+
+        $this->createMocksForUnixEnv();
+
+        $this->dockerLfcProcessMock
+            ->shouldReceive('isRunning')
+            ->andReturn(false);
+        $this->dockerLfcProcessMock
+            ->shouldReceive('isSuccessful')
+            ->andReturn(true);
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getOutput')
+            ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getErrorOutput')
+            ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
+        $this->dockerLfcProcessMock
+            ->shouldReceive('setTempFilename')
+            ->withAnyArgs();
+        $this->dockerLfcProcessMock
+            ->shouldReceive('setDockerCommand')
+            ->withAnyArgs();
+
+        if (file_exists(getcwd() . DIRECTORY_SEPARATOR . 'fakerepo')) {
+            rmdir(getcwd() . DIRECTORY_SEPARATOR . 'fakerepo');
+        }
+
+
+        $kernel = self::bootKernel();
+
+        $application = new Application($kernel);
+        $application->add(new DockerManageCommand());
+
+        $command = $application->find('docker:manage');
+        $commandTester = new CommandTester($command);
+
+        $arguments = [
+            'command' => $command->getName(),
+            '--interactive' => true,
+            '--tty' => true,
+            '--detached' => true,
+            '--phpversion' => '7.2',
+            '--threadsafe' => 'nts',
+            '--port' => '7474:80',
+            '--mount' => ['source=unittest_srv_mysql,target=/srv/mysql,,,unittest_srv_mysql,,,,'],
+            '--volume' => '${PWD}/:/srv/www',
+            '--script' => "docker-compose,,,fakerepo,,,user1:secret",
+            'execute' => 'stop-force',
+        ];
+        $commandTester->execute($arguments);
+
+        $this->assertSame(
+            PHP_EOL
+            . 'URL is invalid!'
+            . PHP_EOL
+            . PHP_EOL
+            . 'Please make sure that the URL is allowed and valid,'
+            . PHP_EOL
+            . 'and that cURL and Git are available on your system.'
+            . PHP_EOL
+            . PHP_EOL,
+            $this->getActualOutput()
+        );
+
+        ob_end_clean();
+    }
+
+    public function testExecuteStopForceCommandWithDockerComposeWithWrongRemoteUrl()
     {
         // Redirect output to command output
         //$this->setOutputCallback(function () {
@@ -2572,7 +2684,10 @@ class DockerManageCommandTest extends KernelTestCase
             PHP_EOL
             . 'URL is invalid!'
             . PHP_EOL
-            . 'Please make sure that the URL is allowed and valid.'
+            . PHP_EOL
+            . 'Please make sure that the URL is allowed and valid,'
+            . PHP_EOL
+            . 'and that cURL and Git are available on your system.'
             . PHP_EOL
             . PHP_EOL,
             $this->getActualOutput()

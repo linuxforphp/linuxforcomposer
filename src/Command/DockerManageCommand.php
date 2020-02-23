@@ -156,7 +156,10 @@ class DockerManageCommand extends Command
                                 echo PHP_EOL
                                     . 'URL is invalid!'
                                     . PHP_EOL
-                                    . 'Please make sure that the URL is allowed and valid.'
+                                    . PHP_EOL
+                                    . 'Please make sure that the URL is allowed and valid,'
+                                    . PHP_EOL
+                                    . 'and that cURL and Git are available on your system.'
                                     . PHP_EOL
                                     . PHP_EOL;
 
@@ -197,7 +200,10 @@ class DockerManageCommand extends Command
                     echo PHP_EOL
                         . 'URL is invalid!'
                         . PHP_EOL
-                        . 'Please make sure that the URL is allowed and valid.'
+                        . PHP_EOL
+                        . 'Please make sure that the URL is allowed and valid,'
+                        . PHP_EOL
+                        . 'and that cURL and Git are available on your system.'
                         . PHP_EOL
                         . PHP_EOL;
 
@@ -212,7 +218,10 @@ class DockerManageCommand extends Command
                     echo PHP_EOL
                         . 'URL is invalid!'
                         . PHP_EOL
-                        . 'Please make sure that the URL is allowed and valid.'
+                        . PHP_EOL
+                        . 'Please make sure that the URL is allowed and valid,'
+                        . PHP_EOL
+                        . 'and that cURL and Git are available on your system.'
                         . PHP_EOL
                         . PHP_EOL;
 
@@ -230,7 +239,7 @@ class DockerManageCommand extends Command
 
                 $buildContainerProcess = new LinuxForComposerProcess($dockerBuildCommand);
 
-                echo 'Building all containers...' . PHP_EOL;
+                echo PHP_EOL . 'Building all containers...' . PHP_EOL;
 
                 // @codeCoverageIgnoreStart
                 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -353,12 +362,14 @@ class DockerManageCommand extends Command
                                 . $mountName
                                 . ',target=/tmp/tempo '
                                 . $scriptArray['image_name'] . ' '
-                                . 'bash -c "rsync -avP --delete-before '
+                                . 'sh -c "cp -rfp '
                                 . $directory
-                                . '/ /tmp/tempo/ >/dev/null"';
+                                . '/* /tmp/tempo/ >/dev/null"';
 
                             $initializeVolumeProcess =
                                 new LinuxForComposerProcess($initializeVolumeCommand);
+
+                            echo PHP_EOL . 'Building mount point...' . PHP_EOL;
 
                             $initializeVolumeProcess->setTty($initializeVolumeProcess->isTtySupported());
 
@@ -400,7 +411,7 @@ class DockerManageCommand extends Command
                         . $imageName
                     );
 
-                    echo 'Starting container...' . PHP_EOL;
+                    echo PHP_EOL . 'Starting container...' . PHP_EOL;
 
                     // @codeCoverageIgnoreStart
                     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -528,13 +539,16 @@ class DockerManageCommand extends Command
                             $initializeVolumeCommand =
                                 'docker run --rm --mount source='
                                 . $mountName
-                                . ',target=/tmp/tempo asclinux/linuxforphp-8.2-ultimate:7.4-nts '
+                                . ',target=/tmp/tempo '
+                                . 'asclinux/linuxforphp-8.2-ultimate:src '
                                 . 'bash -c "rsync -avP --delete-before '
                                 . $directory
                                 . '/ /tmp/tempo/ >/dev/null"';
 
                             $initializeVolumeProcess =
                                 new LinuxForComposerProcess($initializeVolumeCommand);
+
+                            echo PHP_EOL . 'Building mount point...' . PHP_EOL;
 
                             $initializeVolumeProcess->setTty($initializeVolumeProcess->isTtySupported());
 
@@ -568,7 +582,7 @@ class DockerManageCommand extends Command
 
                 $runContainerProcess = new LinuxForComposerProcess($this->dockerRunCommand);
 
-                echo 'Starting container...' . PHP_EOL;
+                echo PHP_EOL . 'Starting container...' . PHP_EOL;
 
                 // @codeCoverageIgnoreStart
                 if ($input->getOption('detached') !== false) {
@@ -671,7 +685,19 @@ class DockerManageCommand extends Command
 
                     $pathArray = explode('/', $urlArray['path']);
 
-                    $path = array_pop($pathArray);
+                    if (isset($urlArray['host']) && strpos($urlArray['scheme'], 'http') !== false) {
+                        $path = array_pop($pathArray);
+                    } elseif (!isset($urlArray['host'])) {
+                        $path = $urlArray['path'];
+
+                        // @codeCoverageIgnoreStart
+                        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                            if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                                $path = $this->winNormalizePath($path);
+                            }
+                        }
+                        // @codeCoverageIgnoreEnd
+                    }
                 } else {
                     $engine = '';
 
@@ -692,7 +718,7 @@ class DockerManageCommand extends Command
 
                         $buildContainerProcess = new LinuxForComposerProcess($dockerStopCommand);
 
-                        echo 'Stopping all containers...' . PHP_EOL;
+                        echo PHP_EOL . 'Stopping all containers...' . PHP_EOL;
 
                         $buildContainerProcess->setTty($buildContainerProcess->isTtySupported());
 
@@ -728,7 +754,10 @@ class DockerManageCommand extends Command
                         echo PHP_EOL
                             . 'URL is invalid!'
                             . PHP_EOL
-                            . 'Please make sure that the URL is allowed and valid.'
+                            . PHP_EOL
+                            . 'Please make sure that the URL is allowed and valid,'
+                            . PHP_EOL
+                            . 'and that cURL and Git are available on your system.'
                             . PHP_EOL
                             . PHP_EOL;
 
