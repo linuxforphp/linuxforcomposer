@@ -328,25 +328,27 @@ class DockerParsejsonCommand extends Command
             if ($fileContentsArray['single']['containers']['persist-data']['mount'] == 'true') {
                 foreach ($fileContentsArray['single']['containers']['persist-data']['directories'] as $directory) {
                     if (!empty($directory)) {
+                        $search = strpos($directory, DIRECTORY_SEPARATOR) !== false ? DIRECTORY_SEPARATOR : '/' ;
                         $dockerManageCommand .=
                             'source='
                             . $fileContentsArray['single']['containers']['persist-data']['root-name']
-                            . str_replace(DIRECTORY_SEPARATOR, '_', $directory)
+                            . str_replace($search, '_', $directory)
                             . ',target='
                             . $directory
                             . ',,,'
                             . $fileContentsArray['single']['containers']['persist-data']['root-name']
-                            . str_replace(DIRECTORY_SEPARATOR, '_', $directory)
+                            . str_replace($search, '_', $directory)
                             . ',,,,';
                     }
                 }
             } else {
                 foreach ($fileContentsArray['single']['containers']['persist-data']['directories'] as $directory) {
                     if (!empty($directory)) {
+                        $search = strpos($directory, DIRECTORY_SEPARATOR) !== false ? DIRECTORY_SEPARATOR : '/' ;
                         $dockerManageCommand .=
                             ':'
                             . $fileContentsArray['single']['containers']['persist-data']['root-name']
-                            . str_replace(DIRECTORY_SEPARATOR, '_', $directory)
+                            . str_replace($search, '_', $directory)
                             . ',,,,';
                     }
                 }
