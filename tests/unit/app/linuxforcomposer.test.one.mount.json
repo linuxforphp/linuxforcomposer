@@ -39,12 +39,12 @@
             },
             "persist-data": {
                 "mount": "true",
+                "root-name": "unittest",
                 "directories": {
                     "directory1": "/srv",
                     "directory2": "",
                     "directory3": ""
-                },
-                "root-name": "unittest"
+                }
             }
         }
     },

@@ -39,12 +39,12 @@
             },
             "persist-data": {
                 "mount": "false",
+                "root-name": "",
                 "directories": {
                     "directory1": "",
                     "directory2": "",
                     "directory3": ""
-                },
-                "root-name": ""
+                }
             }
         }
     },
