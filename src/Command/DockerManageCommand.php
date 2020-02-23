@@ -188,8 +188,8 @@ class DockerManageCommand extends Command
 
                     // @codeCoverageIgnoreStart
                     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                        if (strstr(php_uname('v'), 'Windows 10') === false && php_uname('r') != '10.0') {
-                            $path = $this->win8NormalizePath($path);
+                        if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                            $path = $this->winNormalizePath($path);
                         }
                     }
                     // @codeCoverageIgnoreEnd
@@ -293,7 +293,7 @@ class DockerManageCommand extends Command
                             if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                                 $checkVolumeProcess->setDecorateWindowsWithStdout(true, $temp_filename);
                             } else {
-                                $temp_filename = $this->win8NormalizePath($temp_filename);
+                                $temp_filename = $this->winNormalizePath($temp_filename);
                                 $checkVolumeProcess->setDecorateWindowsLegacyWithStdout(true, $temp_filename);
                             }
                         // @codeCoverageIgnoreEnd
@@ -470,7 +470,7 @@ class DockerManageCommand extends Command
                             if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                                 $checkVolumeProcess->setDecorateWindowsWithStdout(true, $temp_filename);
                             } else {
-                                $temp_filename = $this->win8NormalizePath($temp_filename);
+                                $temp_filename = $this->winNormalizePath($temp_filename);
                                 $checkVolumeProcess->setDecorateWindowsLegacyWithStdout(true, $temp_filename);
                             }
                         // @codeCoverageIgnoreEnd
@@ -576,7 +576,7 @@ class DockerManageCommand extends Command
                         if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                             $runContainerProcess->setDecorateWindowsWithStdout(true, $temp_filename);
                         } else {
-                            $temp_filename = $this->win8NormalizePath($temp_filename);
+                            $temp_filename = $this->winNormalizePath($temp_filename);
                             $runContainerProcess->setDecorateWindowsLegacyWithStdout(true, $temp_filename);
                         }
                     } else {
@@ -825,7 +825,7 @@ class DockerManageCommand extends Command
 
                                             $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprv');
 
-                                            $temp_filename = $this->win8NormalizePath($temp_filename);
+                                            $temp_filename = $this->winNormalizePath($temp_filename);
 
                                             $containerCommitInfoProcess =
                                                 new LinuxForComposerProcess(
@@ -1144,7 +1144,7 @@ class DockerManageCommand extends Command
                             if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                                 $checkVolumeProcess->setDecorateWindowsWithStdout(true, $temp_filename);
                             } else {
-                                $temp_filename = $this->win8NormalizePath($temp_filename);
+                                $temp_filename = $this->winNormalizePath($temp_filename);
                                 $checkVolumeProcess->setDecorateWindowsLegacyWithStdout(true, $temp_filename);
                             }
                         // @codeCoverageIgnoreEnd
@@ -1235,7 +1235,7 @@ class DockerManageCommand extends Command
             if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
                 $checkImageProcess->setDecorateWindowsWithReturnCode(true, $temp_filename);
             } else {
-                $temp_filename = $this->win8NormalizePath($temp_filename);
+                $temp_filename = $this->winNormalizePath($temp_filename);
                 $checkImageProcess->setDecorateWindowsLegacyWithReturnCode(true, $temp_filename);
             }
             // @codeCoverageIgnoreEnd
@@ -1359,7 +1359,7 @@ class DockerManageCommand extends Command
             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                 // @codeCoverageIgnoreStart
                 if (strstr(php_uname('v'), 'Windows 10') === false && php_uname('r') != '10.0') {
-                    $tempScriptFilePath = $this->win8NormalizePath($tempScriptFile);
+                    $tempScriptFilePath = $this->winNormalizePath($tempScriptFile);
                     $tempScriptFilePath = lcfirst($tempScriptFilePath);
                     $tempScriptFilePath = str_replace(':/', '/', $tempScriptFilePath);
                     $tempScriptFilePath = '/' . $tempScriptFilePath;
@@ -1464,7 +1464,7 @@ class DockerManageCommand extends Command
                         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                             // @codeCoverageIgnoreStart
                             if (strstr(php_uname('v'), 'Windows 10') === false && php_uname('r') != '10.0') {
-                                $volumeMap = $this->win8NormalizePath($volumeMap);
+                                $volumeMap = $this->winNormalizePath($volumeMap);
                                 $volumeMap = lcfirst($volumeMap);
                                 $volumeMap = str_replace(':/', '/', $volumeMap);
                                 $volumeMap = '/' . $volumeMap;
@@ -1481,7 +1481,7 @@ class DockerManageCommand extends Command
                 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                     // @codeCoverageIgnoreStart
                     if (strstr(php_uname('v'), 'Windows 10') === false && php_uname('r') != '10.0') {
-                        $volumes = $this->win8NormalizePath($volumes);
+                        $volumes = $this->winNormalizePath($volumes);
                         $volumes = lcfirst($volumes);
                         $volumes = str_replace(':/', '/', $volumes);
                         $volumes = '/' . $volumes;
@@ -1531,7 +1531,7 @@ class DockerManageCommand extends Command
     }
 
     // @codeCoverageIgnoreStart
-    protected function win8NormalizePath($path)
+    protected function winNormalizePath($path)
     {
         $path = str_replace('\\', '/', $path);
         $path = preg_replace('|(?<=.)/+|', '/', $path);
