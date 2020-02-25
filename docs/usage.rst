@@ -40,3 +40,33 @@ containers with **Linux for Composer**.
 
 .. image:: /images/image002.png
     :align: center
+
+.. index:: stop-force command
+
+.. _stop-force command:
+
+linuxforcomposer docker:run stop-force
+--------------------------------------
+
+In order to force stop all the containers that were started using **Linux for Composer** without being asked to commit
+each and every container, please use the following command::
+
+    $ php vendor/bin/linuxforcomposer.phar docker:run stop-force
+
+The ``docker:run stop-force`` command will automatically stop and remove each and every container that
+you have started.
+
+.. index:: deploy command
+
+.. _deploy command:
+
+linuxforcomposer docker:run deploy
+--------------------------------------
+
+In order to deploy your current configuration file to the **Linux for PHP Cloud Services**, please use the following command::
+
+    $ php vendor/bin/linuxforcomposer.phar docker:run deploy
+
+The ``docker:run deploy`` command will automatically post your configuration to the **Linux for PHP Cloud Services**.
+
+.. note:: Please note that some configurations might be restricted due to the limitations of your service plan. Please see https://linuxforphp.com/account for more details on your service plan.
