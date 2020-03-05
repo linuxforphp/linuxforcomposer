@@ -1,7 +1,13 @@
 {
     "name": "linuxforphp/linuxforcomposer",
-    "description": "A Composer interface to run 'Linux for PHP' Docker containers.",
-    "php-versions": [
-        "5.6.35"
-    ]
+    "description": "A Composer interface to run 'Linux for PHP' Docker containers, Dockerfiles or docker-compose files.",
+    "single": {
+        "image": {
+            "linuxforcomposer": {
+                "php-versions": [
+                    "5.6"
+                ]
+            }
+        }
+    }
 }

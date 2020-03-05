@@ -1,10 +1,9 @@
 <?php
-
 /**
  * Linux for PHP/Linux for Composer
  *
- * Copyright 2010 - 2019 Foreach Code Factory <lfphp@asclinux.net>
- * Version 1.0.2
+ * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
+ * Version 2.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +18,8 @@
  * limitations under the License.
  *
  * @package    Linux for PHP/Linux for Composer
- * @copyright  Copyright 2010 - 2019 Foreach Code Factory <lfphp@asclinux.net>
- * @link       http://linuxforphp.net/
+ * @copyright  Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
+ * @link       https://linuxforphp.net/
  * @license    Apache License, Version 2.0, see above
  * @license    http://www.apache.org/licenses/LICENSE-2.0
  * @since 0.9.8
@@ -39,6 +38,8 @@ use Linuxforcomposer\Helper\LinuxForComposerProcess;
 
 class DockerRunCommand extends Command
 {
+    const LFPHPCLOUDSERVER = 'https://linuxforphp.com/api/v1/deployments';
+
     protected static $defaultName = 'docker:run';
 
     public function __construct()
@@ -63,33 +64,11 @@ class DockerRunCommand extends Command
     {
         switch ($input->getArgument('execute')) {
             case 'start':
-                $parseCommand = $this->getApplication()->find('docker:parsejson');
+                $dockerManageCommandsArray = $this->getParsedJsonFile($input);
 
-                $jsonFile = ($input->getOption('jsonfile')) ?: null;
-
-                if ($jsonFile !== null) {
-                    $arguments = array(
-                        '--jsonfile' => $jsonFile,
-                    );
-                } else {
-                    $arguments = array();
+                if (is_int($dockerManageCommandsArray)) {
+                    return $dockerManageCommandsArray;
                 }
-
-                $parseInput = new ArrayInput($arguments);
-
-                $parseOutput = new BufferedOutput();
-
-                $returnCode = (int) $parseCommand->run($parseInput, $parseOutput);
-
-                if ($returnCode > 1) {
-                    echo PHP_EOL . 'You must choose at least one PHP version to run.' . PHP_EOL . PHP_EOL;
-                    break;
-                } elseif ($returnCode === 1) {
-                    echo PHP_EOL . "The 'Linux for Composer' JSON file is invalid." . PHP_EOL . PHP_EOL;
-                    break;
-                }
-
-                $dockerManageCommandsArray = explode("\n", $parseOutput->fetch());
 
                 foreach ($dockerManageCommandsArray as $key => $value) {
                     if (empty($value)) {
@@ -121,23 +100,56 @@ class DockerRunCommand extends Command
 
                     $processStderr = $process->getErrorOutput();
 
+                    $returnCode = $process->getExitCode();
+
                     //$output->writeln($process->getOutput());
                     if (!empty($processStdout)) {
                         echo $processStdout . PHP_EOL;
                     }
 
                     //$output->writeln($process->getErrorOutput());
-                    if (!empty($processStderr)) {
+                    if (!empty($processStderr) || $returnCode > 0) {
                         echo $processStderr . PHP_EOL;
                     }
                 }
 
                 break;
 
+            case 'stop-force':
+                $stopForce = true;
+
+                // break; Fall through. Deliberately not breaking here.
+
             case 'stop':
-                $dockerManageCommand = 'php '
-                    . PHARFILENAME
-                    . ' docker:manage stop';
+                $dockerManageCommandsArray = $this->getParsedJsonFile($input);
+
+                if (is_int($dockerManageCommandsArray)) {
+                    return $dockerManageCommandsArray;
+                }
+
+                $stopForce = isset($stopForce) ?: false;
+
+                $stopCommand = $stopForce ? 'stop-force' : 'stop';
+
+                if (($position = strrpos($dockerManageCommandsArray[0], 'build')) !== false) {
+                    $searchLength = strlen('build');
+                    $dockerManageCommand = substr_replace(
+                        $dockerManageCommandsArray[0],
+                        $stopCommand,
+                        $position,
+                        $searchLength
+                    );
+                }
+
+                if (($position = strrpos($dockerManageCommandsArray[0], 'run')) !== false) {
+                    $searchLength = strlen('run');
+                    $dockerManageCommand = substr_replace(
+                        $dockerManageCommandsArray[0],
+                        $stopCommand,
+                        $position,
+                        $searchLength
+                    );
+                }
 
                 $process = new LinuxForComposerProcess($dockerManageCommand);
 
@@ -155,19 +167,190 @@ class DockerRunCommand extends Command
 
                 $processStderr = $process->getErrorOutput();
 
+                $returnCode = $process->getExitCode();
+
+                //$output->writeln($process->getOutput());
                 if (!empty($processStdout)) {
                     echo $processStdout . PHP_EOL;
                 }
 
-                if (!empty($processStderr)) {
+                //$output->writeln($process->getErrorOutput());
+                if (!empty($processStderr) || $returnCode > 0) {
                     echo $processStderr . PHP_EOL;
+
+                    return $returnCode;
                 }
 
                 break;
 
+            // @codeCoverageIgnoreStart
+            case 'deploy':
+                set_time_limit(0);
+
+                $dockerManageCommandsArray = $this->getParsedJsonFile($input);
+
+                if (is_int($dockerManageCommandsArray)) {
+                    return $dockerManageCommandsArray;
+                }
+
+                $jsonFile = ($input->getOption('jsonfile')) ?: null;
+
+                if (($jsonFile === null || !file_exists($jsonFile)) && file_exists(JSONFILE)) {
+                    $jsonFile = JSONFILE;
+                } elseif (($jsonFile === null || !file_exists($jsonFile)) && !file_exists(JSONFILE)) {
+                    $jsonFile = JSONFILEDIST;
+                }
+
+                $fileContentsJson = file_get_contents($jsonFile);
+
+                $fileContentsArray = json_decode($fileContentsJson, true);
+
+                if ($fileContentsArray === null) {
+                    echo PHP_EOL . "The 'Linux for Composer' JSON file is invalid." . PHP_EOL . PHP_EOL;
+                    return 1;
+                }
+
+                $account = $fileContentsArray['lfphp-cloud']['account'];
+
+                $username = $fileContentsArray['lfphp-cloud']['username'];
+
+                $token = $fileContentsArray['lfphp-cloud']['token'];
+
+                if (empty($account) || empty($username) || empty($token)) {
+                    echo PHP_EOL
+                        . PHP_EOL
+                        . "Insufficient information in order to deploy to the Cloud."
+                        . PHP_EOL
+                        . PHP_EOL;
+                    return 7;
+                }
+
+                $cloudServerUrl = DockerRunCommand::LFPHPCLOUDSERVER . '/' . $account;
+
+                $ch = \curl_init($cloudServerUrl);
+                \curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+                \curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                \curl_setopt($ch, CURLOPT_POST, true);
+
+                $postData = [
+                    'account' => $account,
+                    'username' => $username,
+                    'token' => $token,
+                    'json' => $fileContentsJson,
+                ];
+
+                if (isset($fileContentsArray['single']['image']['dockerfile'])
+                    && !empty($fileContentsArray['single']['image']['dockerfile']['url'])
+                ) {
+                    $url = $fileContentsArray['single']['image']['dockerfile']['url'];
+
+                    $urlArray = parse_url($url);
+
+                    $pathArray = explode('/', $urlArray['path']);
+
+                    $filename = array_pop($pathArray);
+
+                    $path = BASEDIR . DIRECTORY_SEPARATOR . $filename;
+
+                    if (!isset($urlArray['host']) && !isset($urlArray['scheme'])) {
+                        if (file_exists($path)) {
+                            $curlFile = curl_file_create($path);
+                            $postData['file'] = $curlFile;
+                        }
+                    }
+                }
+
+                \curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+                $response = \curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                \curl_close($ch);
+
+                if (isset($fp) && is_resource($fp)) {
+                    fclose($fp);
+                }
+
+                if ($httpCode === 0 && $response === false) {
+                    echo PHP_EOL
+                        . 'The Linux for PHP Cloud Services are currently unavailable.'
+                        . PHP_EOL
+                        . 'Please try again later.'
+                        . PHP_EOL
+                        . PHP_EOL;
+                } else {
+                    echo PHP_EOL . $httpCode . PHP_EOL . $response . PHP_EOL;
+
+                    switch ($httpCode) {
+                        case 200:
+                        case 201:
+                            echo 'Payload sent and deployed to the LfPHP Cloud.'
+                                . PHP_EOL
+                                . PHP_EOL;
+                            break;
+                        case 400:
+                            echo 'The request is invalid.'
+                                . PHP_EOL
+                                . PHP_EOL;
+                            break;
+                        case 401:
+                            echo 'Valid credentials are required.'
+                                . PHP_EOL
+                                . PHP_EOL;
+                            break;
+                        case 403:
+                            echo 'Access is forbidden.'
+                                . PHP_EOL
+                                . PHP_EOL;
+                            break;
+                        default:
+                            echo 'Unable to complete the deployment.'
+                                . 'Please contact support.'
+                                . PHP_EOL
+                                . PHP_EOL;
+                            break;
+                    }
+                }
+
+                break;
+            // @codeCoverageIgnoreEnd
+
             default:
                 echo PHP_EOL . 'Wrong command given!' . PHP_EOL . PHP_EOL;
-                break;
+
+                return 1; //break;
         }
+
+        return 0;
+    }
+
+    protected function getParsedJsonFile(InputInterface $input)
+    {
+        $parseCommand = $this->getApplication()->find('docker:parsejson');
+
+        $jsonFile = ($input->getOption('jsonfile')) ?: null;
+
+        if ($jsonFile !== null) {
+            $arguments = [
+                '--jsonfile' => $jsonFile,
+            ];
+        } else {
+            $arguments = [];
+        }
+
+        $parseInput = new ArrayInput($arguments);
+
+        $parseOutput = new BufferedOutput();
+
+        $returnCode = (int) $parseCommand->run($parseInput, $parseOutput);
+
+        if ($returnCode > 1) {
+            echo PHP_EOL . "Please check your 'Linux for Composer' JSON file for misconfigurations." . PHP_EOL . PHP_EOL;
+            return $returnCode;
+        } elseif ($returnCode === 1) {
+            echo PHP_EOL . "The 'Linux for Composer' JSON file is invalid." . PHP_EOL . PHP_EOL;
+            return 1;
+        }
+
+        return explode("\n", $parseOutput->fetch());
     }
 }

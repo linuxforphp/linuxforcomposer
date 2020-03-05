@@ -12,7 +12,7 @@ Configure and run Linux for PHP containers without ever touching the Docker comm
 **You can create a custom configuration for each PHP project you have and launch the Linux for PHP containers directly from within your projects' working directories!**
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 5
 
    license
    whats_new

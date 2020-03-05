@@ -1,10 +1,9 @@
 <?php
-
 /**
  * Linux for PHP/Linux for Composer
  *
- * Copyright 2010 - 2019 Foreach Code Factory <lfphp@asclinux.net>
- * Version 1.0.2
+ * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
+ * Version 2.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +18,8 @@
  * limitations under the License.
  *
  * @package    Linux for PHP/Linux for Composer
- * @copyright  Copyright 2010 - 2019 Foreach Code Factory <lfphp@asclinux.net>
- * @link       http://linuxforphp.net/
+ * @copyright  Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
+ * @link       https://linuxforphp.net/
  * @license    Apache License, Version 2.0, see above
  * @license    http://www.apache.org/licenses/LICENSE-2.0
  * @since 0.9.8
@@ -28,6 +27,23 @@
 
 if (PHP_SAPI !== 'cli') {
     die('This is a CLI-based application only. Aborting...');
+}
+
+$lfphpEnv = (bool) getenv('LFPHP') ?: false;
+
+define('LFPHP', $lfphpEnv);
+
+if (LFPHP) {
+    $lfphpEnvMem = (string) getenv('LFPHP_MEM') ?: '1g';
+    define('LFPHP_MEM', $lfphpEnvMem);
+    $lfphpEnvSwap = (string) getenv('LFPHP_SWAP') ?: '2g';
+    define('LFPHP_SWAP', $lfphpEnvSwap);
+    $lfphpEnvShares = (int) getenv('LFPHP_SHARES') ?: '1024';
+    define('LFPHP_SHARES', $lfphpEnvShares);
+    $lfphpEnvPeriod = (int) getenv('LFPHP_PERIOD') ?: '100000';
+    define('LFPHP_PERIOD', $lfphpEnvPeriod);
+    $lfphpEnvQuota = (int) getenv('LFPHP_QUOTA') ?: '100000';
+    define('LFPHP_QUOTA', $lfphpEnvQuota);
 }
 
 define('BASEDIR', getcwd());

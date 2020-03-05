@@ -1,0 +1,20 @@
+FROM asclinux/linuxforphp-8.1-ultimate:7.2-nts
+
+MAINTAINER Andrew Caya <andrewscaya@yahoo.ca>
+
+EXPOSE 80
+
+# Set up the Redis server
+#RUN sed -i "s/bind 127.0.0.1/bind $( ifconfig eth0 | grep 'inet addr' | cut -d ':' -f 2 | cut -d ' ' -f 1 )/" /etc/redis/redis.conf
+RUN sed -i "s/bind 127.0.0.1/#bind 127.0.0.1/" /etc/redis/redis.conf
+RUN sed -i "s/protected-mode yes/protected-mode no/" /etc/redis/redis.conf
+RUN mkdir -p /etc/sv/redis/supervise && chmod -R 700 /etc/sv/redis/supervise && touch /etc/sv/redis/run && echo -e "#!/usr/bin/env bash" > /etc/sv/redis/run && echo "exec /usr/local/bin/redis-server /etc/redis/redis.conf" >> /etc/sv/redis/run && chmod +x /etc/sv/redis/run && ln -s /etc/sv/redis /services
+
+# Change root password
+RUN echo "root:newsecret" | chpasswd
+
+ENTRYPOINT ["/bin/lfphp"]
+
+CMD ["--mysql", "--phpfpm", "--apache"]
+
+RUN touch /srv/www/index.php && echo "<?php echo 'Hello ' . \$_GET['name'];"  > /srv/www/index.php

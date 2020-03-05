@@ -1,0 +1,11 @@
+FROM asclinux/linuxforphp-8.2-ultimate:7.1-nts
+
+MAINTAINER Andrew Caya
+
+RUN cd /srv && composer create-project laravel/laravel:~5.4 app && mv www www.OLD && ln -s app/public www
+
+RUN chmod -R 777 /srv/app/storage
+
+ENTRYPOINT ["/bin/lfphp"]
+
+CMD ["--mysql", "--phpfpm", "--apache"]

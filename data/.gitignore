@@ -1,2 +1,8 @@
 *
 !.gitignore
+!Dockerfile.Example
+!Dockerfile.Laravel
+!lfphpdevuser.bash
+!example.txt
+!index.php
+!index-server.php

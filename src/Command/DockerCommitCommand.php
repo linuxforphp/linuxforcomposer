@@ -1,10 +1,9 @@
 <?php
-
 /**
  * Linux for PHP/Linux for Composer
  *
- * Copyright 2010 - 2019 Foreach Code Factory <lfphp@asclinux.net>
- * Version 1.0.2
+ * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
+ * Version 2.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +18,8 @@
  * limitations under the License.
  *
  * @package    Linux for PHP/Linux for Composer
- * @copyright  Copyright 2010 - 2019 Foreach Code Factory <lfphp@asclinux.net>
- * @link       http://linuxforphp.net/
+ * @copyright  Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
+ * @link       https://linuxforphp.net/
  * @license    Apache License, Version 2.0, see above
  * @license    http://www.apache.org/licenses/LICENSE-2.0
  * @since 1.0.0
@@ -82,13 +81,13 @@ class DockerCommitCommand extends Command
             return;
         }
 
-        if (!isset($fileContentsArray['php-versions']) || empty($fileContentsArray['php-versions'])) {
+        if (!isset($fileContentsArray['single']['image']['linuxforcomposer']['php-versions']) || empty($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])) {
             echo "WARNING: No versions of PHP found in the linuxforcomposer.json file! The file is unchanged." . PHP_EOL;
             return;
         }
 
         // @codeCoverageIgnoreStart
-        if ($fileContentsArray['thread-safe'] === 'true') {
+        if ($fileContentsArray['single']['image']['linuxforcomposer']['thread-safe'] === 'true') {
             $threadsafe = '-zts';
         } else {
             $threadsafe = '-nts';
@@ -142,7 +141,7 @@ class DockerCommitCommand extends Command
         $position = $input->getOption('savetojsonfile');
 
         if ($position !== null) {
-            $fileContentsArray['php-versions'][$position] = $versionName;
+            $fileContentsArray['single']['image']['linuxforcomposer']['php-versions'][$position] = $versionName;
 
             $fileContentsJson = json_encode($fileContentsArray, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 

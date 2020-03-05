@@ -1,10 +1,9 @@
 <?php
-
 /**
  * Linux for PHP/Linux for Composer
  *
- * Copyright 2010 - 2019 Foreach Code Factory <lfphp@asclinux.net>
- * Version 1.0.2
+ * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
+ * Version 2.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +18,8 @@
  * limitations under the License.
  *
  * @package    Linux for PHP/Linux for Composer
- * @copyright  Copyright 2010 - 2019 Foreach Code Factory <lfphp@asclinux.net>
- * @link       http://linuxforphp.net/
+ * @copyright  Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
+ * @link       https://linuxforphp.net/
  * @license    Apache License, Version 2.0, see above
  * @license    http://www.apache.org/licenses/LICENSE-2.0
  * @since 0.9.8
@@ -151,11 +150,11 @@ class DockerCommitCommandTest extends KernelTestCase
 
         $command = $application->find('docker:commit');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             'command'  => $command->getName(),
             'pid'  => 'a1a1',
             'name'  => 'myversion',
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
@@ -171,8 +170,10 @@ class DockerCommitCommandTest extends KernelTestCase
     public function testExecuteOutputToJsonFile()
     {
         // Redirect output to command output
-        $this->setOutputCallback(function () {
-        });
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
 
         $jsonFile = JSONFILE;
 
@@ -205,14 +206,12 @@ class DockerCommitCommandTest extends KernelTestCase
 
         $command = $application->find('docker:commit');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(
-            array(
-                'command'  => $command->getName(),
-                'pid'  => 'a1a1',
-                'name'  => '7.2.5-myversion',
-                '--savetojsonfile' => '0',
-            )
-        );
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            'pid'  => 'a1a1',
+            'name'  => '7.4-myversion',
+            '--savetojsonfile' => '0',
+        ]);
 
         // the output of the command in the console
         //$output = $commandTester->getDisplay();
@@ -226,11 +225,13 @@ class DockerCommitCommandTest extends KernelTestCase
 
         $fileContentsArray = json_decode($fileContentsJson, true);
 
-        $actual = (string) $fileContentsArray['php-versions'][0];
+        $actual = (string) $fileContentsArray['single']['image']['linuxforcomposer']['php-versions'][0];
 
-        $this->assertSame('custom-7.2.5-myversion', $actual);
+        $this->assertSame('custom-7.4-myversion', $actual);
 
         file_put_contents($jsonFile, $fileContentsJsonOriginal);
+
+        ob_end_clean();
     }
 
     public function testExecuteWithEmptyJsonFile()
@@ -275,14 +276,12 @@ class DockerCommitCommandTest extends KernelTestCase
 
         $command = $application->find('docker:commit');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(
-            array(
-                'command'  => $command->getName(),
-                'pid'  => 'a1a1',
-                'name'  => '7.2.5-myversion',
-                '--savetojsonfile' => '0',
-            )
-        );
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            'pid'  => 'a1a1',
+            'name'  => '7.2-myversion',
+            '--savetojsonfile' => '0',
+        ]);
 
         file_put_contents($jsonFile, $fileContentsJsonOriginal);
 
@@ -337,14 +336,12 @@ class DockerCommitCommandTest extends KernelTestCase
 
         $command = $application->find('docker:commit');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(
-            array(
-                'command'  => $command->getName(),
-                'pid'  => 'a1a1',
-                'name'  => '7.2.5-myversion',
-                '--savetojsonfile' => '0',
-            )
-        );
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            'pid'  => 'a1a1',
+            'name'  => '7.2-myversion',
+            '--savetojsonfile' => '0',
+        ]);
 
         file_put_contents($jsonFile, $fileContentsJsonOriginal);
 
@@ -399,14 +396,12 @@ class DockerCommitCommandTest extends KernelTestCase
 
         $command = $application->find('docker:commit');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(
-            array(
-                'command'  => $command->getName(),
-                'pid'  => 'a1a1',
-                'name'  => '7.2.5-myversion',
-                '--savetojsonfile' => '0',
-            )
-        );
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            'pid'  => 'a1a1',
+            'name'  => '7.2-myversion',
+            '--savetojsonfile' => '0',
+        ]);
 
         file_put_contents($jsonFile, $fileContentsJsonOriginal);
 
