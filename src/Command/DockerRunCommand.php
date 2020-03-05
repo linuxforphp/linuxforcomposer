@@ -217,7 +217,11 @@ class DockerRunCommand extends Command
                 $token = $fileContentsArray['lfphp-cloud']['token'];
 
                 if (empty($account) || empty($username) || empty($token)) {
-                    echo PHP_EOL . PHP_EOL . "Insufficient information to deploy to the Cloud." . PHP_EOL . PHP_EOL;
+                    echo PHP_EOL
+                        . PHP_EOL
+                        . "Insufficient information in order to deploy to the Cloud."
+                        . PHP_EOL
+                        . PHP_EOL;
                     return 7;
                 }
 
@@ -230,6 +234,7 @@ class DockerRunCommand extends Command
                 \curl_setopt($ch, CURLOPT_POST, true);
 
                 $postData = [
+                    'account' => $account,
                     'username' => $username,
                     'token' => $token,
                     'json' => $fileContentsJson,
@@ -257,11 +262,53 @@ class DockerRunCommand extends Command
                 }
 
                 \curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-                \curl_exec($ch);
+                $response = \curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 \curl_close($ch);
 
                 if (isset($fp) && is_resource($fp)) {
                     fclose($fp);
+                }
+
+                if ($httpCode === 0 && $response === false) {
+                    echo PHP_EOL
+                        . 'The Linux for PHP Cloud Services are currently unavailable.'
+                        . PHP_EOL
+                        . 'Please try again later.'
+                        . PHP_EOL
+                        . PHP_EOL;
+                } else {
+                    echo PHP_EOL . $httpCode . PHP_EOL . $response . PHP_EOL;
+
+                    switch ($httpCode) {
+                        case 200:
+                        case 201:
+                            echo 'Payload sent and deployed to the LfPHP Cloud.'
+                                . PHP_EOL
+                                . PHP_EOL;
+                            break;
+                        case 400:
+                            echo 'The request is invalid.'
+                                . PHP_EOL
+                                . PHP_EOL;
+                            break;
+                        case 401:
+                            echo 'Valid credentials are required.'
+                                . PHP_EOL
+                                . PHP_EOL;
+                            break;
+                        case 403:
+                            echo 'Access is forbidden.'
+                                . PHP_EOL
+                                . PHP_EOL;
+                            break;
+                        default:
+                            echo 'Unable to complete the deployment.'
+                                . 'Please contact support.'
+                                . PHP_EOL
+                                . PHP_EOL;
+                            break;
+                    }
                 }
 
                 break;
