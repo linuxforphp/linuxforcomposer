@@ -485,7 +485,7 @@ for the account that should to be used.
     [...]
 
     "lfphp-cloud": {
-        "account": "johnsmithexamplecom",
+        "account": "johnsmithexamplecom1",
         "username": "john.smith@example.com",
         "token": "rnvaernlaiurnaliurnfgalriunvaernveiruneirug"
     }

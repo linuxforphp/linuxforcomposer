@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.0
+ * Version 2.0.1
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1492,11 +1492,15 @@ class DockerManageCommand extends Command
                     if (!empty($volumeMap)) {
                         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                             // @codeCoverageIgnoreStart
-                            if (strstr(php_uname('v'), 'Windows 10') === false && php_uname('r') != '10.0') {
+                            if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+                                $volumeMap = $this->winNormalizePath($volumeMap);
+                            } else {
                                 $volumeMap = $this->winNormalizePath($volumeMap);
                                 $volumeMap = lcfirst($volumeMap);
-                                $volumeMap = str_replace(':/', '/', $volumeMap);
-                                $volumeMap = '/' . $volumeMap;
+                                if (strpos($volumeMap, ':') === 1) {
+                                    $volumeMap = substr_replace($volumeMap, '', 1, 1);
+                                    $volumeMap = '/' . $volumeMap;
+                                }
                             }
                             // @codeCoverageIgnoreEnd
                         }
