@@ -17,12 +17,15 @@ composer require linuxforphp/linuxforcomposer
 
 Once the dependencies are installed, you can create the linuxforcomposer.json file using:
 ```bash
-php vendor/bin/linuxforcomposer.phar docker:run start
+php vendor/bin/linuxforcomposer.phar
 ```
 
 NOTE: On Windows, please use the Linux for Composer PHAR file in the 'vendor/linuxforphp/linuxforcomposer/bin' folder.
 
-Then, you only have to enter the previous command again to run the Linux for PHP containers that you have configured in the JSON file.
+Then, you only have to enter the following command to run the Linux for PHP containers that you have configured in the JSON file.
+```bash
+php vendor/bin/linuxforcomposer.phar docker:run start
+```
 
 If you wish to install the Linux for Composer binary for your entire system, please copy the PHAR file to a folder included in your PATH:
 ```bash
@@ -35,12 +38,13 @@ cd /folder/of/my/favorite/project
 linuxforcomposer docker:run start
 ```
 
-For more information on configuring Linux for Composer, please visit this page:
+For more information on configuring and using Linux for Composer, please visit this page:
 
-https://linuxforphp.net/composer-integration
+https://linuxforphp.net/documentation
 
 Have a lot of fun! :)
 
-PLEASE NOTE: As long as you have [Docker](https://www.docker.com/) installed on your computer, this library should work fine.
+PLEASE NOTE: As long as you have [Docker](https://www.docker.com/), [Composer](https://getcomposer.org/), [Git](https://git-scm.com/) and [cURL](https://curl.haxx.se/) installed on your computer, this library should work fine.
 If on Windows, make sure you are using the linuxforcomposer.phar file contained in the 'vendor/linuxforphp/linuxforcomposer/bin' folder.
+
 Enjoy!
