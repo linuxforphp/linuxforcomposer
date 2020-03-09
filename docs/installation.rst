@@ -10,10 +10,14 @@ Prerequisites
 
 **Linux for Composer** runs in the default Docker environment of each supported platform (operating system).
 
-* All platforms: Composer, cURL and Git,
+* All platforms:
+    * Docker (https://www.docker.com/)
+    * Composer (https://getcomposer.org/)
+    * Git (https://git-scm.com/)
+    * cURL (https://curl.haxx.se/)
 * Unix/Mac/Linux: Bash,
 * Windows 10: PowerShell,
-* Windows 8: Bash (Docker Toolbox).
+* Windows 8: Bash for Windows (Docker Toolbox).
 
 Installation using Composer
 ---------------------------

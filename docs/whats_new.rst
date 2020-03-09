@@ -3,6 +3,12 @@
 What's New
 ==========
 
+What's New in Version 2.0.1 (2020-03-09)
+----------------------------------------
+
+* Fixes an issue with volume paths on Windows.
+
+
 What's New in Version 2.0.0 (2020-02-24)
 ----------------------------------------
 
