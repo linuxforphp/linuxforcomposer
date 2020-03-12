@@ -29,6 +29,19 @@ if (PHP_SAPI !== 'cli') {
     die('This is a CLI-based application only. Aborting...');
 }
 
+define('LFC_VERSION', '2.0.2');
+
+if ($argv[1] === '--version'
+    || $argv[1] === '-v'
+    ) {
+    echo PHP_EOL
+        . 'Linux for Composer '
+        . LFC_VERSION
+        . PHP_EOL
+        . PHP_EOL;
+    exit;
+}
+
 $lfphpEnv = (bool) getenv('LFPHP') ?: false;
 
 define('LFPHP', $lfphpEnv);
