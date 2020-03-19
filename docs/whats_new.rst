@@ -3,6 +3,14 @@
 What's New
 ==========
 
+What's New in Version 2.0.2 (2020-03-19)
+----------------------------------------
+
+* Fixes an issue when changing from a Dockerfile to Linux for Composer in order to start containers.
+* Updates the LfPHP client to take into account the new Cloud API.
+* Adds the '--version' option.
+
+
 What's New in Version 2.0.1 (2020-03-09)
 ----------------------------------------
 

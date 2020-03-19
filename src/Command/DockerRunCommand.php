@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.1
+ * Version 2.0.2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -247,21 +247,42 @@ class DockerRunCommand extends Command
 
                     $urlArray = parse_url($url);
 
-                    $pathArray = explode('/', $urlArray['path']);
+                    if (isset($urlArray['host']) && isset($urlArray['scheme'])) {
+                        $pathArray = explode('/', $urlArray['path']);
 
-                    $filename = array_pop($pathArray);
+                        $filename = array_pop($pathArray);
+                    } else {
+                        $filename = $urlArray['path'];
+                    }
 
                     $path = BASEDIR . DIRECTORY_SEPARATOR . $filename;
 
-                    if (!isset($urlArray['host']) && !isset($urlArray['scheme'])) {
-                        if (file_exists($path)) {
-                            $curlFile = curl_file_create($path);
-                            $postData['file'] = $curlFile;
-                        }
+                    if (file_exists($path)) {
+                        $curlFile = curl_file_create($path);
+                        $postData['file'] = $curlFile;
                     }
                 }
 
                 \curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+
+                $headers = [
+                    //'X-Apple-Tz: 0',
+                    //'X-Apple-Store-Front: 143444,12',
+                    //'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                    'Accept: application/json',
+                    'Accept-Encoding: gzip, deflate',
+                    'Accept-Language: en-US,en;q=0.5',
+                    'Cache-Control: no-cache',
+                    //'Content-Type: application/x-www-form-urlencoded; charset=utf-8',
+                    //'Host: www.example.com',
+                    //'Referer: http://www.example.com/index.php', //Your referrer address
+                    //'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:28.0) Gecko/20100101 Firefox/28.0',
+                    //'X-MicrosoftAjax: Delta=true'
+                    'User-Agent: Linux for PHP Deployment Client',
+                ];
+
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
                 $response = \curl_exec($ch);
                 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 \curl_close($ch);
@@ -303,7 +324,7 @@ class DockerRunCommand extends Command
                                 . PHP_EOL;
                             break;
                         default:
-                            echo 'Unable to complete the deployment.'
+                            echo 'Unable to complete the deployment. '
                                 . 'Please contact support.'
                                 . PHP_EOL
                                 . PHP_EOL;
