@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.0.2 (2020-03-19)
+
+- Fixes an issue when changing from a Dockerfile to Linux for Composer in order to start containers.
+- Updates the LfPHP client to take into account the new Cloud API.
+- Adds the '--version' option.
+
 ## 2.0.1 (2020-03-09)
 
 - Fixes an issue with volume paths on Windows.
