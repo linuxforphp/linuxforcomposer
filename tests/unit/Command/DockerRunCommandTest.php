@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.2
+ * Version 2.0.3
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ class DockerRunCommandTest extends KernelTestCase
 {
     protected $dockerLfcProcessMock;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (!defined('PHARFILENAME')) {
             define(
@@ -77,7 +77,7 @@ class DockerRunCommandTest extends KernelTestCase
         }
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         \Mockery::close();
 
@@ -128,7 +128,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         // the output of the command in the console
         //$output = $commandTester->getDisplay();
-        $this->assertContains(
+        $this->assertStringContainsString(
             PHP_EOL
             . 'Wrong command given!'
             . PHP_EOL,
@@ -161,7 +161,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         // the output of the command in the console
         //$output = $commandTester->getDisplay();
-        $this->assertContains(
+        $this->assertStringContainsString(
             PHP_EOL
             . 'Wrong command given!'
             . PHP_EOL,
@@ -194,7 +194,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         // the output of the command in the console
         //$output = $commandTester->getDisplay();
-        $this->assertContains(
+        $this->assertStringContainsString(
             PHP_EOL
             . 'Wrong command given!'
             . PHP_EOL,

@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.2
+ * Version 2.0.3
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -329,7 +329,19 @@ class DockerManageCommand extends Command
 
                         //$output->writeln($process->getErrorOutput());
                         if (empty($processStdout)) {
-                            $createVolumeCommand = 'docker volume create ' . $mountName;
+                            if (LFPHP) {
+                                // @codeCoverageIgnoreStart
+                                $volumeUnit = '';
+                                preg_match('/[a-zA-Z]+/', LFPHP_VOLSIZE, $volumeUnit);
+                                $numberVolumes = count($mountNames);
+                                $totalVolSize = (int) LFPHP_VOLSIZE;
+                                $volumeSize = floor($totalVolSize / $numberVolumes) . strtoupper($volumeUnit[0]);
+
+                                $createVolumeCommand = 'docker volume create -d flocker -o size=' . $volumeSize . ' ' . $mountName;
+                                // @codeCoverageIgnoreEnd
+                            } else {
+                                $createVolumeCommand = 'docker volume create ' . $mountName;
+                            }
 
                             $createVolumeProcess =
                                 new LinuxForComposerProcess($createVolumeCommand);
@@ -508,7 +520,19 @@ class DockerManageCommand extends Command
 
                         //$output->writeln($process->getErrorOutput());
                         if (empty($processStdout)) {
-                            $createVolumeCommand = 'docker volume create ' . $mountName;
+                            if (LFPHP) {
+                                // @codeCoverageIgnoreStart
+                                $volumeUnit = '';
+                                preg_match('/[a-zA-Z]+/', LFPHP_VOLSIZE, $volumeUnit);
+                                $numberVolumes = count($mountNames);
+                                $totalVolSize = (int) LFPHP_VOLSIZE;
+                                $volumeSize = floor($totalVolSize / $numberVolumes) . strtoupper($volumeUnit[0]);
+
+                                $createVolumeCommand = 'docker volume create -d flocker -o size=' . $volumeSize . ' ' . $mountName;
+                                // @codeCoverageIgnoreEnd
+                            } else {
+                                $createVolumeCommand = 'docker volume create ' . $mountName;
+                            }
 
                             $createVolumeProcess =
                                 new LinuxForComposerProcess($createVolumeCommand);
