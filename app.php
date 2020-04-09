@@ -47,6 +47,8 @@ $lfphpEnv = (bool) getenv('LFPHP') ?: false;
 define('LFPHP', $lfphpEnv);
 
 if (LFPHP) {
+    $lfphpEnvVolsize = (string) getenv('LFPHP_VOLSIZE') ?: '10GB';
+    define('LFPHP_VOLSIZE', $lfphpEnvVolsize);
     $lfphpEnvMem = (string) getenv('LFPHP_MEM') ?: '1g';
     define('LFPHP_MEM', $lfphpEnvMem);
     $lfphpEnvSwap = (string) getenv('LFPHP_SWAP') ?: '2g';

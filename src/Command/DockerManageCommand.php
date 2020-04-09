@@ -329,7 +329,17 @@ class DockerManageCommand extends Command
 
                         //$output->writeln($process->getErrorOutput());
                         if (empty($processStdout)) {
-                            $createVolumeCommand = 'docker volume create ' . $mountName;
+                            if (LFPHP) {
+                                $volumeUnit = '';
+                                preg_match('/[a-zA-Z]+/', LFPHP_VOLSIZE, $volumeUnit);
+                                $numberVolumes = count($mountNames);
+                                $totalVolSize = (int) LFPHP_VOLSIZE;
+                                $volumeSize = floor($totalVolSize / $numberVolumes) . strtoupper($volumeUnit[0]);
+
+                                $createVolumeCommand = 'docker volume create -d flocker -o size=' . $volumeSize . ' ' . $mountName;
+                            } else {
+                                $createVolumeCommand = 'docker volume create ' . $mountName;
+                            }
 
                             $createVolumeProcess =
                                 new LinuxForComposerProcess($createVolumeCommand);
@@ -508,7 +518,17 @@ class DockerManageCommand extends Command
 
                         //$output->writeln($process->getErrorOutput());
                         if (empty($processStdout)) {
-                            $createVolumeCommand = 'docker volume create ' . $mountName;
+                            if (LFPHP) {
+                                $volumeUnit = '';
+                                preg_match('/[a-zA-Z]+/', LFPHP_VOLSIZE, $volumeUnit);
+                                $numberVolumes = count($mountNames);
+                                $totalVolSize = (int) LFPHP_VOLSIZE;
+                                $volumeSize = floor($totalVolSize / $numberVolumes) . strtoupper($volumeUnit[0]);
+
+                                $createVolumeCommand = 'docker volume create -d flocker -o size=' . $volumeSize . ' ' . $mountName;
+                            } else {
+                                $createVolumeCommand = 'docker volume create ' . $mountName;
+                            }
 
                             $createVolumeProcess =
                                 new LinuxForComposerProcess($createVolumeCommand);
