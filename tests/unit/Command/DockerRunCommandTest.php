@@ -128,7 +128,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         // the output of the command in the console
         //$output = $commandTester->getDisplay();
-        $this->assertContains(
+        $this->assertStringContainsString(
             PHP_EOL
             . 'Wrong command given!'
             . PHP_EOL,
@@ -161,7 +161,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         // the output of the command in the console
         //$output = $commandTester->getDisplay();
-        $this->assertContains(
+        $this->assertStringContainsString(
             PHP_EOL
             . 'Wrong command given!'
             . PHP_EOL,
@@ -194,7 +194,7 @@ class DockerRunCommandTest extends KernelTestCase
 
         // the output of the command in the console
         //$output = $commandTester->getDisplay();
-        $this->assertContains(
+        $this->assertStringContainsString(
             PHP_EOL
             . 'Wrong command given!'
             . PHP_EOL,
