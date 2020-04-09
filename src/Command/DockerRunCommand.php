@@ -282,6 +282,7 @@ class DockerRunCommand extends Command
                 ];
 
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                //curl_setopt($ch, CURLOPT_USERPWD, "user:pass");
 
                 $response = \curl_exec($ch);
                 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
