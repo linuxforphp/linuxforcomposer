@@ -38,7 +38,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class DockerParsejsonCommandTest extends KernelTestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (!defined('PHARFILENAME')) {
             define(

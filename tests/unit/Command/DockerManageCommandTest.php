@@ -43,7 +43,7 @@ class DockerManageCommandTest extends KernelTestCase
 
     protected $progressBarMock;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (!defined('PHARFILENAME')) {
             define(
@@ -92,7 +92,7 @@ class DockerManageCommandTest extends KernelTestCase
         }
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         \Mockery::close();
 

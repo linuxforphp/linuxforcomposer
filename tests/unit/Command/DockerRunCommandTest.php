@@ -41,7 +41,7 @@ class DockerRunCommandTest extends KernelTestCase
 {
     protected $dockerLfcProcessMock;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (!defined('PHARFILENAME')) {
             define(
@@ -77,7 +77,7 @@ class DockerRunCommandTest extends KernelTestCase
         }
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         \Mockery::close();
 
