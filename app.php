@@ -47,7 +47,7 @@ $lfphpEnv = (bool) getenv('LFPHP') ?: false;
 define('LFPHP', $lfphpEnv);
 
 if (LFPHP) {
-    $lfphpEnvVolsize = (string) getenv('LFPHP_VOLSIZE') ?: '10GB';
+    $lfphpEnvVolsize = (string) getenv('LFPHP_VOLSIZE') ?: '10g';
     define('LFPHP_VOLSIZE', $lfphpEnvVolsize);
     $lfphpEnvMem = (string) getenv('LFPHP_MEM') ?: '1g';
     define('LFPHP_MEM', $lfphpEnvMem);
@@ -59,6 +59,8 @@ if (LFPHP) {
     define('LFPHP_PERIOD', $lfphpEnvPeriod);
     $lfphpEnvQuota = (int) getenv('LFPHP_QUOTA') ?: '100000';
     define('LFPHP_QUOTA', $lfphpEnvQuota);
+    $lfphpEnvAccount = (int) getenv('LFPHP_ACCOUNT') ?: '';
+    define('LFPHP_ACCOUNT', $lfphpEnvAccount);
 }
 
 define('BASEDIR', getcwd());

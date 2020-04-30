@@ -1086,4 +1086,37 @@ class DockerRunCommandTest extends KernelTestCase
             $this->getActualOutput()
         );
     }
+
+    public function testExecuteWithStopCommandWithInvalidScriptJsonFile()
+    {
+        // Redirect output to command output
+        $this->setOutputCallback(function () {
+        });
+
+        $kernel = self::bootKernel();
+
+        $application = new Application($kernel);
+        $application->add(new DockerRunCommand());
+        $application->add(new DockerParsejsonCommand());
+
+        $command = $application->find('docker:run');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            'execute'  => 'stop',
+            '--jsonfile' => dirname(__DIR__)
+                . DIRECTORY_SEPARATOR
+                . 'app'
+                . DIRECTORY_SEPARATOR
+                . 'linuxforcomposer.test.invalid.script.json',
+        ]);
+
+        $this->assertSame(
+            PHP_EOL
+            . "The 'Linux for Composer' JSON file is invalid."
+            . PHP_EOL
+            . PHP_EOL,
+            $this->getActualOutput()
+        );
+    }
 }

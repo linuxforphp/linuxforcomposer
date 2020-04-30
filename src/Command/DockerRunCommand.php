@@ -149,9 +149,6 @@ class DockerRunCommand extends Command
                         $position,
                         $searchLength
                     );
-                } else {
-                    echo PHP_EOL . "The 'Linux for Composer' JSON file is invalid." . PHP_EOL . PHP_EOL;
-                    return 1;
                 }
 
                 $process = new LinuxForComposerProcess($dockerManageCommand);

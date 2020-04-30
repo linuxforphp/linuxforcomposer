@@ -331,13 +331,16 @@ class DockerManageCommand extends Command
                         if (empty($processStdout)) {
                             if (LFPHP) {
                                 // @codeCoverageIgnoreStart
-                                $volumeUnit = '';
-                                preg_match('/[a-zA-Z]+/', LFPHP_VOLSIZE, $volumeUnit);
-                                $numberVolumes = count($mountNames);
-                                $totalVolSize = (int) LFPHP_VOLSIZE;
-                                $volumeSize = floor($totalVolSize / $numberVolumes) . strtoupper($volumeUnit[0]);
+                                //$volumeUnit = '';
+                                //preg_match('/[a-zA-Z]+/', LFPHP_VOLSIZE, $volumeUnit);
+                                //$numberVolumes = count($mountNames);
+                                //$totalVolSize = (int) LFPHP_VOLSIZE;
+                                //$volumeSize = floor($totalVolSize / $numberVolumes) . strtoupper($volumeUnit[0]);
 
-                                $createVolumeCommand = 'docker volume create -d flocker -o size=' . $volumeSize . ' ' . $mountName;
+                                // docker volume create -d flocker -o size=
+                                // docker volume create -d local -o o=size=
+                                // docker volume create -d local -o type=tmpfs -o device=tmpfs -o o=size=100m,uid=1000
+                                $createVolumeCommand = 'docker volume create -d local -o type=ext4 -o device=/dev/vg00/' . LFPHP_ACCOUNT . ' ' . $mountName;
                                 // @codeCoverageIgnoreEnd
                             } else {
                                 $createVolumeCommand = 'docker volume create ' . $mountName;
@@ -522,13 +525,16 @@ class DockerManageCommand extends Command
                         if (empty($processStdout)) {
                             if (LFPHP) {
                                 // @codeCoverageIgnoreStart
-                                $volumeUnit = '';
-                                preg_match('/[a-zA-Z]+/', LFPHP_VOLSIZE, $volumeUnit);
-                                $numberVolumes = count($mountNames);
-                                $totalVolSize = (int) LFPHP_VOLSIZE;
-                                $volumeSize = floor($totalVolSize / $numberVolumes) . strtoupper($volumeUnit[0]);
+                                //$volumeUnit = '';
+                                //preg_match('/[a-zA-Z]+/', LFPHP_VOLSIZE, $volumeUnit);
+                                //$numberVolumes = count($mountNames);
+                                //$totalVolSize = (int) LFPHP_VOLSIZE;
+                                //$volumeSize = floor($totalVolSize / $numberVolumes) . strtoupper($volumeUnit[0]);
 
-                                $createVolumeCommand = 'docker volume create -d flocker -o size=' . $volumeSize . ' ' . $mountName;
+                                // docker volume create -d flocker -o size=
+                                // docker volume create -d local -o o=size=
+                                // docker volume create -d local -o type=tmpfs -o device=tmpfs -o o=size=100m,uid=1000
+                                $createVolumeCommand = 'docker volume create -d local -o type=ext4 -o device=/dev/vg00/' . LFPHP_ACCOUNT . ' ' . $mountName;
                                 // @codeCoverageIgnoreEnd
                             } else {
                                 $createVolumeCommand = 'docker volume create ' . $mountName;
