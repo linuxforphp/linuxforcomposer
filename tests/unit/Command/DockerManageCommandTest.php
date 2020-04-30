@@ -200,6 +200,7 @@ class DockerManageCommandTest extends KernelTestCase
             . PHP_EOL
             . 'One download failed'
             . PHP_EOL
+            . PHP_EOL
             . 'Done!'
             . PHP_EOL
             . PHP_EOL,
@@ -293,7 +294,11 @@ class DockerManageCommandTest extends KernelTestCase
             . PHP_EOL
             . 'One download failed'
             . PHP_EOL
+            . PHP_EOL
             . 'Done!'
+            . PHP_EOL
+            . PHP_EOL
+            . 'Compiling from source...'
             . PHP_EOL
             . PHP_EOL,
             $this->getActualOutput()
@@ -378,6 +383,7 @@ class DockerManageCommandTest extends KernelTestCase
             . 'We downloaded the image!'
             . PHP_EOL
             . 'One download failed'
+            . PHP_EOL
             . PHP_EOL
             . 'Done!'
             . PHP_EOL
@@ -823,10 +829,8 @@ class DockerManageCommandTest extends KernelTestCase
     public function testFormatInputWhenCreatingNewPHPVersion()
     {
         // Redirect output to command output
-        //$this->setOutputCallback(function () {
-        //});
-
-        ob_start();
+        $this->setOutputCallback(function () {
+        });
 
         $this->createMocksForUnixEnv();
 
@@ -956,8 +960,6 @@ class DockerManageCommandTest extends KernelTestCase
             . 'asclinux/linuxforphp-8.2-ultimate:src',
             $output
         );
-
-        ob_end_clean();
     }
 
     public function testGetMountOptionsWithExistingPHPVersion()
@@ -1735,6 +1737,7 @@ class DockerManageCommandTest extends KernelTestCase
             . 'This may take a few minutes...'
             . PHP_EOL
             . PHP_EOL
+            . PHP_EOL
             . 'Done!'
             . PHP_EOL
             . PHP_EOL
@@ -1796,6 +1799,7 @@ class DockerManageCommandTest extends KernelTestCase
             . 'Fake containers started...'
             . PHP_EOL
             . 'We have received a few errors...'
+            . PHP_EOL
             . PHP_EOL
             . 'Done!'
             . PHP_EOL
@@ -1874,6 +1878,7 @@ class DockerManageCommandTest extends KernelTestCase
             . PHP_EOL
             . PHP_EOL
             . 'This may take a few minutes...'
+            . PHP_EOL
             . PHP_EOL
             . PHP_EOL
             . 'Done!'

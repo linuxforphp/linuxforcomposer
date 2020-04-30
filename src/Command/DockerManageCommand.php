@@ -600,7 +600,7 @@ class DockerManageCommand extends Command
                     }
                 }
 
-                $this->dockerRunCommand = $this->formatInput($input);
+                $this->formatInput($input);
 
                 $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprv');
 
@@ -1320,11 +1320,13 @@ class DockerManageCommand extends Command
             $checkLocalExitCode = (int) trim($checkImageProcess->getExitCode());
         }
 
-        echo 'Done!' . PHP_EOL . PHP_EOL;
+        echo PHP_EOL . 'Done!' . PHP_EOL . PHP_EOL;
 
         $imageName = '';
 
         if ($checkLocalExitCode !== 0) {
+            echo 'Compiling from source...' . PHP_EOL . PHP_EOL;
+
             $imageName .= DockerManageCommand::LFPHPDEFAULTVERSION . ':src ';
         }
 
@@ -1391,6 +1393,7 @@ class DockerManageCommand extends Command
 
             if (!empty($checkImageName)) {
                 array_unshift($scriptArray, 'lfphp-compile ' . $phpversion . ' ' . $threadsafe);
+                array_push($scriptArray, 'lfphp --mysql --phpfpm --apache');
             }
 
             $script = implode("\n", $scriptArray);
