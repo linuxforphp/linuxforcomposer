@@ -14,12 +14,11 @@ Configure and run Linux for PHP containers without ever touching the Docker comm
 .. toctree::
    :maxdepth: 5
 
-   license
-   whats_new
    installation
    configuration
    usage
-
+   whats_new
+   license
 
 Indices and tables
 ==================
