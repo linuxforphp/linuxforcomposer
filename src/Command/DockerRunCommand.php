@@ -74,12 +74,14 @@ class DockerRunCommand extends Command
                 continue;
             }
 
+            // @codeCoverageIgnoreStart
             if (($position = strrpos($value, 'build')) === false
                 && ($position = strrpos($value, 'run')) === false
             ) {
                 echo PHP_EOL . "The 'Linux for Composer' JSON file is invalid." . PHP_EOL . PHP_EOL;
                 return 1;
             }
+            // @codeCoverageIgnoreEnd
         }
 
         switch ($input->getArgument('execute')) {
