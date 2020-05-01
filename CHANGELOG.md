@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.5 (2020-05-01)
+
+- Fixes an issue when reading from environment variables.
+
 ## 2.0.4 (2020-04-30)
 
 - Fixes an issue when the JSON file is invalid.

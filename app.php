@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.4
+ * Version 2.0.5
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ if (PHP_SAPI !== 'cli') {
     die('This is a CLI-based application only. Aborting...');
 }
 
-define('LFC_VERSION', '2.0.4');
+define('LFC_VERSION', '2.0.5');
 
 if ($argv[1] === '--version'
     || $argv[1] === '-v'
@@ -59,7 +59,7 @@ if (LFPHP) {
     define('LFPHP_PERIOD', $lfphpEnvPeriod);
     $lfphpEnvQuota = (int) getenv('LFPHP_QUOTA') ?: '100000';
     define('LFPHP_QUOTA', $lfphpEnvQuota);
-    $lfphpEnvAccount = (int) getenv('LFPHP_ACCOUNT') ?: '';
+    $lfphpEnvAccount = (string) getenv('LFPHP_ACCOUNT') ?: '';
     define('LFPHP_ACCOUNT', $lfphpEnvAccount);
 }
 
