@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.3
+ * Version 2.0.4
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -331,13 +331,16 @@ class DockerManageCommand extends Command
                         if (empty($processStdout)) {
                             if (LFPHP) {
                                 // @codeCoverageIgnoreStart
-                                $volumeUnit = '';
-                                preg_match('/[a-zA-Z]+/', LFPHP_VOLSIZE, $volumeUnit);
-                                $numberVolumes = count($mountNames);
-                                $totalVolSize = (int) LFPHP_VOLSIZE;
-                                $volumeSize = floor($totalVolSize / $numberVolumes) . strtoupper($volumeUnit[0]);
+                                //$volumeUnit = '';
+                                //preg_match('/[a-zA-Z]+/', LFPHP_VOLSIZE, $volumeUnit);
+                                //$numberVolumes = count($mountNames);
+                                //$totalVolSize = (int) LFPHP_VOLSIZE;
+                                //$volumeSize = floor($totalVolSize / $numberVolumes) . strtoupper($volumeUnit[0]);
 
-                                $createVolumeCommand = 'docker volume create -d flocker -o size=' . $volumeSize . ' ' . $mountName;
+                                // docker volume create -d flocker -o size=
+                                // docker volume create -d local -o o=size=
+                                // docker volume create -d local -o type=tmpfs -o device=tmpfs -o o=size=100m,uid=1000
+                                $createVolumeCommand = 'docker volume create -d local -o type=ext4 -o device=/dev/vg00/' . LFPHP_ACCOUNT . ' ' . $mountName;
                                 // @codeCoverageIgnoreEnd
                             } else {
                                 $createVolumeCommand = 'docker volume create ' . $mountName;
@@ -522,13 +525,16 @@ class DockerManageCommand extends Command
                         if (empty($processStdout)) {
                             if (LFPHP) {
                                 // @codeCoverageIgnoreStart
-                                $volumeUnit = '';
-                                preg_match('/[a-zA-Z]+/', LFPHP_VOLSIZE, $volumeUnit);
-                                $numberVolumes = count($mountNames);
-                                $totalVolSize = (int) LFPHP_VOLSIZE;
-                                $volumeSize = floor($totalVolSize / $numberVolumes) . strtoupper($volumeUnit[0]);
+                                //$volumeUnit = '';
+                                //preg_match('/[a-zA-Z]+/', LFPHP_VOLSIZE, $volumeUnit);
+                                //$numberVolumes = count($mountNames);
+                                //$totalVolSize = (int) LFPHP_VOLSIZE;
+                                //$volumeSize = floor($totalVolSize / $numberVolumes) . strtoupper($volumeUnit[0]);
 
-                                $createVolumeCommand = 'docker volume create -d flocker -o size=' . $volumeSize . ' ' . $mountName;
+                                // docker volume create -d flocker -o size=
+                                // docker volume create -d local -o o=size=
+                                // docker volume create -d local -o type=tmpfs -o device=tmpfs -o o=size=100m,uid=1000
+                                $createVolumeCommand = 'docker volume create -d local -o type=ext4 -o device=/dev/vg00/' . LFPHP_ACCOUNT . ' ' . $mountName;
                                 // @codeCoverageIgnoreEnd
                             } else {
                                 $createVolumeCommand = 'docker volume create ' . $mountName;
@@ -600,7 +606,7 @@ class DockerManageCommand extends Command
                     }
                 }
 
-                $this->dockerRunCommand = $this->formatInput($input);
+                $this->formatInput($input);
 
                 $temp_filename = tempnam(sys_get_temp_dir(), 'lfcprv');
 
@@ -1320,11 +1326,13 @@ class DockerManageCommand extends Command
             $checkLocalExitCode = (int) trim($checkImageProcess->getExitCode());
         }
 
-        echo 'Done!' . PHP_EOL . PHP_EOL;
+        echo PHP_EOL . 'Done!' . PHP_EOL . PHP_EOL;
 
         $imageName = '';
 
         if ($checkLocalExitCode !== 0) {
+            echo 'Compiling from source...' . PHP_EOL . PHP_EOL;
+
             $imageName .= DockerManageCommand::LFPHPDEFAULTVERSION . ':src ';
         }
 
@@ -1391,6 +1399,7 @@ class DockerManageCommand extends Command
 
             if (!empty($checkImageName)) {
                 array_unshift($scriptArray, 'lfphp-compile ' . $phpversion . ' ' . $threadsafe);
+                array_push($scriptArray, 'lfphp --mysql --phpfpm --apache');
             }
 
             $script = implode("\n", $scriptArray);

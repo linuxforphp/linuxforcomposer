@@ -3,10 +3,19 @@
 What's New
 ==========
 
+
+What's New in Version 2.0.4 (2020-04-30)
+----------------------------------------
+
+* Fixes an issue when the JSON file is invalid.
+* Fixes a minor regression when compiling PHP from source.
+* Replaces the flocker driver by the local driver for Docker shared volume creation.
+
+
 What's New in Version 2.0.3 (2020-04-09)
 ----------------------------------------
 
-- Adds the shared Docker volume size feature for the LfPHP Cloud.
+* Adds the shared Docker volume size feature for the LfPHP Cloud.
 
 
 What's New in Version 2.0.2 (2020-03-19)

@@ -13,6 +13,7 @@
 !linuxforcomposer.test.dockerfile.json
 !linuxforcomposer.test.empty.json
 !linuxforcomposer.test.invalid.json
+!linuxforcomposer.test.invalid.script.json
 !linuxforcomposer.test.json
 !linuxforcomposer.test.minimum.config.json
 !linuxforcomposer.test.missing.detached.json

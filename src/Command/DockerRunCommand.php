@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.3
+ * Version 2.0.4
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,20 +62,30 @@ class DockerRunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $dockerManageCommandsArray = $this->getParsedJsonFile($input);
+
+        if (is_int($dockerManageCommandsArray)) {
+            return $dockerManageCommandsArray;
+        }
+
+        foreach ($dockerManageCommandsArray as $key => $value) {
+            if (empty($value)) {
+                unset($dockerManageCommandsArray[$key]);
+                continue;
+            }
+
+            // @codeCoverageIgnoreStart
+            if (($position = strrpos($value, 'build')) === false
+                && ($position = strrpos($value, 'run')) === false
+            ) {
+                echo PHP_EOL . "The 'Linux for Composer' JSON file is invalid." . PHP_EOL . PHP_EOL;
+                return 1;
+            }
+            // @codeCoverageIgnoreEnd
+        }
+
         switch ($input->getArgument('execute')) {
             case 'start':
-                $dockerManageCommandsArray = $this->getParsedJsonFile($input);
-
-                if (is_int($dockerManageCommandsArray)) {
-                    return $dockerManageCommandsArray;
-                }
-
-                foreach ($dockerManageCommandsArray as $key => $value) {
-                    if (empty($value)) {
-                        unset($dockerManageCommandsArray[$key]);
-                    }
-                }
-
                 foreach ($dockerManageCommandsArray as $key => $dockerManageCommand) {
                     $process = new LinuxForComposerProcess($dockerManageCommand);
 
@@ -121,12 +131,6 @@ class DockerRunCommand extends Command
                 // break; Fall through. Deliberately not breaking here.
 
             case 'stop':
-                $dockerManageCommandsArray = $this->getParsedJsonFile($input);
-
-                if (is_int($dockerManageCommandsArray)) {
-                    return $dockerManageCommandsArray;
-                }
-
                 $stopForce = isset($stopForce) ?: false;
 
                 $stopCommand = $stopForce ? 'stop-force' : 'stop';
@@ -139,9 +143,7 @@ class DockerRunCommand extends Command
                         $position,
                         $searchLength
                     );
-                }
-
-                if (($position = strrpos($dockerManageCommandsArray[0], 'run')) !== false) {
+                } elseif (($position = strrpos($dockerManageCommandsArray[0], 'run')) !== false) {
                     $searchLength = strlen('run');
                     $dockerManageCommand = substr_replace(
                         $dockerManageCommandsArray[0],
@@ -186,12 +188,6 @@ class DockerRunCommand extends Command
             // @codeCoverageIgnoreStart
             case 'deploy':
                 set_time_limit(0);
-
-                $dockerManageCommandsArray = $this->getParsedJsonFile($input);
-
-                if (is_int($dockerManageCommandsArray)) {
-                    return $dockerManageCommandsArray;
-                }
 
                 $jsonFile = ($input->getOption('jsonfile')) ?: null;
 
@@ -287,10 +283,6 @@ class DockerRunCommand extends Command
                 $response = \curl_exec($ch);
                 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 \curl_close($ch);
-
-                if (isset($fp) && is_resource($fp)) {
-                    fclose($fp);
-                }
 
                 if ($httpCode === 0 && $response === false) {
                     echo PHP_EOL
