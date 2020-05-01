@@ -4,6 +4,12 @@ What's New
 ==========
 
 
+What's New in Version 2.0.5 (2020-05-01)
+----------------------------------------
+
+- Fixes an issue when reading from environment variables.
+
+
 What's New in Version 2.0.4 (2020-04-30)
 ----------------------------------------
 
