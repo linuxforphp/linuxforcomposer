@@ -59,7 +59,7 @@ if (LFPHP) {
     define('LFPHP_PERIOD', $lfphpEnvPeriod);
     $lfphpEnvQuota = (int) getenv('LFPHP_QUOTA') ?: '100000';
     define('LFPHP_QUOTA', $lfphpEnvQuota);
-    $lfphpEnvAccount = (int) getenv('LFPHP_ACCOUNT') ?: '';
+    $lfphpEnvAccount = (string) getenv('LFPHP_ACCOUNT') ?: '';
     define('LFPHP_ACCOUNT', $lfphpEnvAccount);
 }
 
