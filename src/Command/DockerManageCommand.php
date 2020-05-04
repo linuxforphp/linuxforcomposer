@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.5
+ * Version 2.0.6
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -688,9 +688,14 @@ class DockerManageCommand extends Command
 
                 // @codeCoverageIgnoreStart
                 if (!empty($this->tempScriptFile)) {
+                    // Allow for a clean restart with Docker.
                     if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
                         unlink($this->tempScriptFile);
                     }
+
+                    file_put_contents($this->tempScriptFile, "#!/usr/bin/env bash\nlfphp");
+
+                    chmod($this->tempScriptFile, 777); // Must be world-writable for Mac computers.
                 }
                 // @codeCoverageIgnoreEnd
 
@@ -1399,12 +1404,12 @@ class DockerManageCommand extends Command
 
             if (!empty($checkImageName)) {
                 array_unshift($scriptArray, 'lfphp-compile ' . $phpversion . ' ' . $threadsafe);
-                array_push($scriptArray, 'lfphp --mysql --phpfpm --apache');
+                array_push($scriptArray, 'lfphp');
             }
 
             $script = implode("\n", $scriptArray);
 
-            $tempScriptFile = tempnam(sys_get_temp_dir(), 'entryscript');
+            $tempScriptFile = tempnam(VENDORFOLDERPID . DIRECTORY_SEPARATOR . 'composer', 'entryscript');
 
             $tempScriptFilePath = '';
 
