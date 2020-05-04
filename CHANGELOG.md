@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.6 (2020-05-04)
+
+- Fixes an issue when restarting an LfC container using Docker.
+
 ## 2.0.5 (2020-05-01)
 
 - Fixes an issue when reading from environment variables.
