@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.7 (2020-05-18)
+
+- Fixes an issue with clean restarts on local/Windows computers.
+
 ## 2.0.6 (2020-05-04)
 
 - Fixes an issue when restarting an LfC container using Docker.
