@@ -4,16 +4,22 @@ What's New
 ==========
 
 
+What's New in Version 2.0.7 (2020-05-18)
+----------------------------------------
+
+* Fixes an issue with clean restarts on local/Windows computers.
+
+
 What's New in Version 2.0.6 (2020-05-04)
 ----------------------------------------
 
-- Fixes an issue when restarting an LfC container using Docker.
+* Fixes an issue when restarting an LfC container using Docker.
 
 
 What's New in Version 2.0.5 (2020-05-01)
 ----------------------------------------
 
-- Fixes an issue when reading from environment variables.
+* Fixes an issue when reading from environment variables.
 
 
 What's New in Version 2.0.4 (2020-04-30)

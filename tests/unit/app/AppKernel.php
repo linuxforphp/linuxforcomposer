@@ -4,7 +4,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.6
+ * Version 2.0.7
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

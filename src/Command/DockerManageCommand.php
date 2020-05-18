@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.6
+ * Version 2.0.7
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -688,14 +688,14 @@ class DockerManageCommand extends Command
 
                 // @codeCoverageIgnoreStart
                 if (!empty($this->tempScriptFile)) {
-                    // Allow for a clean restart with Docker.
-                    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+                    // Allow for a clean restart with Docker on Cloud servers using a Linux/Unix OS.
+                    if (LFPHP && strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
                         unlink($this->tempScriptFile);
+
+                        file_put_contents($this->tempScriptFile, "#!/usr/bin/env bash\nlfphp");
+
+                        chmod($this->tempScriptFile, 777); // Must be world-writable for Mac computers.
                     }
-
-                    file_put_contents($this->tempScriptFile, "#!/usr/bin/env bash\nlfphp");
-
-                    chmod($this->tempScriptFile, 777); // Must be world-writable for Mac computers.
                 }
                 // @codeCoverageIgnoreEnd
 
