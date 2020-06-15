@@ -55,6 +55,6 @@
     "test": "phpunit",
     "test-cover": "phpunit --coverage-clover build/logs/clover.xml",
     "test-report": "test-reporter --coverage-report build/logs/clover.xml",
-    "apidocs": "phpdoc --template=responsive-twig"
+    "apidocs": "php phpDocumentor.phar --template=responsive-twig"
   }
 }
