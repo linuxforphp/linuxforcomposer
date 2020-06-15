@@ -75,6 +75,19 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'linuxforcomposer.test.json'
             );
         }
+
+        if (!defined('VENDORFOLDERPID')) {
+            define(
+                'VENDORFOLDERPID',
+                dirname(__DIR__)
+                . DIRECTORY_SEPARATOR
+                . 'app'
+            );
+        }
+
+        if (!defined('LFPHP')) {
+            define('LFPHP', false);
+        }
     }
 
     public function tearDown(): void
@@ -875,6 +888,55 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.dockerfile.json',
+        ]);
+
+        $this->assertSame(
+            'Fake Docker is running!'
+            . PHP_EOL,
+            $this->getActualOutput()
+        );
+
+        ob_end_clean();
+    }
+
+    public function testExecuteWithStartCommandWithDockerfileOnly()
+    {
+        // Redirect output to command output
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
+
+        $this->createMocksForUnixEnv();
+
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getOutput')
+            ->once()
+            ->andReturn('Fake Docker is running!');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getErrorOutput')
+            ->once()
+            ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
+
+        $kernel = self::bootKernel();
+
+        $application = new Application($kernel);
+        $application->add(new DockerRunCommand());
+        $application->add(new DockerParsejsonCommand());
+
+        $command = $application->find('docker:run');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            'execute'  => 'start',
+            '--jsonfile' => dirname(__DIR__)
+                . DIRECTORY_SEPARATOR
+                . 'app'
+                . DIRECTORY_SEPARATOR
+                . 'linuxforcomposer.test.minimum.dockerfile.json',
         ]);
 
         $this->assertSame(

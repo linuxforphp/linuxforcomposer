@@ -87,7 +87,9 @@ class DockerParsejsonCommand extends Command
             }
         }
 
-        if (is_array($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
+        if (isset($fileContentsArray['single']['image']['linuxforcomposer'])
+            && isset($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
+            && is_array($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
             && count($fileContentsArray['single']['image']['linuxforcomposer']['php-versions']) > 1
         ) {
             if (!in_array('detached', $fileContentsArray['single']['containers']['modes'])) {
