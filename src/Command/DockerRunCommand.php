@@ -62,6 +62,25 @@ class DockerRunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $arguments = $input->getArguments();
+
+        if ($arguments['command'] === 'docker:run'
+            && $arguments['execute'] === 'start'
+            && file_exists(
+                VENDORFOLDERPID
+                . DIRECTORY_SEPARATOR
+                . 'composer'
+                . DIRECTORY_SEPARATOR
+                . 'linuxforcomposer.pid'
+            )) {
+            echo PHP_EOL
+                . "Attention: before starting new containers, please enter the 'stop' command\n"
+                . "in order to shut down the current containers properly."
+                . PHP_EOL
+                . PHP_EOL;
+            exit;
+        }
+
         $dockerManageCommandsArray = $this->getParsedJsonFile($input);
 
         if (is_int($dockerManageCommandsArray)) {

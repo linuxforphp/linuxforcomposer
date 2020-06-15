@@ -31,17 +31,6 @@ if (PHP_SAPI !== 'cli') {
 
 define('LFC_VERSION', '2.0.7');
 
-if ($argv[1] === '--version'
-    || $argv[1] === '-v'
-    ) {
-    echo PHP_EOL
-        . 'Linux for Composer '
-        . LFC_VERSION
-        . PHP_EOL
-        . PHP_EOL;
-    exit;
-}
-
 $lfphpEnv = (bool) getenv('LFPHP') ?: false;
 
 define('LFPHP', $lfphpEnv);
@@ -75,6 +64,13 @@ if (strlen($path) > 0) {
     define('PHARFILENAME', $path . DIRECTORY_SEPARATOR . basename(PHARFILENAMERET));
 
     define(
+        'COMPOSERJSONFILE',
+        BASEDIR
+        . DIRECTORY_SEPARATOR
+        . 'composer.json'
+    );
+
+    define(
         'VENDORFOLDER',
         PHARFILENAMERET
         . DIRECTORY_SEPARATOR
@@ -86,6 +82,15 @@ if (strlen($path) > 0) {
         BASEDIR
         . DIRECTORY_SEPARATOR
         . 'vendor'
+    );
+
+    define(
+        'COMPOSERFOLDER',
+        BASEDIR
+        . DIRECTORY_SEPARATOR
+        . 'vendor'
+        . DIRECTORY_SEPARATOR
+        . 'composer'
     );
 
     define(
@@ -109,6 +114,13 @@ if (strlen($path) > 0) {
     define('PHARFILENAME', PHARBASEDIR . DIRECTORY_SEPARATOR . basename(__FILE__));
 
     define(
+        'COMPOSERJSONFILE',
+        BASEDIR
+        . DIRECTORY_SEPARATOR
+        . 'composer.json'
+    );
+
+    define(
         'VENDORFOLDER',
         BASEDIR
         . DIRECTORY_SEPARATOR
@@ -116,6 +128,15 @@ if (strlen($path) > 0) {
     );
 
     define('VENDORFOLDERPID', VENDORFOLDER);
+
+    define(
+        'COMPOSERFOLDER',
+        BASEDIR
+        . DIRECTORY_SEPARATOR
+        . 'vendor'
+        . DIRECTORY_SEPARATOR
+        . 'composer'
+    );
 
     define(
         'JSONFILEDIST',
@@ -132,10 +153,41 @@ if (strlen($path) > 0) {
     );
 }
 
-if (!file_exists(VENDORFOLDER) && !file_exists(VENDORFOLDERPID)) {
-    echo 'Could not find the vendor folder!'
+if (!file_exists(COMPOSERJSONFILE) && !file_exists(COMPOSERJSONFILE)) {
+    echo PHP_EOL
+        . 'We could not find the composer.json file!'
         . PHP_EOL
-        . 'Please change to the project\'s working directory or install Linux for Composer using Composer.'
+        . 'Please change to the project\'s working directory and/or install Linux for Composer using Composer.'
+        . PHP_EOL
+        . PHP_EOL;
+    exit;
+}
+
+if (!file_exists(VENDORFOLDER) && !file_exists(VENDORFOLDERPID)) {
+    echo PHP_EOL
+        . 'We could not find the vendor folder!'
+        . PHP_EOL
+        . 'Please change to the project\'s working directory and/or install Linux for Composer using Composer.'
+        . PHP_EOL
+        . PHP_EOL;
+    exit;
+}
+
+if (!file_exists(COMPOSERFOLDER) && !file_exists(COMPOSERFOLDER)) {
+    echo PHP_EOL
+        . 'We could not find the Composer folder!'
+        . PHP_EOL
+        . 'Please change to the project\'s working directory and/or install Linux for Composer using Composer.'
+        . PHP_EOL
+        . PHP_EOL;
+    exit;
+}
+
+if (count($argv) === 1) {
+    echo PHP_EOL
+        . 'Missing command argument!'
+        . PHP_EOL
+        . 'To get help, please enter the "help" or "list" commands.'
         . PHP_EOL
         . PHP_EOL;
     exit;
@@ -177,24 +229,7 @@ if (!file_exists(JSONFILE)) {
     }
 }
 
-if ($argv[1] === 'docker:run'
-    && $argv[2] === 'start'
-    && file_exists(
-        VENDORFOLDERPID
-        . DIRECTORY_SEPARATOR
-        . 'composer'
-        . DIRECTORY_SEPARATOR
-        . 'linuxforcomposer.pid'
-)) {
-    echo PHP_EOL
-        . "Attention: before starting new containers, please enter the 'stop' command "
-        . "in order to shut down the current containers properly."
-        . PHP_EOL
-        . PHP_EOL;
-    exit;
-}
-
-$application = new Application();
+$application = new Application('Linux for Composer', LFC_VERSION);
 
 $application->add(new DockerParsejsonCommand());
 
