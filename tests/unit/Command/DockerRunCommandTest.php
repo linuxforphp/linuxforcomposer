@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.7
+ * Version 2.0.8
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,19 @@ class DockerRunCommandTest extends KernelTestCase
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.json'
             );
+        }
+
+        if (!defined('VENDORFOLDERPID')) {
+            define(
+                'VENDORFOLDERPID',
+                dirname(__DIR__)
+                . DIRECTORY_SEPARATOR
+                . 'app'
+            );
+        }
+
+        if (!defined('LFPHP')) {
+            define('LFPHP', false);
         }
     }
 
@@ -875,6 +888,55 @@ class DockerRunCommandTest extends KernelTestCase
                 . 'app'
                 . DIRECTORY_SEPARATOR
                 . 'linuxforcomposer.test.dockerfile.json',
+        ]);
+
+        $this->assertSame(
+            'Fake Docker is running!'
+            . PHP_EOL,
+            $this->getActualOutput()
+        );
+
+        ob_end_clean();
+    }
+
+    public function testExecuteWithStartCommandWithDockerfileOnly()
+    {
+        // Redirect output to command output
+        //$this->setOutputCallback(function () {
+        //});
+
+        ob_start();
+
+        $this->createMocksForUnixEnv();
+
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getOutput')
+            ->once()
+            ->andReturn('Fake Docker is running!');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getErrorOutput')
+            ->once()
+            ->andReturn('');
+        $this->dockerLfcProcessMock
+            ->shouldReceive('getExitCode')
+            ->andReturn(0);
+
+        $kernel = self::bootKernel();
+
+        $application = new Application($kernel);
+        $application->add(new DockerRunCommand());
+        $application->add(new DockerParsejsonCommand());
+
+        $command = $application->find('docker:run');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            'execute'  => 'start',
+            '--jsonfile' => dirname(__DIR__)
+                . DIRECTORY_SEPARATOR
+                . 'app'
+                . DIRECTORY_SEPARATOR
+                . 'linuxforcomposer.test.minimum.dockerfile.json',
         ]);
 
         $this->assertSame(

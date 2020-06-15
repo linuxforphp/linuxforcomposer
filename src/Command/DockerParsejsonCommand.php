@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.7
+ * Version 2.0.8
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,9 @@ class DockerParsejsonCommand extends Command
             }
         }
 
-        if (is_array($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
+        if (isset($fileContentsArray['single']['image']['linuxforcomposer'])
+            && isset($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
+            && is_array($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
             && count($fileContentsArray['single']['image']['linuxforcomposer']['php-versions']) > 1
         ) {
             if (!in_array('detached', $fileContentsArray['single']['containers']['modes'])) {

@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.7
+ * Version 2.0.8
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,27 @@ class DockerRunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $arguments = $input->getArguments();
+
+        // @codeCoverageIgnoreStart
+        if ($arguments['command'] === 'docker:run'
+            && $arguments['execute'] === 'start'
+            && file_exists(
+                VENDORFOLDERPID
+                . DIRECTORY_SEPARATOR
+                . 'composer'
+                . DIRECTORY_SEPARATOR
+                . 'linuxforcomposer.pid'
+            )) {
+            echo PHP_EOL
+                . "Attention: before starting new containers, please enter the 'stop' command\n"
+                . "in order to shut down the current containers properly."
+                . PHP_EOL
+                . PHP_EOL;
+            exit;
+        }
+        // @codeCoverageIgnoreEnd
+
         $dockerManageCommandsArray = $this->getParsedJsonFile($input);
 
         if (is_int($dockerManageCommandsArray)) {

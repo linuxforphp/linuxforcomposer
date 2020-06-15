@@ -16,6 +16,7 @@
 !linuxforcomposer.test.invalid.script.json
 !linuxforcomposer.test.json
 !linuxforcomposer.test.minimum.config.json
+!linuxforcomposer.test.minimum.dockerfile.json
 !linuxforcomposer.test.missing.detached.json
 !linuxforcomposer.test.missing.mount.json
 !linuxforcomposer.test.missing.mount.rootname.json

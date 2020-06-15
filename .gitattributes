@@ -17,6 +17,7 @@ phpunit.* export-ignore
 phpcs.* export-ignore
 # phpDocumentor files
 phpdoc.* export-ignore
+phpDocumentor.phar export-ignore
 # general text files
 *README.txt export-ignore
 *readme.md export-ignore

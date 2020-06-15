@@ -1,0 +1,14 @@
+{
+    "name": "linuxforphp/linuxforcomposer",
+    "description": "A Composer interface to run 'Linux for PHP' Docker containers, Dockerfiles or docker-compose files.",
+    "single": {
+        "image": {
+            "dockerfile": {
+                "url": "Dockerfile",
+                "container-name": "dockerfiletest",
+                "username": "",
+                "token": ""
+            }
+        }
+    }
+}
