@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.7
+ * Version 2.0.8
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,7 @@ class DockerRunCommand extends Command
     {
         $arguments = $input->getArguments();
 
+        // @codeCoverageIgnoreStart
         if ($arguments['command'] === 'docker:run'
             && $arguments['execute'] === 'start'
             && file_exists(
@@ -80,6 +81,7 @@ class DockerRunCommand extends Command
                 . PHP_EOL;
             exit;
         }
+        // @codeCoverageIgnoreEnd
 
         $dockerManageCommandsArray = $this->getParsedJsonFile($input);
 
