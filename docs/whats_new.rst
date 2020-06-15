@@ -4,6 +4,13 @@ What's New
 ==========
 
 
+What's New in Version 2.0.8 (2020-06-15)
+----------------------------------------
+
+* Fixes an issue when using only a Dockerfile as the minimum configuration.
+* Fixes some failures when using Linux for Composer without Composer.
+
+
 What's New in Version 2.0.7 (2020-05-18)
 ----------------------------------------
 
