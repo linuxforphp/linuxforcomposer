@@ -75,7 +75,8 @@ class DockerRunCommand extends Command
                 . 'linuxforcomposer.pid'
             )) {
             echo PHP_EOL
-                . "Attention: before starting new containers, please enter the 'stop' command\n"
+                . "Attention: before starting new containers, please enter the 'stop' command"
+                . PHP_EOL
                 . "in order to shut down the current containers properly."
                 . PHP_EOL
                 . PHP_EOL;

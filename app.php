@@ -157,7 +157,7 @@ if (!file_exists(COMPOSERJSONFILE) && !file_exists(COMPOSERJSONFILE)) {
     echo PHP_EOL
         . 'We could not find the composer.json file!'
         . PHP_EOL
-        . 'Please change to the project\'s working directory and/or install Linux for Composer using Composer.'
+        . "Please change to the project's working directory and/or\ninstall Linux for Composer using Composer."
         . PHP_EOL
         . PHP_EOL;
     exit;
@@ -167,7 +167,7 @@ if (!file_exists(VENDORFOLDER) && !file_exists(VENDORFOLDERPID)) {
     echo PHP_EOL
         . 'We could not find the vendor folder!'
         . PHP_EOL
-        . 'Please change to the project\'s working directory and/or install Linux for Composer using Composer.'
+        . "Please change to the project's working directory and/or\ninstall Linux for Composer using Composer."
         . PHP_EOL
         . PHP_EOL;
     exit;
@@ -177,7 +177,7 @@ if (!file_exists(COMPOSERFOLDER) && !file_exists(COMPOSERFOLDER)) {
     echo PHP_EOL
         . 'We could not find the Composer folder!'
         . PHP_EOL
-        . 'Please change to the project\'s working directory and/or install Linux for Composer using Composer.'
+        . "Please change to the project's working directory and/or\ninstall Linux for Composer using Composer."
         . PHP_EOL
         . PHP_EOL;
     exit;
@@ -223,7 +223,9 @@ if (!file_exists(JSONFILE)) {
         exit;
     } else {
         echo PHP_EOL
-            . "Could not create the linuxforcomposer.json file! Please verify your working directory's permissions."
+            . 'Could not create the linuxforcomposer.json file!'
+            . PHP_EOL
+            . "Please verify your working directory's permissions."
             . PHP_EOL
             . PHP_EOL;
     }
