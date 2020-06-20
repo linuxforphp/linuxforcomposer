@@ -70,3 +70,58 @@ In order to deploy your current configuration file to the **Linux for PHP Cloud 
 The ``docker:run deploy`` command will automatically post your configuration to the **Linux for PHP Cloud Services**.
 
 .. note:: Please note that some configurations might be restricted due to the limitations of your service plan. Please see https://linuxforphp.com/account for more details on your service plan.
+
+.. index:: list command
+
+.. _list command:
+
+linuxforcomposer list
+--------------------------------------
+
+Use the following to list the currently available commands::
+
+    $ php vendor/bin/linuxforcomposer.phar list
+
+**Linux for Composer 2.0.8**
+
+Usage:
+  command [options] [arguments]
+
+Options:
++--------+-----------------+--------------------------------------+
+| Simple | Readable        | Description                          |
++========+=================+======================================+
+| -h     | --help          | Display this help message            |
++--------+-----------------+--------------------------------------+
+| -q     | --quiet         | Do not output any message            |
++--------+-----------------+--------------------------------------+
+| -V     | --version       | Display this application version     |
++--------+-----------------+--------------------------------------+
+|        | --ansi          | Force ANSI output                    |
++--------+-----------------+--------------------------------------+
+|        | --no-ansi       | Disable ANSI output                  |
++--------+-----------------+--------------------------------------+
+| -n     | --no-interaction| Do not ask any interactive questions |
++--------+-----------------+--------------------------------------+
+| -v     | --verbose       | Increase the verbosity of messages:  |
+|        |                 | "v" for normal output,               |
+|        |                 | "vv" for more verbose output and     |
+|        |                 | "vvv" for debug                      |
++--------+-----------------+--------------------------------------+
+
+Available commands:
++--------------------+----------------------------------------------+
+| Command            | Description                                  |
++====================+==============================================+
+| help               | Displays help for a command                  |
++--------------------+----------------------------------------------+
+| list               | Lists commands                               |
++--------------------+----------------------------------------------+
+|  docker:commit     | Docker commit commands.                      |
++--------------------+----------------------------------------------+
+|  docker:manage     | Run Docker management commands.              |
++--------------------+----------------------------------------------+
+|  docker:parsejson  | Parse JSON file for instructions for Docker. |
++--------------------+----------------------------------------------+
+|  docker:run        | Run 'Linux for PHP' containers.              |
++--------------------+----------------------------------------------+
