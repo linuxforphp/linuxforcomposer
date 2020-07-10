@@ -70,23 +70,6 @@ class DockerParsejsonCommand extends Command
             return 1;
         }
 
-        if (!isset($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
-                || empty($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
-        ) {
-            if ((!isset($fileContentsArray['single']['image']['dockerfile']['url'])
-                    || empty($fileContentsArray['single']['image']['dockerfile']['url'])
-                )
-                && (!isset($fileContentsArray['single']['image']['dockerfile']['container-name'])
-                    || empty($fileContentsArray['single']['image']['dockerfile']['container-name'])
-                )
-                && (!isset($fileContentsArray['docker-compose']['url'])
-                    || empty($fileContentsArray['docker-compose']['url'])
-                )
-            ) {
-                return 2;
-            }
-        }
-
         if (isset($fileContentsArray['single']['image']['linuxforcomposer'])
             && isset($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
             && is_array($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
@@ -106,6 +89,8 @@ class DockerParsejsonCommand extends Command
         }
 
         if (isset($fileContentsArray['single']['image']['dockerfile'])
+            && isset($fileContentsArray['single']['image']['dockerfile']['url'])
+            && isset($fileContentsArray['single']['image']['dockerfile']['container-name'])
             && !empty($fileContentsArray['single']['image']['dockerfile']['url'])
             && !empty($fileContentsArray['single']['image']['dockerfile']['container-name'])
         ) {
@@ -154,7 +139,9 @@ class DockerParsejsonCommand extends Command
             return 0;
         }
 
-        if (isset($fileContentsArray['docker-compose']) && !empty($fileContentsArray['docker-compose']['url'])) {
+        if (isset($fileContentsArray['docker-compose'])
+            && !empty($fileContentsArray['docker-compose']['url'])
+        ) {
             $dockerManageCommand = 'php '
                 . PHARFILENAME
                 . ' docker:manage ';
