@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.0.9 (2020-07-10)
+
+- Fixes some issues when some configuration settings are missing.
+- Fixes an issue when the 'build' and 'run' keywords are used in scripts.
+- Optimizes the 'Parsejson' command.
+
 ## 2.0.8 (2020-06-15)
 
 - Fixes an issue when using only a Dockerfile as the minimum configuration.
