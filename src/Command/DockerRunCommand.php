@@ -228,13 +228,19 @@ class DockerRunCommand extends Command
                     return 1;
                 }
 
-                $account = $fileContentsArray['lfphp-cloud']['account'];
+                if (isset($fileContentsArray['lfphp-cloud']['account'])
+                    && isset($fileContentsArray['lfphp-cloud']['username'])
+                    && isset($fileContentsArray['lfphp-cloud']['token'])
+                    && !empty($fileContentsArray['lfphp-cloud']['account'])
+                    && !empty($fileContentsArray['lfphp-cloud']['username'])
+                    && !empty($fileContentsArray['lfphp-cloud']['token'])
+                ) {
+                    $account = $fileContentsArray['lfphp-cloud']['account'];
 
-                $username = $fileContentsArray['lfphp-cloud']['username'];
+                    $username = $fileContentsArray['lfphp-cloud']['username'];
 
-                $token = $fileContentsArray['lfphp-cloud']['token'];
-
-                if (empty($account) || empty($username) || empty($token)) {
+                    $token = $fileContentsArray['lfphp-cloud']['token'];
+                } else {
                     echo PHP_EOL
                         . PHP_EOL
                         . "Insufficient information in order to deploy to the Cloud."
