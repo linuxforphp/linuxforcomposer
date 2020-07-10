@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.8
+ * Version 2.0.9
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,23 +70,6 @@ class DockerParsejsonCommand extends Command
             return 1;
         }
 
-        if (!isset($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
-                || empty($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
-        ) {
-            if ((!isset($fileContentsArray['single']['image']['dockerfile']['url'])
-                    || empty($fileContentsArray['single']['image']['dockerfile']['url'])
-                )
-                && (!isset($fileContentsArray['single']['image']['dockerfile']['container-name'])
-                    || empty($fileContentsArray['single']['image']['dockerfile']['container-name'])
-                )
-                && (!isset($fileContentsArray['docker-compose']['url'])
-                    || empty($fileContentsArray['docker-compose']['url'])
-                )
-            ) {
-                return 2;
-            }
-        }
-
         if (isset($fileContentsArray['single']['image']['linuxforcomposer'])
             && isset($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
             && is_array($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
@@ -106,6 +89,8 @@ class DockerParsejsonCommand extends Command
         }
 
         if (isset($fileContentsArray['single']['image']['dockerfile'])
+            && isset($fileContentsArray['single']['image']['dockerfile']['url'])
+            && isset($fileContentsArray['single']['image']['dockerfile']['container-name'])
             && !empty($fileContentsArray['single']['image']['dockerfile']['url'])
             && !empty($fileContentsArray['single']['image']['dockerfile']['container-name'])
         ) {
@@ -154,7 +139,9 @@ class DockerParsejsonCommand extends Command
             return 0;
         }
 
-        if (isset($fileContentsArray['docker-compose']) && !empty($fileContentsArray['docker-compose']['url'])) {
+        if (isset($fileContentsArray['docker-compose'])
+            && !empty($fileContentsArray['docker-compose']['url'])
+        ) {
             $dockerManageCommand = 'php '
                 . PHARFILENAME
                 . ' docker:manage ';
@@ -186,70 +173,77 @@ class DockerParsejsonCommand extends Command
             return 0;
         }
 
-        for ($i = 0; $i < count($fileContentsArray['single']['image']['linuxforcomposer']['php-versions']); $i++) {
-            $dockerManageCommand = 'php '
-                . PHARFILENAME
-                . ' docker:manage ';
+        if (isset($fileContentsArray['single']['image']['linuxforcomposer'])
+            && isset($fileContentsArray['single']['image']['linuxforcomposer']['php-versions'])
+            && count($fileContentsArray['single']['image']['linuxforcomposer']['php-versions']) > 0
+        ) {
+            for ($i = 0; $i < count($fileContentsArray['single']['image']['linuxforcomposer']['php-versions']); $i++) {
+                $dockerManageCommand = 'php '
+                    . PHARFILENAME
+                    . ' docker:manage ';
 
-            $dockerManageCommand .= $this->getModes($fileContentsArray);
+                $dockerManageCommand .= $this->getModes($fileContentsArray);
 
-            $dockerManageCommand .= '--phpversion ';
+                $dockerManageCommand .= '--phpversion ';
 
-            $dockerManageCommand .= $fileContentsArray['single']['image']['linuxforcomposer']['php-versions'][$i] . ' ';
+                $dockerManageCommand .= $fileContentsArray['single']['image']['linuxforcomposer']['php-versions'][$i] . ' ';
 
-            // @codeCoverageIgnoreStart
-            $threadsafe =
-                isset($fileContentsArray['single']['image']['linuxforcomposer']['thread-safe'])
-                && $fileContentsArray['single']['image']['linuxforcomposer']['thread-safe'] === 'true'
-                    ? 'zts'
-                    : 'nts';
-            // @codeCoverageIgnoreEnd
+                // @codeCoverageIgnoreStart
+                $threadsafe =
+                    isset($fileContentsArray['single']['image']['linuxforcomposer']['thread-safe'])
+                    && $fileContentsArray['single']['image']['linuxforcomposer']['thread-safe'] === 'true'
+                        ? 'zts'
+                        : 'nts';
+                // @codeCoverageIgnoreEnd
 
-            $dockerManageCommand .= '--threadsafe ';
+                $dockerManageCommand .= '--threadsafe ';
 
-            $dockerManageCommand .= $threadsafe . ' ';
+                $dockerManageCommand .= $threadsafe . ' ';
 
-            $dockerManageCommand .= $this->getPorts($fileContentsArray, $i);
+                $dockerManageCommand .= $this->getPorts($fileContentsArray, $i);
 
-            $dockerManageCommand .= $this->getMount($fileContentsArray);
+                $dockerManageCommand .= $this->getMount($fileContentsArray);
 
-            $dockerManageCommand .= $this->getVolumes($fileContentsArray);
+                $dockerManageCommand .= $this->getVolumes($fileContentsArray);
 
-            $script = '';
+                $script = '';
 
-            if (isset($fileContentsArray['single']['image']['linuxforcomposer']['script'])
-                && !empty($fileContentsArray['single']['image']['linuxforcomposer']['script'])
-                && is_array($fileContentsArray['single']['image']['linuxforcomposer']['script'])
-            ) {
-                foreach ($fileContentsArray['single']['image']['linuxforcomposer']['script'] as $command) {
-                    if (!empty($script)) {
-                        $script .= ',,,';
+                if (isset($fileContentsArray['single']['image']['linuxforcomposer']['script'])
+                    && !empty($fileContentsArray['single']['image']['linuxforcomposer']['script'])
+                    && is_array($fileContentsArray['single']['image']['linuxforcomposer']['script'])
+                ) {
+                    foreach ($fileContentsArray['single']['image']['linuxforcomposer']['script'] as $command) {
+                        if (!empty($script)) {
+                            $script .= ',,,';
+                        }
+
+                        $script .= $command . ' ';
                     }
-
-                    $script .= $command . ' ';
+                } elseif (isset($fileContentsArray['single']['image']['linuxforcomposer']['script'])
+                    && !empty($fileContentsArray['single']['image']['linuxforcomposer']['script'])
+                    && !is_array($fileContentsArray['single']['image']['linuxforcomposer']['script'])
+                ) {
+                    $script .= $fileContentsArray['single']['image']['linuxforcomposer']['script'] . ' ';
+                } else {
+                    $script .= 'lfphp ';
                 }
-            } elseif (isset($fileContentsArray['single']['image']['linuxforcomposer']['script'])
-                && !empty($fileContentsArray['single']['image']['linuxforcomposer']['script'])
-                && !is_array($fileContentsArray['single']['image']['linuxforcomposer']['script'])
-            ) {
-                $script .= $fileContentsArray['single']['image']['linuxforcomposer']['script'] . ' ';
-            } else {
-                $script .= 'lfphp ';
+
+                $dockerManageCommand .= '--script ';
+
+                $dockerManageCommand .= escapeshellarg($script) . ' ';
+
+                $dockerManageCommand .= 'run';
+
+                // outputs a message followed by a newline ("\n")
+                $output->writeln($dockerManageCommand);
+
+                $dockerManageCommand = '';
             }
 
-            $dockerManageCommand .= '--script ';
-
-            $dockerManageCommand .= escapeshellarg($script) . ' ';
-
-            $dockerManageCommand .= 'run';
-
-            // outputs a message followed by a newline ("\n")
-            $output->writeln($dockerManageCommand);
-
-            $dockerManageCommand = '';
+            return 0;
         }
 
-        return 0;
+        return 2;
     }
 
     protected function getModes(array $fileContentsArray)
