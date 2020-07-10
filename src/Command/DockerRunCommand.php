@@ -97,8 +97,8 @@ class DockerRunCommand extends Command
             }
 
             // @codeCoverageIgnoreStart
-            if (($position = strrpos($value, 'build')) === false
-                && ($position = strrpos($value, 'run')) === false
+            if (($position = strpos($value, 'build', -6)) === false
+                && ($position = strpos($value, 'run', -4)) === false
             ) {
                 echo PHP_EOL . "The 'Linux for Composer' JSON file is invalid." . PHP_EOL . PHP_EOL;
                 return 1;
@@ -157,7 +157,7 @@ class DockerRunCommand extends Command
 
                 $stopCommand = $stopForce ? 'stop-force' : 'stop';
 
-                if (($position = strrpos($dockerManageCommandsArray[0], 'build')) !== false) {
+                if (($position = strpos($dockerManageCommandsArray[0], 'build', -6)) !== false) {
                     $searchLength = strlen('build');
                     $dockerManageCommand = substr_replace(
                         $dockerManageCommandsArray[0],
@@ -165,7 +165,7 @@ class DockerRunCommand extends Command
                         $position,
                         $searchLength
                     );
-                } elseif (($position = strrpos($dockerManageCommandsArray[0], 'run')) !== false) {
+                } elseif (($position = strpos($dockerManageCommandsArray[0], 'run', -4)) !== false) {
                     $searchLength = strlen('run');
                     $dockerManageCommand = substr_replace(
                         $dockerManageCommandsArray[0],
