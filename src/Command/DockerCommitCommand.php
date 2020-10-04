@@ -27,26 +27,19 @@
 
 namespace Linuxforcomposer\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Linuxforcomposer\Helper\LinuxForComposerProcess;
 
-class DockerCommitCommand extends Command
+class DockerCommitCommand extends BaseCommand
 {
     const LFPHPDEFAULTVERSION = DockerManageCommand::LFPHPDEFAULTVERSION;
 
     protected static $defaultName = 'docker:commit';
 
     protected $dockerCommitCommand = 'docker commit ';
-
-    public function __construct()
-    {
-        // you *must* call the parent constructor
-        parent::__construct();
-    }
 
     protected function configure()
     {
@@ -106,9 +99,9 @@ class DockerCommitCommand extends Command
 
         $commitImageProcess = new LinuxForComposerProcess($this->dockerCommitCommand);
 
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        if ($this->isWindows()) {
             // @codeCoverageIgnoreStart
-            if (strstr(php_uname('v'), 'Windows 10') !== false && php_uname('r') == '10.0') {
+            if ($this->isWindows10()) {
                 $commitImageProcess->setDecorateWindows(true);
             } else {
                 $commitImageProcess->setDecorateWindowsLegacy(true);
