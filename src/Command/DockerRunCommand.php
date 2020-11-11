@@ -27,7 +27,6 @@
 
 namespace Linuxforcomposer\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,17 +35,11 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Linuxforcomposer\Helper\LinuxForComposerProcess;
 
-class DockerRunCommand extends Command
+class DockerRunCommand extends BaseCommand
 {
     const LFPHPCLOUDSERVER = 'https://linuxforphp.com/api/v1/deployments';
 
     protected static $defaultName = 'docker:run';
-
-    public function __construct()
-    {
-        // you *must* call the parent constructor
-        parent::__construct();
-    }
 
     protected function configure()
     {
@@ -235,11 +228,7 @@ class DockerRunCommand extends Command
                     && !empty($fileContentsArray['lfphp-cloud']['username'])
                     && !empty($fileContentsArray['lfphp-cloud']['token'])
                 ) {
-                    $account = $fileContentsArray['lfphp-cloud']['account'];
-
-                    $username = $fileContentsArray['lfphp-cloud']['username'];
-
-                    $token = $fileContentsArray['lfphp-cloud']['token'];
+                    ['account' => $account, 'username' => $username, 'token' => $token] = $fileContentsArray['lfphp-cloud'];
                 } else {
                     echo PHP_EOL
                         . PHP_EOL
@@ -388,9 +377,11 @@ class DockerRunCommand extends Command
         if ($returnCode > 1) {
             echo PHP_EOL . "Please check your 'Linux for Composer' JSON file for misconfigurations." . PHP_EOL . PHP_EOL;
             return $returnCode;
-        } elseif ($returnCode === 1) {
+        }
+
+        if ($returnCode === 1) {
             echo PHP_EOL . "The 'Linux for Composer' JSON file is invalid." . PHP_EOL . PHP_EOL;
-            return 1;
+            return $returnCode;
         }
 
         return explode("\n", $parseOutput->fetch());

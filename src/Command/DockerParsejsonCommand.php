@@ -32,15 +32,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DockerParsejsonCommand extends Command
+class DockerParsejsonCommand extends BaseCommand
 {
     protected static $defaultName = 'docker:parsejson';
-
-    public function __construct()
-    {
-        // you *must* call the parent constructor
-        parent::__construct();
-    }
 
     protected function configure()
     {
@@ -98,13 +92,13 @@ class DockerParsejsonCommand extends Command
                 . PHARFILENAME
                 . ' docker:manage ';
 
-            $dockerManageCommand .= $this->getModes($fileContentsArray);
+            $dockerManageCommand .= $this->getModesOptions($fileContentsArray['single']['containers']['modes']);
 
-            $dockerManageCommand .= $this->getPorts($fileContentsArray, 0);
+            $dockerManageCommand .= $this->getPortsOptions($fileContentsArray, 0);
 
-            $dockerManageCommand .= $this->getMount($fileContentsArray);
+            $dockerManageCommand .= $this->getMountOptions($fileContentsArray);
 
-            $dockerManageCommand .= $this->getVolumes($fileContentsArray);
+            $dockerManageCommand .= $this->getVolumesOptions($fileContentsArray);
 
             $dockerManageCommand .=
                 '--script dockerfile,,,'
@@ -182,7 +176,7 @@ class DockerParsejsonCommand extends Command
                     . PHARFILENAME
                     . ' docker:manage ';
 
-                $dockerManageCommand .= $this->getModes($fileContentsArray);
+                $dockerManageCommand .= $this->getModesOptions($fileContentsArray['single']['containers']['modes']);
 
                 $dockerManageCommand .= '--phpversion ';
 
@@ -200,11 +194,11 @@ class DockerParsejsonCommand extends Command
 
                 $dockerManageCommand .= $threadsafe . ' ';
 
-                $dockerManageCommand .= $this->getPorts($fileContentsArray, $i);
+                $dockerManageCommand .= $this->getPortsOptions($fileContentsArray, $i);
 
-                $dockerManageCommand .= $this->getMount($fileContentsArray);
+                $dockerManageCommand .= $this->getMountOptions($fileContentsArray);
 
-                $dockerManageCommand .= $this->getVolumes($fileContentsArray);
+                $dockerManageCommand .= $this->getVolumesOptions($fileContentsArray);
 
                 $script = '';
 
@@ -246,26 +240,26 @@ class DockerParsejsonCommand extends Command
         return 2;
     }
 
-    protected function getModes(array $fileContentsArray)
+    protected function getModesOptions(array $modes)
     {
         $dockerManageCommand = '';
 
-        if (in_array('detached', $fileContentsArray['single']['containers']['modes'])) {
+        if (in_array('detached', $modes)) {
             $dockerManageCommand .= '--detached ';
         }
 
-        if (in_array('interactive', $fileContentsArray['single']['containers']['modes'])) {
+        if (in_array('interactive', $modes)) {
             $dockerManageCommand .= '--interactive ';
         }
 
-        if (in_array('tty', $fileContentsArray['single']['containers']['modes'])) {
+        if (in_array('tty', $modes)) {
             $dockerManageCommand .= '--tty ';
         }
 
         return $dockerManageCommand;
     }
 
-    protected function getPorts(array $fileContentsArray, int $i)
+    protected function getPortsOptions(array $fileContentsArray, int $portKey)
     {
         $dockerManageCommand = '';
 
@@ -275,10 +269,10 @@ class DockerParsejsonCommand extends Command
         ) {
             foreach ($fileContentsArray['single']['containers']['ports'] as $port) {
                 if (is_array($port) && count($port) >= 1) {
-                    $portNumber =  isset($port[$i]) && !empty($port[$i]) ? $port[$i] : '';
+                    $portNumber =  isset($port[$portKey]) && !empty($port[$portKey]) ? $port[$portKey] : '';
                 } else {
-                    if ($i === 0) {
-                        $portNumber =  isset($port) && !empty($port) ? $port : '';
+                    if ($portKey === 0) {
+                        $portNumber = !empty($port) ? $port : '';
                     } else {
                         $portNumber = '';
                     }
@@ -297,7 +291,7 @@ class DockerParsejsonCommand extends Command
                     ? $fileContentsArray['single']['containers']['ports']
                     : '';
 
-            if (!empty($portNumber) && $i === 0) {
+            if (!empty($portNumber) && $portKey === 0) {
                 $dockerManageCommand .= '--port ';
 
                 $dockerManageCommand .= $portNumber . ' ';
@@ -307,7 +301,7 @@ class DockerParsejsonCommand extends Command
         return $dockerManageCommand;
     }
 
-    protected function getMount(array $fileContentsArray)
+    protected function getMountOptions(array $fileContentsArray)
     {
         $dockerManageCommand = '';
 
@@ -321,7 +315,7 @@ class DockerParsejsonCommand extends Command
             ) {
             $dockerManageCommand .= '--mount ';
 
-            if ($fileContentsArray['single']['containers']['persist-data']['mount'] == 'true') {
+            if ($fileContentsArray['single']['containers']['persist-data']['mount'] === 'true') {
                 foreach ($fileContentsArray['single']['containers']['persist-data']['directories'] as $directory) {
                     if (!empty($directory)) {
                         $search = strpos($directory, DIRECTORY_SEPARATOR) !== false ? DIRECTORY_SEPARATOR : '/' ;
@@ -349,18 +343,14 @@ class DockerParsejsonCommand extends Command
                     }
                 }
             }
-        } else {
-            $dockerManageCommand = '';
 
-            return $dockerManageCommand;
+            $dockerManageCommand .= ' ';
         }
-
-        $dockerManageCommand .= ' ';
 
         return $dockerManageCommand;
     }
 
-    protected function getVolumes(array $fileContentsArray)
+    protected function getVolumesOptions(array $fileContentsArray)
     {
         $dockerManageCommand = '';
 
