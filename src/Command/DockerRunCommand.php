@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.8
+ * Version 2.0.9
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,8 @@ class DockerRunCommand extends Command
                 . 'linuxforcomposer.pid'
             )) {
             echo PHP_EOL
-                . "Attention: before starting new containers, please enter the 'stop' command\n"
+                . "Attention: before starting new containers, please enter the 'stop' command"
+                . PHP_EOL
                 . "in order to shut down the current containers properly."
                 . PHP_EOL
                 . PHP_EOL;
@@ -96,8 +97,8 @@ class DockerRunCommand extends Command
             }
 
             // @codeCoverageIgnoreStart
-            if (($position = strrpos($value, 'build')) === false
-                && ($position = strrpos($value, 'run')) === false
+            if (($position = strpos($value, 'build', -6)) === false
+                && ($position = strpos($value, 'run', -4)) === false
             ) {
                 echo PHP_EOL . "The 'Linux for Composer' JSON file is invalid." . PHP_EOL . PHP_EOL;
                 return 1;
@@ -156,7 +157,7 @@ class DockerRunCommand extends Command
 
                 $stopCommand = $stopForce ? 'stop-force' : 'stop';
 
-                if (($position = strrpos($dockerManageCommandsArray[0], 'build')) !== false) {
+                if (($position = strpos($dockerManageCommandsArray[0], 'build', -6)) !== false) {
                     $searchLength = strlen('build');
                     $dockerManageCommand = substr_replace(
                         $dockerManageCommandsArray[0],
@@ -164,7 +165,7 @@ class DockerRunCommand extends Command
                         $position,
                         $searchLength
                     );
-                } elseif (($position = strrpos($dockerManageCommandsArray[0], 'run')) !== false) {
+                } elseif (($position = strpos($dockerManageCommandsArray[0], 'run', -4)) !== false) {
                     $searchLength = strlen('run');
                     $dockerManageCommand = substr_replace(
                         $dockerManageCommandsArray[0],
@@ -227,13 +228,19 @@ class DockerRunCommand extends Command
                     return 1;
                 }
 
-                $account = $fileContentsArray['lfphp-cloud']['account'];
+                if (isset($fileContentsArray['lfphp-cloud']['account'])
+                    && isset($fileContentsArray['lfphp-cloud']['username'])
+                    && isset($fileContentsArray['lfphp-cloud']['token'])
+                    && !empty($fileContentsArray['lfphp-cloud']['account'])
+                    && !empty($fileContentsArray['lfphp-cloud']['username'])
+                    && !empty($fileContentsArray['lfphp-cloud']['token'])
+                ) {
+                    $account = $fileContentsArray['lfphp-cloud']['account'];
 
-                $username = $fileContentsArray['lfphp-cloud']['username'];
+                    $username = $fileContentsArray['lfphp-cloud']['username'];
 
-                $token = $fileContentsArray['lfphp-cloud']['token'];
-
-                if (empty($account) || empty($username) || empty($token)) {
+                    $token = $fileContentsArray['lfphp-cloud']['token'];
+                } else {
                     echo PHP_EOL
                         . PHP_EOL
                         . "Insufficient information in order to deploy to the Cloud."

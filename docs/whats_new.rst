@@ -3,6 +3,13 @@
 What's New
 ==========
 
+What's New in Version 2.0.9 (2020-07-10)
+----------------------------------------
+
+* Fixes some issues when some configuration settings are missing.
+* Fixes an issue when the 'build' and 'run' keywords are used in scripts.
+* Optimizes the 'Parsejson' command.
+
 
 What's New in Version 2.0.8 (2020-06-15)
 ----------------------------------------

@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2020 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.8
+ * Version 2.0.9
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ if (PHP_SAPI !== 'cli') {
     die('This is a CLI-based application only. Aborting...');
 }
 
-define('LFC_VERSION', '2.0.8');
+define('LFC_VERSION', '2.0.9');
 
 $lfphpEnv = (bool) getenv('LFPHP') ?: false;
 
@@ -157,7 +157,7 @@ if (!file_exists(COMPOSERJSONFILE) && !file_exists(COMPOSERJSONFILE)) {
     echo PHP_EOL
         . 'We could not find the composer.json file!'
         . PHP_EOL
-        . 'Please change to the project\'s working directory and/or install Linux for Composer using Composer.'
+        . "Please change to the project's working directory and/or\ninstall Linux for Composer using Composer."
         . PHP_EOL
         . PHP_EOL;
     exit;
@@ -167,7 +167,7 @@ if (!file_exists(VENDORFOLDER) && !file_exists(VENDORFOLDERPID)) {
     echo PHP_EOL
         . 'We could not find the vendor folder!'
         . PHP_EOL
-        . 'Please change to the project\'s working directory and/or install Linux for Composer using Composer.'
+        . "Please change to the project's working directory and/or\ninstall Linux for Composer using Composer."
         . PHP_EOL
         . PHP_EOL;
     exit;
@@ -177,7 +177,7 @@ if (!file_exists(COMPOSERFOLDER) && !file_exists(COMPOSERFOLDER)) {
     echo PHP_EOL
         . 'We could not find the Composer folder!'
         . PHP_EOL
-        . 'Please change to the project\'s working directory and/or install Linux for Composer using Composer.'
+        . "Please change to the project's working directory and/or\ninstall Linux for Composer using Composer."
         . PHP_EOL
         . PHP_EOL;
     exit;
@@ -223,7 +223,9 @@ if (!file_exists(JSONFILE)) {
         exit;
     } else {
         echo PHP_EOL
-            . "Could not create the linuxforcomposer.json file! Please verify your working directory's permissions."
+            . 'Could not create the linuxforcomposer.json file!'
+            . PHP_EOL
+            . "Please verify your working directory's permissions."
             . PHP_EOL
             . PHP_EOL;
     }
