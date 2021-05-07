@@ -87,41 +87,59 @@ Use the following to list the currently available commands::
 Usage:
   command [options] [arguments]
 
-Options:
-+--------+-----------------+--------------------------------------+
-| Simple | Readable        | Description                          |
-+========+=================+======================================+
-| -h     | --help          | Display this help message            |
-+--------+-----------------+--------------------------------------+
-| -q     | --quiet         | Do not output any message            |
-+--------+-----------------+--------------------------------------+
-| -V     | --version       | Display this application version     |
-+--------+-----------------+--------------------------------------+
-|        | --ansi          | Force ANSI output                    |
-+--------+-----------------+--------------------------------------+
-|        | --no-ansi       | Disable ANSI output                  |
-+--------+-----------------+--------------------------------------+
-| -n     | --no-interaction| Do not ask any interactive questions |
-+--------+-----------------+--------------------------------------+
-| -v     | --verbose       | Increase the verbosity of messages:  |
-|        |                 | "v" for normal output,               |
-|        |                 | "vv" for more verbose output and     |
-|        |                 | "vvv" for debug                      |
-+--------+-----------------+--------------------------------------+
+.. list-table:: Options
+   :widths: 10 30 60
+   :header-rows: 1
 
-Available commands:
-+--------------------+----------------------------------------------+
-| Command            | Description                                  |
-+====================+==============================================+
-| help               | Displays help for a command                  |
-+--------------------+----------------------------------------------+
-| list               | Lists commands                               |
-+--------------------+----------------------------------------------+
-|  docker:commit     | Docker commit commands.                      |
-+--------------------+----------------------------------------------+
-|  docker:manage     | Run Docker management commands.              |
-+--------------------+----------------------------------------------+
-|  docker:parsejson  | Parse JSON file for instructions for Docker. |
-+--------------------+----------------------------------------------+
-|  docker:run        | Run 'Linux for PHP' containers.              |
-+--------------------+----------------------------------------------+
+   * - Simple
+     - Readable
+     - Description
+   * - -h
+     - --help
+     - Display this help message
+   * - -q
+     - --quiet
+     - Do not output any message
+   * - -V
+     - --version
+     - Display this application version
+   * -
+     - --ansi
+     - Force ANSI output
+   * -
+     - --no-ansi
+     - Disable ANSI output
+   * - -n
+     - --no-interaction
+     - Do not ask any interactive questions
+   * - -v
+     - --verbose
+     - Increase the verbosity of messages:
+   * -
+     -
+     - "v" for normal output,
+   * -
+     -
+     - "vv" for more verbose output and
+   * -
+     -
+     - "vvv" for debug
+
+.. list-table:: Available Commands:
+   :widths: 40 60
+   :header-rows: 1
+
+   * - Command
+     - Description
+   * - help
+     - Displays help for a command
+   * - list
+     - Lists commands
+   * - docker:commit
+     - Docker commit commands
+   * - docker:manage
+     - Run Docker management commands
+   * - docker:parsejson
+     - Parse JSON file for instructions for Docker
+   * - docker:run
+     - Run 'Linux for PHP' containers
