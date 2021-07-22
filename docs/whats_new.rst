@@ -3,6 +3,22 @@
 What's New
 ==========
 
+What's New in Version 2.0.9.3 (2021-07-22)
+------------------------------------------
+
+* Fixes a minor issue when containers are missing.
+* Updates the test matrix.
+
+What's New in Version 2.0.9.2 (2021-05-07)
+------------------------------------------
+
+* Updates the test matrix.
+
+What's New in Version 2.0.9.1 (2021-05-06)
+------------------------------------------
+
+* Adds support for PHP 8.
+
 What's New in Version 2.0.9 (2020-07-10)
 ----------------------------------------
 
