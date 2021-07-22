@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2.0.9.3 (2021-07-22)
+
+- Fixes a minor issue when containers are missing.
+- Updates the test matrix.
+
+## 2.0.9.2 (2020-05-07)
+
+- Updates the test matrix.
+
+## 2.0.9.1 (2021-05-06)
+
+- Adds support for PHP 8.
+
 ## 2.0.9 (2020-07-10)
 
 - Fixes some issues when some configuration settings are missing.

@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2021 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.9.2
+ * Version 2.0.9.3
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1135,6 +1135,18 @@ class DockerManageCommand extends Command
                             //$output->writeln($process->getErrorOutput());
                             if (!empty($processStderr) || $returnCode > 0) {
                                 echo $processStderr . PHP_EOL;
+
+                                if (preg_match('/No such container:/', $processStderr, $results) || $returnCode > 0) {
+                                    unlink(
+                                        VENDORFOLDERPID
+                                        . DIRECTORY_SEPARATOR
+                                        . 'composer'
+                                        . DIRECTORY_SEPARATOR
+                                        . 'linuxforcomposer.pid'
+                                    );
+
+                                    echo "WARNING: the PID file has now been removed!\n";
+                                }
 
                                 return 5;
                             }

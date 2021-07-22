@@ -2,17 +2,21 @@
 # git files
 .gitattributes export-ignore
 .gitignore export-ignore
+.github export-ignore
 # buildpath files
 .buildpath export-ignore
 # project files and settings
 .project export-ignore
 .settings
+# dev files
+linuxforcomposer.json.dev export-ignore
 # composer files
 composer.json.* export-ignore
 # travis file
 .travis.yml export-ignore
 # phpunit files
 phpunit.* export-ignore
+.phpunit.* export-ignore
 # CodeSniffer files
 phpcs.* export-ignore
 # phpDocumentor files

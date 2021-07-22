@@ -3,7 +3,7 @@
  * Linux for PHP/Linux for Composer
  *
  * Copyright 2017 - 2021 Foreach Code Factory <lfphp@asclinux.net>
- * Version 2.0.9.2
+ * Version 2.0.9.3
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,23 +36,27 @@ $exclude = [
     PHARFILE,
     'bin/linuxforcomposer.phar',
     'build',
-    'data',
-    'docs',
-    'docs-api',
-    'tests',
-    '.gitattributes',
-    '.gitignore',
-    '.travis.yml',
     'composer.json',
     'composer.json.dev',
     'composer.lock',
     'composer.phar',
+    'data',
+    'docs',
+    'docs-api',
+    '.git',
+    '.gitattributes',
+    '.github',
+    '.gitignore',
+    '.idea',
+    'linuxforcomposer.json.dev',
     'phpcs.xml',
     'phpdoc.xml',
+    'phpDocumentor.phar',
+    '.phpunit.result.cache',
     'phpunit.xml.dist',
     'README.md',
-    '.git',
-    '.idea',
+    'tests',
+    '.travis.yml',
 ];
 
 /**

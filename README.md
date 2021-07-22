@@ -5,7 +5,7 @@ https://linuxforphp.net
 
 Composer package that helps to easily configure and run Linux for PHP containers for any PHP project.
 
-[![Coverage Status](docs/images/code_coverage.svg)](https://github.com/linuxforphp/linuxforcomposer)
+[![codecov](https://codecov.io/gh/linuxforphp/linuxforcomposer/branch/master/graph/badge.svg?token=SD9QOT2AJG)](https://codecov.io/gh/linuxforphp/linuxforcomposer)
 [![Documentation Status](https://readthedocs.org/projects/linux-for-composer/badge/?version=latest)](https://linux-for-composer.readthedocs.io/en/latest/?badge=latest)
 [![PDS Skeleton](https://img.shields.io/badge/pds-skeleton-blue.svg?style=flat-square)](https://github.com/php-pds/skeleton)
 
