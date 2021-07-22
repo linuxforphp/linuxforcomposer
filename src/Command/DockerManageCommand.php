@@ -1136,6 +1136,18 @@ class DockerManageCommand extends Command
                             if (!empty($processStderr) || $returnCode > 0) {
                                 echo $processStderr . PHP_EOL;
 
+                                if (preg_match('/No such container:/', $processStderr, $results) || $returnCode > 0) {
+                                    unlink(
+                                        VENDORFOLDERPID
+                                        . DIRECTORY_SEPARATOR
+                                        . 'composer'
+                                        . DIRECTORY_SEPARATOR
+                                        . 'linuxforcomposer.pid'
+                                    );
+
+                                    echo "WARNING: the PID file has now been removed!\n";
+                                }
+
                                 return 5;
                             }
 
