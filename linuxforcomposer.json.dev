@@ -1,0 +1,65 @@
+{
+    "name": "linuxforphp/linuxforcomposer",
+    "description": "A Composer interface to run 'Linux for PHP' Docker containers, Dockerfiles or docker-compose files.",
+    "single": {
+        "image": {
+            "linuxforcomposer": {
+                "php-versions": [
+                    "7.2"
+                ],
+                "script": [
+                    "composer self-update",
+                    "pip install --upgrade pip",
+                    "pip install sphinx",
+                    "sed -i 's/;phar.readonly = On/phar.readonly = Off/' /etc/php.ini",
+                    "groupadd vagrant",
+                    "useradd -p 'vagrant' -g vagrant vagrant",
+                    "cp -rf /etc/skel /home/vagrant",
+                    "chown -R vagrant:vagrant /home/vagrant",
+                    "echo 'vagrant:vagrant' | chpasswd",
+                    "/bin/bash"
+                ],
+                "thread-safe": "false"
+            },
+            "dockerfile": {
+                "url": "",
+                "container-name": "",
+                "username": "",
+                "token": ""
+            }
+        },
+        "containers": {
+            "modes": {
+                "mode1": "interactive",
+                "mode2": "tty"
+            },
+            "ports": {
+                "port1": [
+                    "8181:80"
+                ]
+            },
+            "volumes": {
+                "volume1": "${PWD}/:/srv/linuxforcomposer"
+            },
+            "persist-data": {
+                "mount": "false",
+                "root-name": "",
+                "directories": {
+                    "directory1": "",
+                    "directory2": "",
+                    "directory3": ""
+                }
+            }
+        }
+    },
+    "docker-compose": {
+        "url": "",
+        "username": "",
+        "token": ""
+    },
+    "lfphp-cloud": {
+        "account": "",
+        "username": "",
+        "token": ""
+    }
+}
